@@ -10,6 +10,7 @@ package frc.robot.subsystems.vision;
 import static frc.robot.subsystems.vision.VisionConstants.*;
 
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -133,10 +134,10 @@ public class Vision extends SubsystemBase {
         }
 
         // // Send vision observation
-        // consumer.accept(
-        //     observation.pose().toPose2d(),
-        //     observation.timestamp(),
-        //     VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
+        consumer.accept(
+            observation.pose().toPose2d(),
+            observation.timestamp(),
+            VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
       }
 
       // Log camera metadata
