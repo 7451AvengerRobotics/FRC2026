@@ -62,8 +62,11 @@ public class RobotContainer {
         vision =
             new Vision(
                 drive::addVisionMeasurement,
+                // new VisionIOPhotonVision(
+                //     VisionConstants.camera0Name, VisionConstants.robotToCamera0)
+                //     ,
                 new VisionIOPhotonVision(
-                    VisionConstants.camera0Name, VisionConstants.robotToCamera0));
+                    VisionConstants.camera1Name, VisionConstants.robotToCamera1));
 
         // The ModuleIOTalonFXS implementation provides an example implementation for
         // TalonFXS controller connected to a CANdi with a PWM encoder. The
@@ -96,6 +99,9 @@ public class RobotContainer {
         vision =
             new Vision(
                 drive::addVisionMeasurement,
+                // new VisionIOPhotonVisionSim(
+                //     VisionConstants.camera0Name, VisionConstants.robotToCamera0, drive::getPose)
+                //     ,
                 new VisionIOPhotonVisionSim(
                     VisionConstants.camera0Name, VisionConstants.robotToCamera0, drive::getPose));
         break;
@@ -109,7 +115,7 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
-        vision = new Vision(drive::addVisionMeasurement, new VisionIO() {});
+        vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
         break;
     }
 
