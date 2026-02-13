@@ -8,17 +8,16 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.Turret;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -38,6 +37,8 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   private final Vision vision;
+  private final Turret leftTurret;
+  private final Turret rightTurret;
 
   // Controller
   private final CommandPS5Controller controller = new CommandPS5Controller(0);
@@ -138,6 +139,9 @@ public class RobotContainer {
     autoChooser.addOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
+    leftTurret = new Turret(drive, new Transform3d(-0.17, -0.15, 0.39, new Rotation3d()), "Left");
+    rightTurret = new Turret(drive, new Transform3d(-0.17, 0.15, 0.39, new Rotation3d()), "Right");
+
     // Configure the button bindings
     configureButtonBindings();
   }
@@ -180,6 +184,9 @@ public class RobotContainer {
     //                         new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
     //                 drive)
     //             .ignoringDisable(true));
+
+    controller.L1().onTrue(leftTurret.shootBallCommand());
+    controller.R1().onTrue(rightTurret.shootBallCommand());
   }
 
   /**

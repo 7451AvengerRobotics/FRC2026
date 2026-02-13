@@ -356,4 +356,9 @@ public class Drive extends SubsystemBase {
       new Translation2d(TunerConstants.BackRight.LocationX, TunerConstants.BackRight.LocationY)
     };
   }
+
+  public ChassisSpeeds getRobotRelativeSpeeds() {
+    return kinematics.toChassisSpeeds(
+        modules[0].getState(), modules[1].getState(), modules[2].getState(), modules[3].getState());
+  }
 }
