@@ -11,14 +11,13 @@ public class Index extends SubsystemBase {
         indexMotor = new TalonFX(1); 
     }
 
-    public void runForward() {
-        indexMotor.set(0.5); 
 
-    public void runReverse() {
-        indexMotor.set(-0.5); 
+    public void run(double speed) {
+        indexMotor.set(speed);
     }
 
+   
     public void stop() {
-        indexMotor.set(0); 
+        indexMotor.set(0);
     }
 }
