@@ -7,20 +7,26 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.TurretConstants;
 import frc.robot.subsystems.drive.Drive;
 import java.util.ArrayList;
 import java.util.List;
 import org.littletonrobotics.junction.Logger;
 
-public class Turret extends SubsystemBase {
+public class TurretSim extends SubsystemBase {
   Drive drive;
   Transform3d turretOffset;
   String name;
   Transform2d turretOffsetTransform2d;
   Pose2d turretPositionPose2d;
+
+  ChassisSpeeds Vr;
+  double vxr;
+  double vyr;
 
   private final List<FuelSim> activeFuel = new ArrayList<>();
   Translation2d hub = new Translation2d(11.915, 4.035);
@@ -29,7 +35,7 @@ public class Turret extends SubsystemBase {
   double g = 9.8;
   double a = -g;
 
-  public Turret(Drive drive, Transform3d turretOffset, String name) {
+  public TurretSim(Drive drive, Transform3d turretOffset, String name) {
     this.drive = drive;
     this.turretOffset = turretOffset;
     this.name = name;
@@ -42,6 +48,9 @@ public class Turret extends SubsystemBase {
   @Override
   public void periodic() {
     turretPositionPose2d = drive.getPose().plus(turretOffsetTransform2d);
+    Vr = drive.getRobotRelativeSpeeds();
+    vxr = Vr.vxMetersPerSecond;
+    vyr = Vr.vyMetersPerSecond;
 
     Logger.recordOutput("ZeroedComponentPoses_" + name, new Pose3d[] {new Pose3d()});
     Logger.recordOutput(
@@ -62,8 +71,8 @@ public class Turret extends SubsystemBase {
   }
 
   public double calcYaw() {
-    double deltax = hub.getX() - turretPositionPose2d.getX();
-    double deltay = hub.getY() - turretPositionPose2d.getY();
+    double deltax = hub.getX() - turretPositionPose2d.getX() + vxr * TurretConstants.latency;
+    double deltay = hub.getY() - turretPositionPose2d.getY() + vyr * TurretConstants.latency;
     double initTheta;
 
     if (deltax == 0) {
@@ -100,14 +109,17 @@ public class Turret extends SubsystemBase {
   public void shootBall() {
     xf =
         Math.sqrt(
-            Math.pow((hub.getX() - turretPositionPose2d.getX()), 2)
-                + Math.pow((hub.getY() - turretPositionPose2d.getY()), 2));
+            Math.pow((hub.getX() - turretPositionPose2d.getX()) + vxr * TurretConstants.latency, 2)
+                + Math.pow(
+                    (hub.getY() - turretPositionPose2d.getY()) + vyr * TurretConstants.latency, 2));
 
     double v0 = calcVelocity(xf);
     double pitch0 = calcPitch(v0, xf);
     double yaw0 = calcYawForSimBall();
 
-    activeFuel.add(new FuelSim(v0, pitch0, yaw0, turretPositionPose2d));
+    activeFuel.add(
+        new FuelSim(
+            v0, pitch0, yaw0, turretPositionPose2d, Vr.vxMetersPerSecond, Vr.vyMetersPerSecond));
   }
 
   public Command shootBallCommand() {
