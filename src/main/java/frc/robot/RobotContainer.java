@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.SuperStructure;
+import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.Intake.IntakePivot;
 import frc.robot.subsystems.SimFiles.Turret;
 import frc.robot.subsystems.drive.Drive;
@@ -28,9 +29,6 @@ import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.vision.*;
 import frc.robot.subsystems.Index;
-
-
-import static edu.wpi.first.units.Units.Newton;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -48,6 +46,7 @@ public class RobotContainer {
   private final Turret rightTurret;
   private final IntakePivot intakePivot = new IntakePivot();
   private final Index index = new Index();
+  private final Intake intake = new Intake();
   private final SuperStructure superStructure;
 
   // Controller
@@ -131,7 +130,7 @@ public class RobotContainer {
     // Other subsystems
     leftTurret = new Turret(drive, new Transform3d(-0.17, -0.15, 0.39, new Rotation3d()), "Left");
     rightTurret = new Turret(drive, new Transform3d(-0.17, 0.15, 0.39, new Rotation3d()), "Right");
-    superStructure = new SuperStructure(intakePivot);
+    superStructure = new SuperStructure(index, intake, intakePivot);
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
