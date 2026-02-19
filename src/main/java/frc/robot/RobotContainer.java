@@ -27,6 +27,8 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.vision.*;
+import frc.robot.subsystems.Index;
+
 
 import static edu.wpi.first.units.Units.Newton;
 
@@ -45,6 +47,7 @@ public class RobotContainer {
   private final Turret leftTurret;
   private final Turret rightTurret;
   private final IntakePivot intakePivot = new IntakePivot();
+  private final Index index = new Index();
   private final SuperStructure superStructure;
 
   // Controller
