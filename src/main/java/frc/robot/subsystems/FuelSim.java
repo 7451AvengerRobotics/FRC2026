@@ -30,18 +30,6 @@ public class FuelSim {
     this.pitch = pitch;
     this.yaw = yaw;
     this.initialPos = initialPos;
-
-    // xChange = hub.getX() - initialPos.getX();
-    // yChange = hub.getY() - initialPos.getY();
-  }
-
-  public double mod(double angle) {
-    double thing = angle % (2 * Math.PI);
-    if (thing >= 0) {
-      return thing;
-    } else {
-      return thing + (2 * Math.PI);
-    }
   }
 
   public Pose3d getPose() {

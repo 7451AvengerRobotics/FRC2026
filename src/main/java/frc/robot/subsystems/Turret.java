@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.drive.Drive;
@@ -56,6 +57,8 @@ public class Turret extends SubsystemBase {
     Logger.recordOutput(
         "GamePieces/Fuel_" + name,
         activeFuel.stream().map(FuelSim::getPose).toArray(Pose3d[]::new));
+
+    SmartDashboard.putNumber("Yaw", calcYaw());
   }
 
   public double calcYaw() {
@@ -66,12 +69,12 @@ public class Turret extends SubsystemBase {
     if (deltax == 0) {
       initTheta = 0;
     } else {
-      initTheta = Math.atan2(deltay, deltax);
+      initTheta = Math.PI - Math.atan(deltay / -deltax);
     }
 
     double theta = (initTheta - drive.getPose().getRotation().getRadians());
 
-    return theta;
+    return mod(theta);
   }
 
   public double calcVelocity(double xf) {
@@ -90,6 +93,10 @@ public class Turret extends SubsystemBase {
     return theta;
   }
 
+  public double calcYawForSimBall() {
+    return calcYaw() + drive.getPose().getRotation().getRadians();
+  }
+
   public void shootBall() {
     xf =
         Math.sqrt(
@@ -98,7 +105,7 @@ public class Turret extends SubsystemBase {
 
     double v0 = calcVelocity(xf);
     double pitch0 = calcPitch(v0, xf);
-    double yaw0 = calcYaw();
+    double yaw0 = calcYawForSimBall();
 
     activeFuel.add(new FuelSim(v0, pitch0, yaw0, turretPositionPose2d));
   }
@@ -110,9 +117,8 @@ public class Turret extends SubsystemBase {
         });
   }
 
-  //Helper Function:
+  // Helper Function:
   public double mod(double angle) {
-    return ((angle % 360) + 360) % 360;
+    return ((angle % (2 * Math.PI)) + (2 * Math.PI)) % (2 * Math.PI);
   }
-
 }
