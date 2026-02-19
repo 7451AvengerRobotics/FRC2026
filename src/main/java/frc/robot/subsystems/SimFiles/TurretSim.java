@@ -11,6 +11,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.TargetConstants;
 import frc.robot.Constants.TurretConstants;
 import frc.robot.subsystems.drive.Drive;
 import java.util.ArrayList;
@@ -29,7 +30,7 @@ public class TurretSim extends SubsystemBase {
   double vyr;
 
   private final List<FuelSim> activeFuel = new ArrayList<>();
-  Translation2d hub = new Translation2d(11.915, 4.035);
+  private Translation2d target;
   double yf = 1.329;
   double xf;
   double g = 9.8;
@@ -43,6 +44,16 @@ public class TurretSim extends SubsystemBase {
     turretOffsetTransform2d =
         new Transform2d(turretOffset.getX(), turretOffset.getY(), new Rotation2d());
     turretPositionPose2d = drive.getPose().plus(turretOffsetTransform2d);
+
+    target = TargetConstants.hub;
+  }
+
+  public void setTarget(Translation2d newTarget) {
+    this.target = newTarget;
+  }
+
+  public Translation2d getTarget() {
+    return this.target;
   }
 
   @Override
@@ -71,8 +82,8 @@ public class TurretSim extends SubsystemBase {
   }
 
   public double calcYaw() {
-    double deltax = hub.getX() - turretPositionPose2d.getX() + vxr * TurretConstants.latency;
-    double deltay = hub.getY() - turretPositionPose2d.getY() + vyr * TurretConstants.latency;
+    double deltax = target.getX() - turretPositionPose2d.getX() + vxr * TurretConstants.latency;
+    double deltay = target.getY() - turretPositionPose2d.getY() + vyr * TurretConstants.latency;
     double initTheta;
 
     if (deltax == 0) {
@@ -109,9 +120,9 @@ public class TurretSim extends SubsystemBase {
   public void shootBall() {
     xf =
         Math.sqrt(
-            Math.pow((hub.getX() - turretPositionPose2d.getX()) + vxr * TurretConstants.latency, 2)
+            Math.pow((target.getX() - turretPositionPose2d.getX()) + vxr * TurretConstants.latency, 2)
                 + Math.pow(
-                    (hub.getY() - turretPositionPose2d.getY()) + vyr * TurretConstants.latency, 2));
+                    (target.getY() - turretPositionPose2d.getY()) + vyr * TurretConstants.latency, 2));
 
     double v0 = calcVelocity(xf);
     double pitch0 = calcPitch(v0, xf);
