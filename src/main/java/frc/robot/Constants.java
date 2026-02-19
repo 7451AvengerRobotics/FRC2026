@@ -40,4 +40,14 @@ public final class Constants {
     public static final double kA = 0.0;
     public static final double kG = 0.0;
   }
+
+  public static final class IntakeConstants {
+    public static final int kIntakeID = 48;
+    public static final double kIntakeGearRatio = 1.0;
+  }
+
+  public static final class IndexConstants {
+    public static final int kIntakeID = 47;
+    public static final double kIndexGearRatio = 1.0;
+  }
 }
