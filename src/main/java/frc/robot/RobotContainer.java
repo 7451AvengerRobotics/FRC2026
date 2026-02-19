@@ -17,7 +17,9 @@ import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.Turret;
+import frc.robot.subsystems.SuperStructure;
+import frc.robot.subsystems.Intake.IntakePivot;
+import frc.robot.subsystems.SimFiles.Turret;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -25,6 +27,9 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.vision.*;
+
+import static edu.wpi.first.units.Units.Newton;
+
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -39,6 +44,8 @@ public class RobotContainer {
   private final Vision vision;
   private final Turret leftTurret;
   private final Turret rightTurret;
+  private final IntakePivot intakePivot = new IntakePivot();
+  private final SuperStructure superStructure;
 
   // Controller
   private final CommandPS5Controller controller = new CommandPS5Controller(0);
@@ -118,30 +125,17 @@ public class RobotContainer {
         break;
     }
 
+    // Other subsystems
+    leftTurret = new Turret(drive, new Transform3d(-0.17, -0.15, 0.39, new Rotation3d()), "Left");
+    rightTurret = new Turret(drive, new Transform3d(-0.17, 0.15, 0.39, new Rotation3d()), "Right");
+    superStructure = new SuperStructure(intakePivot);
+
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
-    // Set up SysId routines
-    autoChooser.addOption(
-        "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
-    autoChooser.addOption(
-        "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
-    autoChooser.addOption(
-        "Drive SysId (Quasistatic Forward)",
-        drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
-        "Drive SysId (Quasistatic Reverse)",
-        drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    autoChooser.addOption(
-        "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
-        "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-
-    leftTurret = new Turret(drive, new Transform3d(-0.17, -0.15, 0.39, new Rotation3d()), "Left");
-    rightTurret = new Turret(drive, new Transform3d(-0.17, 0.15, 0.39, new Rotation3d()), "Right");
-
-    // Configure the button bindings
+    // Configure the bindings
     configureButtonBindings();
+    configureAutos();
   }
 
   /**
@@ -158,33 +152,33 @@ public class RobotContainer {
             () -> -controller.getLeftY(),
             () -> -controller.getLeftX(),
             () -> -controller.getRightX()));
-
-    // // Lock to 0° when A button is held
-    // controller
-    //     .a()
-    //     .whileTrue(
-    //         DriveCommands.joystickDriveAtAngle(
-    //             drive,
-    //             () -> -controller.getLeftY(),
-    //             () -> -controller.getLeftX(),
-    //             () -> Rotation2d.kZero));
-
+            
     // // Switch to X pattern when X button is pressed
     // controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
-    // // Reset gyro to 0° when B button is pressed
-    // controller
-    //     .b()
-    //     .onTrue(
-    //         Commands.runOnce(
-    //                 () ->
-    //                     drive.setPose(
-    //                         new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
-    //                 drive)
-    //             .ignoringDisable(true));
-
     controller.L1().onTrue(leftTurret.shootBallCommand());
     controller.R1().onTrue(rightTurret.shootBallCommand());
+
+    //Dropping the intake down
+    controller.L2().onTrue(superStructure.startIntake());
+  }
+
+  public void configureAutos() {
+    //AdvantageKit autos
+    autoChooser.addOption(
+        "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
+    autoChooser.addOption(
+        "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
+    autoChooser.addOption(
+        "Drive SysId (Quasistatic Forward)",
+        drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    autoChooser.addOption(
+        "Drive SysId (Quasistatic Reverse)",
+        drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    autoChooser.addOption(
+        "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    autoChooser.addOption(
+        "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
   }
 
   /**
