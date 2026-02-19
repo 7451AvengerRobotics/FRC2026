@@ -6,12 +6,15 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Constants.TurretConstants;
 
 public class FuelSim {
   double pitch;
   double velocity;
   Pose2d initialPos;
   double yaw;
+  double vxr;
+  double vyr;
 
   double interval = 0.02;
   double time = 0;
@@ -25,11 +28,14 @@ public class FuelSim {
   boolean killValue = false;
   double killTimer;
 
-  public FuelSim(double velocity, double pitch, double yaw, Pose2d initialPos) {
+  public FuelSim(
+      double velocity, double pitch, double yaw, Pose2d initialPos, double vxr, double vyr) {
     this.velocity = velocity;
     this.pitch = pitch;
     this.yaw = yaw;
     this.initialPos = initialPos;
+    this.vxr = vxr;
+    this.vyr = vyr;
   }
 
   public Pose3d getPose() {
@@ -37,11 +43,15 @@ public class FuelSim {
   }
 
   public double getX() {
-    return initialPos.getX() + velocity * Math.cos(pitch) * Math.cos(yaw) * time;
+    return initialPos.getX()
+        + velocity * Math.cos(pitch) * Math.cos(yaw) * time
+        + vxr * (time + TurretConstants.latency);
   }
 
   public double getY() {
-    return initialPos.getY() + velocity * Math.cos(pitch) * Math.sin(yaw) * time;
+    return initialPos.getY()
+        + velocity * Math.cos(pitch) * Math.sin(yaw) * time
+        + vyr * (time + TurretConstants.latency);
   }
 
   public double getZ() {
