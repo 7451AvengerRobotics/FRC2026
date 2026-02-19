@@ -32,11 +32,12 @@ public final class Constants {
   public static final class IntakePivotConstants {
     public static final int kIntakePivotID = 49;
     public static final double kIntakeGearRatio = 1.0; // TODO: Set gear ratio
-    public static final double kS = 0.0;
-    public static final double kV = 0.0;
-    public static final double kA = 0.0;
     public static final double kP = 0.0;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
+    public static final double kS = 0.0;
+    public static final double kV = 0.0;
+    public static final double kA = 0.0;
+    public static final double kG = 0.0;
   }
 }

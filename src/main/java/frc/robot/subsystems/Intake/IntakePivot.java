@@ -4,10 +4,10 @@ import static edu.wpi.first.units.Units.*;
 
 import java.util.function.Supplier;
 
-import com.ctre.phoenix6.BaseStatusSignal;
-import com.ctre.phoenix6.StatusCode;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
@@ -20,76 +20,54 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.IntakePivotConstants;
 
+/* TODO
+ * 1. Find proper inverted value
+ * 2. Confirm coast vs. brake
+ * 3. Set gear ratio
+ * 4. Find STOW and DEPLOYED positions
+ * 5. Tune PID values
+ */
 public class IntakePivot extends SubsystemBase {
     private final TalonFX intakePivot = new TalonFX(IntakePivotConstants.kIntakePivotID);
     private final MotionMagicVoltage pivotRequest = new MotionMagicVoltage(0);
 
     public IntakePivot() {
-        super();
+        TalonFXConfiguration cfg = new TalonFXConfiguration()
+        .withMotorOutput(
+            new MotorOutputConfigs()
+                .withInverted(InvertedValue.CounterClockwise_Positive)
+                .withNeutralMode(NeutralModeValue.Coast)
+        ).withFeedback(
+            new FeedbackConfigs()
+                .withRotorToSensorRatio(1)
+                .withSensorToMechanismRatio(IntakePivotConstants.kIntakeGearRatio)
+        ).withCurrentLimits(
+            new CurrentLimitsConfigs()
+                .withStatorCurrentLimit(Amps.of(40))
+                .withStatorCurrentLimitEnable(true)
+        ).withMotionMagic(
+            new MotionMagicConfigs()
+                .withMotionMagicCruiseVelocity(RotationsPerSecond.of(0.75))
+                .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(7))
+                .withMotionMagicJerk(RotationsPerSecondPerSecond.per(Second).of(100))
+        ).withSlot0(
+            new Slot0Configs()
+                .withKP(IntakePivotConstants.kP)
+                .withKI(IntakePivotConstants.kI)
+                .withKD(IntakePivotConstants.kD)
+                .withKG(IntakePivotConstants.kG)
+                .withKS(IntakePivotConstants.kS)
+                .withKV(IntakePivotConstants.kV)
+                .withKA(IntakePivotConstants.kA)
+        );
 
-        setName("IntakePivot");
-
-        TalonFXConfiguration cfg = new TalonFXConfiguration();
-        cfg.CurrentLimits.StatorCurrentLimitEnable = true;
-        cfg.CurrentLimits.StatorCurrentLimit = 40;
-        cfg.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-        cfg.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-        FeedbackConfigs fdb = cfg.Feedback;
-        fdb.SensorToMechanismRatio = IntakePivotConstants.kIntakeGearRatio;
-        MotionMagicConfigs mm = cfg.MotionMagic;
-        mm.withMotionMagicCruiseVelocity(RotationsPerSecond.of(0.75))
-            .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(7))
-            .withMotionMagicJerk(RotationsPerSecondPerSecond.per(Second).of(100));
-
-        Slot0Configs slot0 = cfg.Slot0;
-        slot0.kS = IntakePivotConstants.kS;
-        slot0.kV = IntakePivotConstants.kV;
-        slot0.kA = IntakePivotConstants.kA;
-        slot0.kP = IntakePivotConstants.kP;
-        slot0.kI = IntakePivotConstants.kI;
-        slot0.kD = IntakePivotConstants.kD;
-
-        StatusCode status = StatusCode.StatusCodeNotInitialized;
-        for (int i = 0; i < 5; ++i) {
-            status = intakePivot.getConfigurator().apply(cfg);
-            if (status.isOK())
-            break;
-        }
-        if (!status.isOK()) {
-            System.out.println("Could not configure device. Error: " + status.toString());
-        }
+        intakePivot.getConfigurator().apply(cfg);
 
         intakePivot.getConfigurator().setPosition(0);
-
-        BaseStatusSignal.setUpdateFrequencyForAll(250,
-            intakePivot.getPosition(),
-            intakePivot.getVelocity(),
-            intakePivot.getMotorVoltage());
     }
 
     public void pivotIntake(double rotations) {
-        intakePivot.setControl(pivotRequest.withPosition(rotations).withSlot(0));
-    }
-
-    public boolean endCommand() {
-        if (intakePivot.getVelocity(true).getValueAsDouble() == 0.0 && intakePivot.getPosition().getValueAsDouble() > 0.01) {
-            return true;
-        }
-        return false;
-    }
-
-    public Command setIntakePivotAngle(PivotPosition pos) {
-        return setIntakePivotAngle(pos.rotations).until(() -> nearSetpoint(pos));
-    }
-
-    public Command setIntakePivotAngle(double rotations) {
-        return run(() -> {
-            pivotIntake(rotations);
-        });
-    }
-
-    public Command toPosition(Supplier<PivotPosition> pos) {
-        return setIntakePivotAngle(pos.get());
+        intakePivot.setControl(pivotRequest.withPosition(rotations));
     }
 
     public boolean nearSetpoint(PivotPosition pos) {
@@ -104,6 +82,16 @@ public class IntakePivot extends SubsystemBase {
     public boolean atDeployed() {
         return nearSetpoint(PivotPosition.DEPLOYED);
     }
+    
+    public Command setIntakePivotAngle(double rotations) {
+        return run(() -> {
+            pivotIntake(rotations);
+        });
+    }
+
+    public Command toPosition(PivotPosition pos) {
+        return setIntakePivotAngle(pos.rotations).until(() -> nearSetpoint(pos));
+    }
 
     @Override
     public void periodic() {
@@ -111,7 +99,7 @@ public class IntakePivot extends SubsystemBase {
     }
 
     public enum PivotPosition {
-        STOW(0.05),
+        STOW(0),
         DEPLOYED(0.35);
 
         public final double rotations;
