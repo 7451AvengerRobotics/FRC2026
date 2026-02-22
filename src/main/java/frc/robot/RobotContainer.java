@@ -15,11 +15,14 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.Constants.ShooterConstants;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Index;
 import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.Intake.IntakePivot;
+import frc.robot.subsystems.Shooters.Shooter;
 import frc.robot.subsystems.SimFiles.TurretSim;
 import frc.robot.subsystems.SuperStructure;
 import frc.robot.subsystems.drive.Drive;
@@ -46,6 +49,11 @@ public class RobotContainer {
   private final IntakePivot intakePivot = new IntakePivot();
   private final Index index = new Index();
   private final Intake intake = new Intake();
+  private final Feeder feeder = new Feeder();
+  private final Shooter leftShooter =
+      new Shooter(ShooterConstants.LeftShooterLeaderID, ShooterConstants.LeftShooterFollowerID);
+  private final Shooter rightShooter =
+      new Shooter(ShooterConstants.RightShooterLeaderID, ShooterConstants.RightShooterFollowerID);
   private final SuperStructure superStructure;
 
   // Controller
@@ -131,7 +139,8 @@ public class RobotContainer {
         new TurretSim(drive, new Transform3d(-0.17, -0.15, 0.39, new Rotation3d()), "Left");
     rightTurret =
         new TurretSim(drive, new Transform3d(-0.17, 0.15, 0.39, new Rotation3d()), "Right");
-    superStructure = new SuperStructure(index, intake, intakePivot);
+    superStructure =
+        new SuperStructure(index, intake, intakePivot, feeder, leftShooter, rightShooter);
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -162,8 +171,21 @@ public class RobotContainer {
     controller.L1().onTrue(leftTurret.shootBallCommand());
     controller.R1().onTrue(rightTurret.shootBallCommand());
 
-    // Dropping the intake down
-    controller.L2().onTrue(superStructure.startIntake());
+    // // Dropping the intake down
+    // controller.L2().onTrue(superStructure.startIntake());
+
+    controller
+        .square()
+        .toggleOnTrue(superStructure.soleIntake())
+        .toggleOnFalse(superStructure.stopIntake());
+    controller
+        .triangle()
+        .toggleOnTrue(superStructure.soleIndex())
+        .toggleOnFalse(superStructure.stopIndex());
+    controller
+        .cross()
+        .toggleOnTrue(superStructure.soleFeeder())
+        .toggleOnFalse(superStructure.stopFeeder());
   }
 
   public void configureAutos() {
