@@ -51,6 +51,22 @@ public final class Constants {
     public static final double kIndexGearRatio = 1.0;
   }
 
+  public static final class FeederConstants {
+    public static final int kFeederID = 47;
+    public static final double kFeederGearRatio = 1.0;
+  }
+
+  public static final class ShooterConstants {
+    public static final int LeftShooterLeaderID = 45;
+    public static final int LeftShooterFollowerID = 46;
+    public static final int RightShooterLeaderID = 47;
+    public static final int RightShooterFollowerID = 48;
+    public static final double kShooterGearRatio = 1.0;
+    public static final double kS = 0.0;
+    public static final double kP = 0.0;
+    public static final double kV = 0.0;
+  }
+
   public static final class TurretConstants {
     public static final int kTurretID = 47;
     public static final double kTurretGearRatio = 1.0;
