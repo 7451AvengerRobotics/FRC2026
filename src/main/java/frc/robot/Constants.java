@@ -7,6 +7,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.RobotBase;
 
 /**
@@ -77,5 +78,9 @@ public final class Constants {
     public static final double kV = 0.0;
     public static final double kA = 0.0;
     public static final double latency = 0.02;
+  }
+
+  public static final class TargetConstants {
+    public static final Translation2d hub = new Translation2d(11.915, 4.035);
   }
 }
