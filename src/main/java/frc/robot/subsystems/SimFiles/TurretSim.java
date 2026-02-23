@@ -120,9 +120,12 @@ public class TurretSim extends SubsystemBase {
   public void shootBall() {
     xf =
         Math.sqrt(
-            Math.pow((target.getX() - turretPositionPose2d.getX()) + vxr * TurretConstants.latency, 2)
+            Math.pow(
+                    (target.getX() - turretPositionPose2d.getX()) + vxr * TurretConstants.latency,
+                    2)
                 + Math.pow(
-                    (target.getY() - turretPositionPose2d.getY()) + vyr * TurretConstants.latency, 2));
+                    (target.getY() - turretPositionPose2d.getY()) + vyr * TurretConstants.latency,
+                    2));
 
     double v0 = calcVelocity(xf);
     double pitch0 = calcPitch(v0, xf);

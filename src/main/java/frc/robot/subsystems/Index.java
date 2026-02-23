@@ -10,7 +10,6 @@ import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.IndexConstants;
@@ -18,42 +17,43 @@ import frc.robot.Constants.IntakePivotConstants;
 
 public class Index extends SubsystemBase {
 
-    private final TalonFX indexMotor = new TalonFX(IndexConstants.kIntakeID);
-    private final DutyCycleOut motorDutyCycleOut = new DutyCycleOut(0);
+  private final TalonFX indexMotor = new TalonFX(IndexConstants.kIntakeID);
+  private final DutyCycleOut motorDutyCycleOut = new DutyCycleOut(0);
 
-    public Index() {
-        TalonFXConfiguration cfg = new TalonFXConfiguration()
-        .withMotorOutput(
-            new MotorOutputConfigs()
-                .withInverted(InvertedValue.CounterClockwise_Positive)
-                .withNeutralMode(NeutralModeValue.Coast)
-        ).withFeedback(
-            new FeedbackConfigs()
-                .withRotorToSensorRatio(1)
-                .withSensorToMechanismRatio(IntakePivotConstants.kIntakeGearRatio)
-        ).withCurrentLimits(
-            new CurrentLimitsConfigs()
-                .withStatorCurrentLimit(Amps.of(40))
-                .withStatorCurrentLimitEnable(true)
-        ); 
+  public Index() {
+    TalonFXConfiguration cfg =
+        new TalonFXConfiguration()
+            .withMotorOutput(
+                new MotorOutputConfigs()
+                    .withInverted(InvertedValue.CounterClockwise_Positive)
+                    .withNeutralMode(NeutralModeValue.Coast))
+            .withFeedback(
+                new FeedbackConfigs()
+                    .withRotorToSensorRatio(1)
+                    .withSensorToMechanismRatio(IntakePivotConstants.kIntakeGearRatio))
+            .withCurrentLimits(
+                new CurrentLimitsConfigs()
+                    .withStatorCurrentLimit(Amps.of(40))
+                    .withStatorCurrentLimitEnable(true));
 
-        indexMotor.getConfigurator().apply(cfg);
-    }
+    indexMotor.getConfigurator().apply(cfg);
+  }
 
+  public void run(double speed) {
+    indexMotor.setControl(motorDutyCycleOut.withOutput(speed));
+  }
 
-    public void run(double speed) {
-        indexMotor.setControl(motorDutyCycleOut.withOutput(speed));
-    }
-
-    public Command runIndex() {
-        return run(() -> {
-            this.run(1);
+  public Command runIndex() {
+    return run(
+        () -> {
+          this.run(1);
         });
-    }
+  }
 
-    public Command stopIndex() {
-        return run(() -> {
-            this.run(0);
+  public Command stopIndex() {
+    return run(
+        () -> {
+          this.run(0);
         });
-    }
+  }
 }

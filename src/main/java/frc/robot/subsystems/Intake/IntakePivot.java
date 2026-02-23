@@ -12,7 +12,6 @@ import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -26,84 +25,85 @@ import frc.robot.Constants.IntakePivotConstants;
  * 5. Tune PID values
  */
 public class IntakePivot extends SubsystemBase {
-    private final TalonFX intakePivot = new TalonFX(IntakePivotConstants.kIntakePivotID);
-    private final MotionMagicVoltage pivotRequest = new MotionMagicVoltage(0);
+  private final TalonFX intakePivot = new TalonFX(IntakePivotConstants.kIntakePivotID);
+  private final MotionMagicVoltage pivotRequest = new MotionMagicVoltage(0);
 
-    public IntakePivot() {
-        TalonFXConfiguration cfg = new TalonFXConfiguration()
-        .withMotorOutput(
-            new MotorOutputConfigs()
-                .withInverted(InvertedValue.CounterClockwise_Positive)
-                .withNeutralMode(NeutralModeValue.Coast)
-        ).withFeedback(
-            new FeedbackConfigs()
-                .withRotorToSensorRatio(1)
-                .withSensorToMechanismRatio(IntakePivotConstants.kIntakeGearRatio)
-        ).withCurrentLimits(
-            new CurrentLimitsConfigs()
-                .withStatorCurrentLimit(Amps.of(40))
-                .withStatorCurrentLimitEnable(true)
-        ).withMotionMagic(
-            new MotionMagicConfigs()
-                .withMotionMagicCruiseVelocity(RotationsPerSecond.of(0.75))
-                .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(7))
-                .withMotionMagicJerk(RotationsPerSecondPerSecond.per(Second).of(100))
-        ).withSlot0(
-            new Slot0Configs()
-                .withKP(IntakePivotConstants.kP)
-                .withKI(IntakePivotConstants.kI)
-                .withKD(IntakePivotConstants.kD)
-                .withKG(IntakePivotConstants.kG)
-                .withKS(IntakePivotConstants.kS)
-                .withKV(IntakePivotConstants.kV)
-                .withKA(IntakePivotConstants.kA)
-        );
+  public IntakePivot() {
+    TalonFXConfiguration cfg =
+        new TalonFXConfiguration()
+            .withMotorOutput(
+                new MotorOutputConfigs()
+                    .withInverted(InvertedValue.CounterClockwise_Positive)
+                    .withNeutralMode(NeutralModeValue.Coast))
+            .withFeedback(
+                new FeedbackConfigs()
+                    .withRotorToSensorRatio(1)
+                    .withSensorToMechanismRatio(IntakePivotConstants.kIntakeGearRatio))
+            .withCurrentLimits(
+                new CurrentLimitsConfigs()
+                    .withStatorCurrentLimit(Amps.of(40))
+                    .withStatorCurrentLimitEnable(true))
+            .withMotionMagic(
+                new MotionMagicConfigs()
+                    .withMotionMagicCruiseVelocity(RotationsPerSecond.of(0.75))
+                    .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(7))
+                    .withMotionMagicJerk(RotationsPerSecondPerSecond.per(Second).of(100)))
+            .withSlot0(
+                new Slot0Configs()
+                    .withKP(IntakePivotConstants.kP)
+                    .withKI(IntakePivotConstants.kI)
+                    .withKD(IntakePivotConstants.kD)
+                    .withKG(IntakePivotConstants.kG)
+                    .withKS(IntakePivotConstants.kS)
+                    .withKV(IntakePivotConstants.kV)
+                    .withKA(IntakePivotConstants.kA));
 
-        intakePivot.getConfigurator().apply(cfg);
+    intakePivot.getConfigurator().apply(cfg);
 
-        intakePivot.getConfigurator().setPosition(0);
-    }
+    intakePivot.getConfigurator().setPosition(0);
+  }
 
-    public void pivotIntake(double rotations) {
-        intakePivot.setControl(pivotRequest.withPosition(rotations));
-    }
+  public void pivotIntake(double rotations) {
+    intakePivot.setControl(pivotRequest.withPosition(rotations));
+  }
 
-    public boolean nearSetpoint(PivotPosition pos) {
-        double diff = intakePivot.getPosition().getValueAsDouble() - pos.rotations;
-        return Math.abs(diff) <= 0.05;
-    }
+  public boolean nearSetpoint(PivotPosition pos) {
+    double diff = intakePivot.getPosition().getValueAsDouble() - pos.rotations;
+    return Math.abs(diff) <= 0.05;
+  }
 
-    public boolean atStow() {
-        return nearSetpoint(PivotPosition.STOW);
-    }
+  public boolean atStow() {
+    return nearSetpoint(PivotPosition.STOW);
+  }
 
-    public boolean atDeployed() {
-        return nearSetpoint(PivotPosition.DEPLOYED);
-    }
-    
-    public Command setIntakePivotAngle(double rotations) {
-        return run(() -> {
-            pivotIntake(rotations);
+  public boolean atDeployed() {
+    return nearSetpoint(PivotPosition.DEPLOYED);
+  }
+
+  public Command setIntakePivotAngle(double rotations) {
+    return run(
+        () -> {
+          pivotIntake(rotations);
         });
+  }
+
+  public Command toPosition(PivotPosition pos) {
+    return setIntakePivotAngle(pos.rotations).until(() -> nearSetpoint(pos));
+  }
+
+  @Override
+  public void periodic() {
+    SmartDashboard.putNumber("IntakePivot Rotations", intakePivot.getPosition().getValueAsDouble());
+  }
+
+  public enum PivotPosition {
+    STOW(0),
+    DEPLOYED(0.35);
+
+    public final double rotations;
+
+    private PivotPosition(double rotations) {
+      this.rotations = rotations;
     }
-
-    public Command toPosition(PivotPosition pos) {
-        return setIntakePivotAngle(pos.rotations).until(() -> nearSetpoint(pos));
-    }
-
-    @Override
-    public void periodic() {
-        SmartDashboard.putNumber("IntakePivot Rotations", intakePivot.getPosition().getValueAsDouble());
-    }
-
-    public enum PivotPosition {
-        STOW(0),
-        DEPLOYED(0.35);
-
-        public final double rotations;
-
-        private PivotPosition(double rotations) {
-            this.rotations = rotations;
-        }
-    }
+  }
 }
