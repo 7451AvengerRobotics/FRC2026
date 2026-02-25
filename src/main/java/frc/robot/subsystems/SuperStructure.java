@@ -79,10 +79,10 @@ public class SuperStructure {
   }
 
   public Command runShooters() {
-    return Commands.parallel(leftShooter.runShooter(), rightShooter.runShooter());
+    return Commands.parallel(leftShooter.setVelCommand(4400), rightShooter.setVelCommand(4400));
   }
 
   public Command stopShooters() {
-    return Commands.parallel(leftShooter.runShooter(), rightShooter.runShooter());
+    return Commands.parallel(leftShooter.setVelCommand(0), rightShooter.setVelCommand(0));
   }
 }
