@@ -31,7 +31,7 @@ public final class Constants {
   }
 
   public static final class IntakePivotConstants {
-    public static final int kIntakePivotID = 49;
+    public static final int kIntakePivotID = 22;
     public static final double kIntakeGearRatio = 1.0; // TODO: Set gear ratio
     public static final double kP = 0.0;
     public static final double kI = 0.0;
@@ -43,29 +43,29 @@ public final class Constants {
   }
 
   public static final class IntakeConstants {
-    public static final int kIntakeID = 48;
-    public static final double kIntakeGearRatio = 1.0;
+    public static final int kIntakeID = 19;
+    public static final double kIntakeGearRatio = 2;
   }
 
   public static final class IndexConstants {
-    public static final int kIntakeID = 47;
+    public static final int kIndexID = 16;
     public static final double kIndexGearRatio = 1.0;
   }
 
   public static final class FeederConstants {
-    public static final int kFeederID = 47;
+    public static final int kFeederID = 41;
     public static final double kFeederGearRatio = 1.0;
   }
 
   public static final class ShooterConstants {
-    public static final int LeftShooterLeaderID = 45;
-    public static final int LeftShooterFollowerID = 46;
-    public static final int RightShooterLeaderID = 47;
-    public static final int RightShooterFollowerID = 48;
+    public static final int LeftShooterLeaderID = 50;
+    public static final int LeftShooterFollowerID = 51;
+    public static final int RightShooterLeaderID = 52;
+    public static final int RightShooterFollowerID = 53;
     public static final double kShooterGearRatio = 1.0;
-    public static final double kS = 0.0;
-    public static final double kP = 0.0;
-    public static final double kV = 0.0;
+    public static final double kS = 0;
+    public static final double kP = 5;
+    public static final double kV = 0;
   }
 
   public static final class TurretConstants {
