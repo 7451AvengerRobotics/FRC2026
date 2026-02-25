@@ -17,7 +17,7 @@ import frc.robot.Constants.IntakePivotConstants;
 
 public class Index extends SubsystemBase {
 
-  private final TalonFX indexMotor = new TalonFX(IndexConstants.kIntakeID);
+  private final TalonFX indexMotor = new TalonFX(IndexConstants.kIndexID);
   private final DutyCycleOut motorDutyCycleOut = new DutyCycleOut(0);
 
   public Index() {
@@ -43,10 +43,10 @@ public class Index extends SubsystemBase {
     indexMotor.setControl(motorDutyCycleOut.withOutput(speed));
   }
 
-  public Command runIndex() {
+  public Command runIndex(double power) {
     return run(
         () -> {
-          this.run(1);
+          this.run(power);
         });
   }
 
