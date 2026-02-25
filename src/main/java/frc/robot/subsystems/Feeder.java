@@ -43,10 +43,10 @@ public class Feeder extends SubsystemBase {
     feederMotor.setControl(motorDutyCycleOut.withOutput(speed));
   }
 
-  public Command runFeeder() {
+  public Command runFeeder(double power) {
     return run(
         () -> {
-          this.run(1);
+          this.run(power);
         });
   }
 

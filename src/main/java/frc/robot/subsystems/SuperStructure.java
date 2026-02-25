@@ -32,50 +32,36 @@ public class SuperStructure {
   public Command startIntake() {
     return Commands.parallel(
         intakePivot.toPosition(IntakePivot.PivotPosition.DEPLOYED),
-        intake.runIntake(1),
-        index.runIndex());
+        intake.runIntake(-0.5),
+        index.runIndex(-0.1));
   }
 
   public Command soleIntake() {
-    return Commands.run(
-        () -> {
-          intake.runIntake(1);
-        });
+    return intake.runIntake(-0.5);
   }
 
   public Command soleIndex() {
-    return Commands.run(
-        () -> {
-          index.runIndex();
-        });
+    return index.runIndex(-0.5);
   }
 
   public Command soleFeeder() {
-    return Commands.run(
-        () -> {
-          feeder.runFeeder();
-        });
+    return feeder.runFeeder(-0.3);
   }
 
   public Command stopIntake() {
-    return Commands.run(
-        () -> {
-          intake.runIntake(0);
-        });
+    return intake.stopIntake();
   }
 
   public Command stopIndex() {
-    return Commands.run(
-        () -> {
-          index.stopIndex();
-        });
+    return index.stopIndex();
   }
 
   public Command stopFeeder() {
-    return Commands.run(
-        () -> {
-          feeder.stopFeeder();
-        });
+    return feeder.stopFeeder();
+  }
+
+  public Command reverseIndex() {
+    return index.runIndex(0.3);
   }
 
   public Command runShooters() {
@@ -83,6 +69,21 @@ public class SuperStructure {
   }
 
   public Command stopShooters() {
-    return Commands.parallel(leftShooter.runShooter(), rightShooter.runShooter());
+    return Commands.parallel(leftShooter.stopShooter(), rightShooter.stopShooter());
+  }
+
+  public Command masterCommand() {
+    return Commands.parallel(
+        intake.runIntake(-0.75), index.runIndex(-0.9), feeder.runFeeder(-0.9), runShooters());
+  }
+
+  public Command weirdMasterCommand() {
+    return Commands.parallel(
+        intake.runIntake(-0.75), index.runIndex(0.6), feeder.runFeeder(-0.9), runShooters());
+  }
+
+  public Command stopMasterCommand() {
+    return Commands.parallel(
+        intake.stopIntake(), index.stopIndex(), feeder.stopFeeder(), stopShooters());
   }
 }

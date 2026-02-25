@@ -161,31 +161,40 @@ public class RobotContainer {
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
-            () -> -controller.getLeftY(),
-            () -> -controller.getLeftX(),
+            () -> controller.getLeftY(),
+            () -> controller.getLeftX(),
             () -> -controller.getRightX()));
 
     // // Switch to X pattern when X button is pressed
     // controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
-    controller.L1().onTrue(leftTurret.shootBallCommand());
-    controller.R1().onTrue(rightTurret.shootBallCommand());
+    // controller.L1().onTrue(leftTurret.shootBallCommand());
+    // controller.R1().onTrue(rightTurret.shootBallCommand());
 
     // // Dropping the intake down
     // controller.L2().onTrue(superStructure.startIntake());
 
-    controller
-        .square()
-        .toggleOnTrue(superStructure.soleIntake())
-        .toggleOnFalse(superStructure.stopIntake());
+    controller.square().onTrue(superStructure.soleIndex());
+    // .toggleOnFalse(superStructure.stopIntake());
+
     controller
         .triangle()
-        .toggleOnTrue(superStructure.soleIndex())
-        .toggleOnFalse(superStructure.stopIndex());
+        .toggleOnTrue(superStructure.weirdMasterCommand())
+        .toggleOnFalse(superStructure.stopMasterCommand());
+    // controller
+    //     .triangle()
+    //     .toggleOnTrue(superStructure.soleIndex())
+    //     .toggleOnFalse(superStructure.stopIndex());
     controller
         .cross()
-        .toggleOnTrue(superStructure.soleFeeder())
-        .toggleOnFalse(superStructure.stopFeeder());
+        .toggleOnTrue(superStructure.masterCommand())
+        .toggleOnFalse(superStructure.stopMasterCommand());
+
+    // controller.L1().onTrue(superStructure.masterCommand());
+    // controller.R1().onTrue(superStructure.stopMasterCommand());
+
+    controller.L1().onTrue(superStructure.runShooters());
+    controller.R1().onTrue(superStructure.stopShooters());
   }
 
   public void configureAutos() {

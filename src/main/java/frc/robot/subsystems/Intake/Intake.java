@@ -59,6 +59,13 @@ public class Intake extends SubsystemBase {
         });
   }
 
+  public Command stopIntake() {
+    return run(
+        () -> {
+          this.setIntakePower(0);
+        });
+  }
+
   @Override
   public void periodic() {
     double velocity = intake.getVelocity().getValueAsDouble();
