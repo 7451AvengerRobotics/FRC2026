@@ -97,6 +97,24 @@ public class TurretSim extends SubsystemBase {
     return mod(theta);
   }
 
+  public double calcYaw(double deltax, double deltay) {
+    double initTheta;
+
+    if (deltax == 0) {
+      initTheta = 0;
+    } else {
+      initTheta = Math.PI - Math.atan(deltay / -deltax);
+    }
+
+    double theta = (initTheta - drive.getPose().getRotation().getRadians());
+
+    return mod(theta);
+  }
+  
+  public double calcYawForSimBall(double yaw) {
+    return yaw + drive.getPose().getRotation().getRadians();
+  }
+
   public double calcVelocity(double xf) {
     double vel = Math.sqrt(g * yf + g * Math.sqrt(Math.pow(xf, 2) + Math.pow(yf, 2))) + 0.5;
 
@@ -113,10 +131,6 @@ public class TurretSim extends SubsystemBase {
     return theta;
   }
 
-  public double calcYawForSimBall() {
-    return calcYaw() + drive.getPose().getRotation().getRadians();
-  }
-
   public void shootBall() {
     xf =
         Math.sqrt(
@@ -129,7 +143,7 @@ public class TurretSim extends SubsystemBase {
 
     double v0 = calcVelocity(xf);
     double pitch0 = calcPitch(v0, xf);
-    double yaw0 = calcYawForSimBall();
+    double yaw0 = calcYawForSimBall(calcYaw());
 
     activeFuel.add(
         new FuelSim(
