@@ -80,7 +80,7 @@ public class SuperStructure {
   }
 
   public Command runShooters() {
-    return Commands.parallel(leftShooter.runShooter(), rightShooter.runShooter());
+    return Commands.parallel(leftShooter.setVelCommand(4400), rightShooter.setVelCommand(4400));
   }
 
   public Command stopShooters() {
@@ -94,7 +94,7 @@ public class SuperStructure {
 
   public Command weirdMasterCommand() {
     return Commands.parallel(
-        intake.runIntake(-0.75), index.runIndex(0.6), feeder.runFeeder(-0.9), runShooters());
+        intake.runIntake(-0.75), index.runIndex(0.6), feeder.runFeeder(-0.9));
   }
 
   public Command shooterlessMasterCommand() {
@@ -114,7 +114,7 @@ public class SuperStructure {
 
   public Command stopMasterCommand() {
     return Commands.parallel(
-        intake.stopIntake(), index.stopIndex(), feeder.stopFeeder(), stopShooters());
+        intake.stopIntake(), index.stopIndex(), feeder.stopFeeder());
   }
 
   public Command deployPivot() {

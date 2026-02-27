@@ -4,6 +4,7 @@ import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
@@ -81,6 +82,18 @@ public class Shooter extends SubsystemBase {
   public void run(double power) {
     // closedLoopController.setSetpoint(targetRPM, ControlType.kVelocity);
     shooterLeader.set(power);
+  }
+
+  public void setVel(double rpm) {
+    closedLoopController.setSetpoint(rpm, ControlType.kMAXMotionVelocityControl);
+  }
+
+  public Command setVelCommand(double rpm) {
+    return run(
+      () -> {
+        this.setVel(rpm);
+      }
+    );
   }
 
   public Command runShooter() {
