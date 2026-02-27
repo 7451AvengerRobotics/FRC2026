@@ -6,7 +6,6 @@ import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXSConfiguration;
-import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFXS;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -52,8 +51,7 @@ public class Turret extends SubsystemBase {
   }
 
   public void run(double rotations) {
-    // turretMotor.setControl(turretRequest.withPosition(mod(rotations)));
-    turretMotor.setControl(new DutyCycleOut(rotations));
+    turretMotor.setControl(turretRequest.withPosition(mod(rotations)));
   }
 
   public Command runTurret() {

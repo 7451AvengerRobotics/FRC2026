@@ -91,7 +91,7 @@ public class RobotContainer {
                 //     ,
                 // new VisionIOPhotonVision(
                 //     VisionConstants.camera1Name, VisionConstants.robotToCamera1)
-                    );
+                );
 
         // The ModuleIOTalonFXS implementation provides an example implementation for
         // TalonFXS controller connected to a CANdi with a PWM encoder. The
@@ -129,7 +129,7 @@ public class RobotContainer {
                 //     ,
                 // new VisionIOPhotonVisionSim(
                 //     VisionConstants.camera1Name, VisionConstants.robotToCamera1, drive::getPose)
-                    );
+                );
         break;
 
       default:
@@ -245,5 +245,4 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     return autoChooser.get();
   }
-
 }

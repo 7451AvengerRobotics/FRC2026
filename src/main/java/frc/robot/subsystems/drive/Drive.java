@@ -21,7 +21,6 @@ import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -48,7 +47,6 @@ import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.generated.TunerConstants;
 import frc.robot.util.LocalADStarAK;
-
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -377,37 +375,44 @@ public class Drive extends SubsystemBase {
   }
 
   public Command followPPPathCommand(String pathName) {
-    return Commands.defer(() -> {
-      try {
-        PathPlannerPath path = PathPlannerPath.fromPathFile(pathName);
+    return Commands.defer(
+        () -> {
+          try {
+            PathPlannerPath path = PathPlannerPath.fromPathFile(pathName);
 
-        Pose2d startingPose = path.getStartingHolonomicPose().get();
+            Pose2d startingPose = path.getStartingHolonomicPose().get();
 
-        return AutoBuilder.resetOdom(startingPose).andThen(AutoBuilder.followPath(path));
-      } catch (Exception e) {
-        DriverStation.reportError("Big oops: "+ e.getMessage(), e.getStackTrace());
-        return Commands.none();
-      }
-    }, Set.of(this));
+            return AutoBuilder.resetOdom(startingPose).andThen(AutoBuilder.followPath(path));
+          } catch (Exception e) {
+            DriverStation.reportError("Big oops: " + e.getMessage(), e.getStackTrace());
+            return Commands.none();
+          }
+        },
+        Set.of(this));
   }
 
   public Command driveToPose(Pose2d pose) {
     return Commands.sequence(
-      runOnce(() -> {
-        holonomicControllerActive = true;
-        holonomicDriveWithPIDController.reset(getPose(), getRobotRelativeSpeeds());
-      }),
-      run(
-        () -> {
-          this.holonomicPoseTarget = pose;
-          runVelocity(holonomicDriveWithPIDController.calculate(getPose(), holonomicPoseTarget));
-          SmartDashboard.putBoolean("x controller", holonomicDriveWithPIDController.xReferenceReached());
-          SmartDashboard.putBoolean("y controller", holonomicDriveWithPIDController.yReferenceReached());
-          SmartDashboard.putBoolean("rotation controller", holonomicDriveWithPIDController.rotationReferenceReached());
-        }
-      ).until(holonomicDriveWithPIDController::atReference),
-      runOnce(this::stop)
-      ).finallyDo(() -> holonomicControllerActive = false);
+            runOnce(
+                () -> {
+                  holonomicControllerActive = true;
+                  holonomicDriveWithPIDController.reset(getPose(), getRobotRelativeSpeeds());
+                }),
+            run(() -> {
+                  this.holonomicPoseTarget = pose;
+                  runVelocity(
+                      holonomicDriveWithPIDController.calculate(getPose(), holonomicPoseTarget));
+                  SmartDashboard.putBoolean(
+                      "x controller", holonomicDriveWithPIDController.xReferenceReached());
+                  SmartDashboard.putBoolean(
+                      "y controller", holonomicDriveWithPIDController.yReferenceReached());
+                  SmartDashboard.putBoolean(
+                      "rotation controller",
+                      holonomicDriveWithPIDController.rotationReferenceReached());
+                })
+                .until(holonomicDriveWithPIDController::atReference),
+            runOnce(this::stop))
+        .finallyDo(() -> holonomicControllerActive = false);
   }
 
   public ChassisSpeeds getRobotRelativeSpeeds() {

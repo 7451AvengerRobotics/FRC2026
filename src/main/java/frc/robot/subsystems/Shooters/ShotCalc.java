@@ -5,6 +5,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.Constants;
 
 public class ShotCalc {
@@ -33,6 +34,29 @@ public class ShotCalc {
     double theta = (initTheta - robotPose.getRotation().getRadians());
 
     return mod(theta);
+  }
+
+  public double getTime(double xf) {
+    return xf / (getVelocity(xf) * Math.cos(pitch));
+  }
+
+  public double getMovingVelocity(double xf, ChassisSpeeds Vr, Pose2d robotPose) {
+    double vxri = Vr.vxMetersPerSecond;
+    double vyri = Vr.vyMetersPerSecond;
+
+    double robotVelocityMag = Math.sqrt(Math.pow(vxri, 2) + Math.pow(vyri, 2));
+
+    double robotVelocityAngle = Math.atan2(vyri, vxri);
+
+    double transformedVelocityAngle = robotVelocityAngle - getYaw(robotPose) + Math.PI / 2;
+
+    double vrxf = Math.cos(transformedVelocityAngle) * robotVelocityMag;
+
+    double vrxHorizontalDisplacement = -vrxf * getTime(xf);
+
+    double vel = Math.sqrt(Math.pow(xf, 2) + Math.pow(vrxHorizontalDisplacement, 2));
+
+    return vel;
   }
 
   public double mod(double angle) {
