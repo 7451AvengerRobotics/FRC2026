@@ -54,9 +54,26 @@ public class ShotCalc {
 
     double vrxHorizontalDisplacement = -vrxf * getTime(xf);
 
-    double vel = Math.sqrt(Math.pow(xf, 2) + Math.pow(vrxHorizontalDisplacement, 2));
+    double newxf = Math.sqrt(Math.pow(xf, 2) + Math.pow(vrxHorizontalDisplacement, 2));
 
-    return vel;
+    return getVelocity(newxf);
+  }
+
+  public double getMovingYaw(double xf, ChassisSpeeds Vr, Pose2d robotPose) {
+    double vxri = Vr.vxMetersPerSecond;
+    double vyri = Vr.vyMetersPerSecond;
+
+    double robotVelocityMag = Math.sqrt(Math.pow(vxri, 2) + Math.pow(vyri, 2));
+
+    double robotVelocityAngle = Math.atan2(vyri, vxri);
+
+    double transformedVelocityAngle = robotVelocityAngle - getYaw(robotPose) + Math.PI / 2;
+
+    double vrxf = Math.cos(transformedVelocityAngle) * robotVelocityMag;
+
+    double vrxHorizontalDisplacement = -vrxf * getTime(xf);
+
+    return Math.atan2(vrxHorizontalDisplacement, xf);
   }
 
   public double mod(double angle) {

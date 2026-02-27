@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -96,6 +97,8 @@ public class TurretSim extends SubsystemBase {
     Logger.recordOutput("Shooter Yaw", shotCalc.getYaw(drive.getPose()) * 180 / Math.PI);
 
     SmartDashboard.putNumber("Yaw", calcYaw());
+
+    SmartDashboard.putData("Mechanism", new Mechanism2d(3, 3));
   }
 
   public double calcYaw() {
@@ -180,12 +183,14 @@ public class TurretSim extends SubsystemBase {
 
     activeFuel.add(
         new FuelSim(
-            shotCalc.getVelocity(xf),
+            shotCalc.getMovingVelocity(xf, Vr, drive.getPose()),
             shotCalc.pitch,
-            shotCalc.getYaw(drive.getPose()) + drive.getPose().getRotation().getRadians(),
+            shotCalc.getYaw(drive.getPose())
+                - shotCalc.getMovingYaw(xf, Vr, drive.getPose())
+                + drive.getPose().getRotation().getRadians(),
             turretPositionPose2d,
-            0,
-            0));
+            Vr.vxMetersPerSecond,
+            Vr.vyMetersPerSecond));
   }
 
   public Pose3d targetPose3d() {
