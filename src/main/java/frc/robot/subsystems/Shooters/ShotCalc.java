@@ -40,40 +40,46 @@ public class ShotCalc {
     return xf / (getVelocity(xf) * Math.cos(pitch));
   }
 
-  public double getMovingVelocity(double xf, ChassisSpeeds Vr, Pose2d robotPose) {
-    double vxri = Vr.vxMetersPerSecond;
-    double vyri = Vr.vyMetersPerSecond;
+  /**
+   * Computes v_ball = v_desired - V_robot in field frame. Returns {vBallX, vBallY}.
+   */
+  private double[] getBallVelocityComponents(double xf, ChassisSpeeds Vr, Pose2d robotPose) {
+    ChassisSpeeds VrField =
+        ChassisSpeeds.fromRobotRelativeSpeeds(Vr, robotPose.getRotation());
 
-    double robotVelocityMag = Math.sqrt(Math.pow(vxri, 2) + Math.pow(vyri, 2));
+    double t = getTime(xf);
+    Transform2d turretOffsetTransform2d =
+        new Transform2d(turretOffset.getX(), turretOffset.getY(), new Rotation2d());
+    Pose2d turretPositionPose2d = robotPose.plus(turretOffsetTransform2d);
 
-    double robotVelocityAngle = Math.atan2(vyri, vxri);
+    double deltax = Constants.TargetConstants.hub.getX() - turretPositionPose2d.getX();
+    double deltay = Constants.TargetConstants.hub.getY() - turretPositionPose2d.getY();
 
-    double transformedVelocityAngle = robotVelocityAngle - getYaw(robotPose) + Math.PI / 2;
+    double vDesiredX = deltax / t;
+    double vDesiredY = deltay / t;
 
-    double vrxf = Math.cos(transformedVelocityAngle) * robotVelocityMag;
-
-    double vrxHorizontalDisplacement = -vrxf * getTime(xf);
-
-    double newxf = Math.sqrt(Math.pow(xf, 2) + Math.pow(vrxHorizontalDisplacement, 2));
-
-    return getVelocity(newxf);
+    return new double[] {
+      vDesiredX - VrField.vxMetersPerSecond, vDesiredY - VrField.vyMetersPerSecond
+    };
   }
 
+  /**
+   * Returns the velocity magnitude needed to hit the target while moving. Uses vector subtraction:
+   * v_ball = v_desired - V_robot (ball velocity in field frame = desired - robot velocity).
+   */
+  public double getMovingVelocity(double xf, ChassisSpeeds Vr, Pose2d robotPose) {
+    double[] vBall = getBallVelocityComponents(xf, Vr, robotPose);
+    double vBallHorizontalMag = Math.sqrt(vBall[0] * vBall[0] + vBall[1] * vBall[1]);
+    return vBallHorizontalMag / Math.cos(pitch);
+  }
+
+  /**
+   * Returns the yaw angle in field frame to point the turret for a moving shot. Uses vector
+   * subtraction: v_ball = v_desired - V_robot.
+   */
   public double getMovingYaw(double xf, ChassisSpeeds Vr, Pose2d robotPose) {
-    double vxri = Vr.vxMetersPerSecond;
-    double vyri = Vr.vyMetersPerSecond;
-
-    double robotVelocityMag = Math.sqrt(Math.pow(vxri, 2) + Math.pow(vyri, 2));
-
-    double robotVelocityAngle = Math.atan2(vyri, vxri);
-
-    double transformedVelocityAngle = robotVelocityAngle - getYaw(robotPose) + Math.PI / 2;
-
-    double vrxf = Math.cos(transformedVelocityAngle) * robotVelocityMag;
-
-    double vrxHorizontalDisplacement = -vrxf * getTime(xf);
-
-    return Math.atan2(vrxHorizontalDisplacement, xf);
+    double[] vBall = getBallVelocityComponents(xf, Vr, robotPose);
+    return Math.atan2(vBall[1], vBall[0]);
   }
 
   public double mod(double angle) {

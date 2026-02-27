@@ -45,15 +45,13 @@ public class FuelSim {
   public double getX() {
     return initialPos.getX()
         + velocity * Math.cos(pitch) * Math.cos(yaw) * time
-        + vxr * (time + TurretConstants.latency)
-        + vxr * time;
+        + vxr * (time + TurretConstants.latency);
   }
 
   public double getY() {
     return initialPos.getY()
         + velocity * Math.cos(pitch) * Math.sin(yaw) * time
-        + vyr * (time + TurretConstants.latency)
-        + vyr * time;
+        + vyr * (time + TurretConstants.latency);
   }
 
   public double getZ() {

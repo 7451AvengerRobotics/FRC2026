@@ -92,9 +92,16 @@ public class TurretSim extends SubsystemBase {
         "GamePieces/Fuel_" + name,
         activeFuel.stream().map(FuelSim::getPose).toArray(Pose3d[]::new));
 
-    Logger.recordOutput("Shooter Velocity", shotCalc.getVelocity(xf));
+    Logger.recordOutput(
+        "Shooter Velocity", shotCalc.getMovingVelocity(xf, Vr, drive.getPose()));
     Logger.recordOutput("Shooter Pitch", shotCalc.pitch * 180 / Math.PI);
-    Logger.recordOutput("Shooter Yaw", shotCalc.getYaw(drive.getPose()) * 180 / Math.PI);
+    Logger.recordOutput(
+        "Shooter Yaw",
+        mod(
+                shotCalc.getMovingYaw(xf, Vr, drive.getPose())
+                    - drive.getPose().getRotation().getRadians())
+            * 180
+            / Math.PI);
 
     SmartDashboard.putNumber("Yaw", calcYaw());
 
@@ -181,16 +188,17 @@ public class TurretSim extends SubsystemBase {
     //             target.getX() - turretPositionPose2d.getX() + vxr * TurretConstants.latency,
     //             target.getY() - turretPositionPose2d.getY() + vyr * TurretConstants.latency));
 
+    ChassisSpeeds VrField =
+        ChassisSpeeds.fromRobotRelativeSpeeds(Vr, drive.getPose().getRotation());
+
     activeFuel.add(
         new FuelSim(
             shotCalc.getMovingVelocity(xf, Vr, drive.getPose()),
             shotCalc.pitch,
-            shotCalc.getYaw(drive.getPose())
-                - shotCalc.getMovingYaw(xf, Vr, drive.getPose())
-                + drive.getPose().getRotation().getRadians(),
+            shotCalc.getMovingYaw(xf, Vr, drive.getPose()),
             turretPositionPose2d,
-            Vr.vxMetersPerSecond,
-            Vr.vyMetersPerSecond));
+            VrField.vxMetersPerSecond,
+            VrField.vyMetersPerSecond));
   }
 
   public Pose3d targetPose3d() {
