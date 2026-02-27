@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.TurretConstants;
+import frc.robot.commands.AutoRoutines;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Feeder;
@@ -65,6 +66,8 @@ public class RobotContainer {
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
+
+  private final AutoRoutines autos;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -152,6 +155,7 @@ public class RobotContainer {
             index, intake, intakePivot, feeder, leftShooter, rightShooter, leftTurret, pivot);
 
     // Set up auto routines
+    autos = new AutoRoutines(drive, superStructure);
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
     simTurret = new TurretSim(drive, new Transform3d(), "Left");
@@ -228,6 +232,9 @@ public class RobotContainer {
         "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
     autoChooser.addOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    autoChooser.addOption("Depot Side Auto", autos.depotSideAuto());
+    autoChooser.addOption("Middle Auto", autos.middleAuto());
+    autoChooser.addOption("Source Side Auto", autos.sourceSideAuto());
   }
 
   /**
@@ -238,4 +245,5 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     return autoChooser.get();
   }
+
 }

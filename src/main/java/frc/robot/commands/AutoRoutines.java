@@ -20,11 +20,31 @@ public class AutoRoutines {
 
     public Command depotSideAuto() {
         return Commands.sequence(
-            drive.driveToPose(new Pose2d(3.5, 6.5, new Rotation2d(-109.069))),
-            Commands.parallel(superStruc.startIntake(), drive.followPPPathCommand("DepotSideStartToSource")),
-            Commands.waitSeconds(10),
-            drive.followPPPathCommand("SourceToDepot"),
+            drive.driveToPose(new Pose2d(3.5, 6.5, new Rotation2d(0))),
+            Commands.parallel(superStruc.deployPivot(), drive.followPPPathCommand("DepotSideStartToSource")),
+            Commands.waitSeconds(3),
+            Commands.parallel(superStruc.startIntake(), drive.followPPPathCommand("SourceToDepot")),
             drive.followPPPathCommand("DepotToShoot")
-            );
+        );
+    }
+
+    public Command middleAuto() {
+        return Commands.sequence(
+            drive.driveToPose(new Pose2d(3.5, 4, new Rotation2d(0))),
+            Commands.parallel(superStruc.deployPivot(), drive.followPPPathCommand("MiddleStartToSource")),
+            Commands.waitSeconds(3),
+            Commands.parallel(superStruc.startIntake(), drive.followPPPathCommand("SourceToDepot")),
+            drive.followPPPathCommand("DepotToShoot")
+        );
+    }
+
+    public Command sourceSideAuto() {
+        return Commands.sequence(
+            drive.driveToPose(new Pose2d(3.5, 1.5, new Rotation2d(0))),
+            Commands.parallel(superStruc.deployPivot(), drive.followPPPathCommand("SourceSideStartToSource")),
+            Commands.waitSeconds(3),
+            Commands.parallel(superStruc.startIntake(), drive.followPPPathCommand("SourceToDepot")),
+            drive.followPPPathCommand("DepotToShoot")
+        );
     }
 }
