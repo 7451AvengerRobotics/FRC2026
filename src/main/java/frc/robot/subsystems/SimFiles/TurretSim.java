@@ -33,7 +33,6 @@ public class TurretSim extends SubsystemBase {
 
   private final List<FuelSim> activeFuel = new ArrayList<>();
   private Translation2d target;
-  double yf = 1.329;
   double xf;
   double g = 9.8;
   double a = -g;
@@ -67,14 +66,17 @@ public class TurretSim extends SubsystemBase {
     vxr = Vr.vxMetersPerSecond;
     vyr = Vr.vyMetersPerSecond;
 
-    xf =
-        Math.sqrt(
-            Math.pow(
-                    (target.getX() - turretPositionPose2d.getX()) + vxr * TurretConstants.latency,
-                    2)
-                + Math.pow(
-                    (target.getY() - turretPositionPose2d.getY()) + vyr * TurretConstants.latency,
-                    2));
+    ChassisSpeeds VrField =
+        ChassisSpeeds.fromRobotRelativeSpeeds(Vr, drive.getPose().getRotation());
+    // Current distance to target (for shot math - must match ShotCalc's deltax/deltay)
+    double deltaxCurr = target.getX() - turretPositionPose2d.getX();
+    double deltayCurr = target.getY() - turretPositionPose2d.getY();
+    xf = Math.max(0.5, Math.sqrt(deltaxCurr * deltaxCurr + deltayCurr * deltayCurr));
+    // Predicted deltas for turret aim (lead by latency)
+    double deltax =
+        deltaxCurr - VrField.vxMetersPerSecond * TurretConstants.latency;
+    double deltay =
+        deltayCurr - VrField.vyMetersPerSecond * TurretConstants.latency;
 
     Logger.recordOutput("ZeroedComponentPoses_" + name, new Pose3d[] {new Pose3d()});
     Logger.recordOutput(
@@ -92,8 +94,7 @@ public class TurretSim extends SubsystemBase {
         "GamePieces/Fuel_" + name,
         activeFuel.stream().map(FuelSim::getPose).toArray(Pose3d[]::new));
 
-    Logger.recordOutput(
-        "Shooter Velocity", shotCalc.getMovingVelocity(xf, Vr, drive.getPose()));
+    Logger.recordOutput("Shooter Velocity", shotCalc.getMovingVelocity(xf, Vr, drive.getPose()));
     Logger.recordOutput("Shooter Pitch", shotCalc.pitch * 180 / Math.PI);
     Logger.recordOutput(
         "Shooter Yaw",
@@ -109,8 +110,16 @@ public class TurretSim extends SubsystemBase {
   }
 
   public double calcYaw() {
-    double deltax = target.getX() - turretPositionPose2d.getX() + vxr * TurretConstants.latency;
-    double deltay = target.getY() - turretPositionPose2d.getY() + vyr * TurretConstants.latency;
+    ChassisSpeeds VrField =
+        ChassisSpeeds.fromRobotRelativeSpeeds(Vr, drive.getPose().getRotation());
+    double deltax =
+        target.getX()
+            - turretPositionPose2d.getX()
+            - VrField.vxMetersPerSecond * TurretConstants.latency;
+    double deltay =
+        target.getY()
+            - turretPositionPose2d.getY()
+            - VrField.vyMetersPerSecond * TurretConstants.latency;
     double initTheta;
 
     if (deltax == 0) {
@@ -143,12 +152,14 @@ public class TurretSim extends SubsystemBase {
   }
 
   public double calcVelocity(double xf) {
+    double yf = TargetConstants.yf;
     double vel = Math.sqrt(g * yf + g * Math.sqrt(Math.pow(xf, 2) + Math.pow(yf, 2))) + 0.5;
 
     return vel;
   }
 
   public double calcPitch(double v, double xf) {
+    double yf = TargetConstants.yf;
     double A = a * Math.pow(xf, 2) / (2 * Math.pow(v, 2));
     double B = xf;
     double C = A - yf;
@@ -188,27 +199,19 @@ public class TurretSim extends SubsystemBase {
     //             target.getX() - turretPositionPose2d.getX() + vxr * TurretConstants.latency,
     //             target.getY() - turretPositionPose2d.getY() + vyr * TurretConstants.latency));
 
-    ChassisSpeeds VrField =
-        ChassisSpeeds.fromRobotRelativeSpeeds(Vr, drive.getPose().getRotation());
+    double dx = target.getX() - turretPositionPose2d.getX();
+    double dy = target.getY() - turretPositionPose2d.getY();
+    double t = shotCalc.getTime(xf);
+    double vDesiredX = dx / t;
+    double vDesiredY = dy / t;
+    double vVertical =
+        shotCalc.getMovingVelocity(xf, Vr, drive.getPose()) * Math.sin(shotCalc.pitch);
 
-    activeFuel.add(
-        new FuelSim(
-            shotCalc.getMovingVelocity(xf, Vr, drive.getPose()),
-            shotCalc.pitch,
-            shotCalc.getMovingYaw(xf, Vr, drive.getPose()),
-            turretPositionPose2d,
-            VrField.vxMetersPerSecond,
-            VrField.vyMetersPerSecond));
+    activeFuel.add(new FuelSim(vDesiredX, vDesiredY, vVertical, turretPositionPose2d));
   }
 
   public Pose3d targetPose3d() {
-    double time = calcShotTime(xf, calcVelocity(xf), calcPitch(calcVelocity(xf), xf));
-
-    return new Pose3d(
-        target.getX() + vxr * TurretConstants.latency,
-        target.getY() + vyr * TurretConstants.latency,
-        yf,
-        new Rotation3d());
+    return new Pose3d(target.getX(), target.getY(), TargetConstants.yf, new Rotation3d());
   }
 
   public Command shootBallCommand() {

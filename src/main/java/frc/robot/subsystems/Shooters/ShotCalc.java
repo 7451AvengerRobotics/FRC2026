@@ -17,8 +17,9 @@ public class ShotCalc {
   public ShotCalc() {}
 
   public double getVelocity(double xf) {
-    return Math.sqrt(
-        (-g * Math.pow(xf, 2)) / (2 * Math.pow(Math.cos(pitch), 2) * (yf - Math.tan(pitch) * xf)));
+    double denom = 2 * Math.pow(Math.cos(pitch), 2) * (Math.tan(pitch) * xf - yf);
+    if (denom <= 0 || xf < 0.5) return 10.0; // fallback for invalid range
+    return Math.sqrt(g * xf * xf / denom);
   }
 
   public double getYaw(Pose2d robotPose) {
@@ -37,26 +38,24 @@ public class ShotCalc {
   }
 
   public double getTime(double xf) {
-    return xf / (getVelocity(xf) * Math.cos(pitch));
+    double v = getVelocity(Math.max(0.5, xf));
+    double t = xf / (v * Math.cos(pitch));
+    return Math.max(0.1, t);
   }
 
-  /**
-   * Computes v_ball = v_desired - V_robot in field frame. Returns {vBallX, vBallY}.
-   */
+  /** Computes v_ball = v_desired - V_robot. v_desired is field velocity to reach hub in time t. */
   private double[] getBallVelocityComponents(double xf, ChassisSpeeds Vr, Pose2d robotPose) {
-    ChassisSpeeds VrField =
-        ChassisSpeeds.fromRobotRelativeSpeeds(Vr, robotPose.getRotation());
+    ChassisSpeeds VrField = ChassisSpeeds.fromRobotRelativeSpeeds(Vr, robotPose.getRotation());
+    Transform2d t2d = new Transform2d(turretOffset.getX(), turretOffset.getY(), new Rotation2d());
+    Pose2d turret = robotPose.plus(t2d);
 
-    double t = getTime(xf);
-    Transform2d turretOffsetTransform2d =
-        new Transform2d(turretOffset.getX(), turretOffset.getY(), new Rotation2d());
-    Pose2d turretPositionPose2d = robotPose.plus(turretOffsetTransform2d);
+    double dx = Constants.TargetConstants.hub.getX() - turret.getX();
+    double dy = Constants.TargetConstants.hub.getY() - turret.getY();
+    double t = getTime(Math.max(0.5, xf));
+    if (t <= 0) t = 0.5;
 
-    double deltax = Constants.TargetConstants.hub.getX() - turretPositionPose2d.getX();
-    double deltay = Constants.TargetConstants.hub.getY() - turretPositionPose2d.getY();
-
-    double vDesiredX = deltax / t;
-    double vDesiredY = deltay / t;
+    double vDesiredX = dx / t;
+    double vDesiredY = dy / t;
 
     return new double[] {
       vDesiredX - VrField.vxMetersPerSecond, vDesiredY - VrField.vyMetersPerSecond

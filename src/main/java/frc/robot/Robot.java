@@ -141,7 +141,16 @@ public class Robot extends LoggedRobot {
 
   /** This function is called once when the robot is first started up. */
   @Override
-  public void simulationInit() {}
+  public void simulationInit() {
+    if (Constants.currentMode == Constants.Mode.SIM) {
+      // Blue side: robot ~2m from blue hub, facing -X toward hub
+      robotContainer
+          .getDrive()
+          .setPose(
+              new edu.wpi.first.math.geometry.Pose2d(
+                  15.5, 4.0, new edu.wpi.first.math.geometry.Rotation2d(Math.PI)));
+    }
+  }
 
   /** This function is called periodically whilst in simulation. */
   @Override

@@ -8,6 +8,7 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -158,7 +159,7 @@ public class RobotContainer {
     autos = new AutoRoutines(drive, superStructure);
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
-    simTurret = new TurretSim(drive, new Transform3d(), "Left");
+    simTurret = new TurretSim(drive, new Transform3d(-0.17, -0.15, 0.39, new Rotation3d()), "Left");
 
     // Configure the bindings
     configureButtonBindings();
@@ -244,5 +245,10 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     return autoChooser.get();
+  }
+
+  /** Returns the drive subsystem for simulation setup. */
+  public Drive getDrive() {
+    return drive;
   }
 }

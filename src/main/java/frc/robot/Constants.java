@@ -82,7 +82,12 @@ public final class Constants {
   }
 
   public static final class TargetConstants {
-    public static final Translation2d hub = new Translation2d(11.915, 4.035);
-    public static final double yf = 1.32;
+    // Field: 17.55m x 8.05m. Red wall at x=0, Blue wall at x=17.55.
+    // RED hub: 4.03m from red wall. BLUE hub: 4.03m from blue wall.
+    public static final Translation2d redHub = new Translation2d(4.03, 4.035);
+    public static final Translation2d blueHub = new Translation2d(13.52, 4.035);
+    public static final Translation2d hub = blueHub; // Blue alliance (robot on blue side)
+    // Hub opening height 72in = 1.829m. Vertical displacement from launch (0.5m): 1.329m
+    public static final double yf = 1.329;
   }
 }
