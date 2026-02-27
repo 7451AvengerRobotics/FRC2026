@@ -3,13 +3,14 @@ package frc.robot.subsystems.Shooters;
 import static edu.wpi.first.units.Units.Amps;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
-import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.TalonFXSConfiguration;
+import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
-import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.hardware.TalonFXS;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.MotorArrangementValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -17,26 +18,22 @@ import frc.robot.Constants.TurretConstants;
 
 public class Turret extends SubsystemBase {
 
-  private final TalonFX turretMotor;
+  private final TalonFXS turretMotor;
   private final MotionMagicVoltage turretRequest = new MotionMagicVoltage(0);
 
   public Turret(int leaderID) {
 
-    turretMotor = new TalonFX(leaderID);
+    turretMotor = new TalonFXS(leaderID);
 
-    TalonFXConfiguration cfg =
-        new TalonFXConfiguration()
+    TalonFXSConfiguration cfg =
+        new TalonFXSConfiguration()
             .withMotorOutput(
                 new MotorOutputConfigs()
                     .withInverted(InvertedValue.CounterClockwise_Positive)
                     .withNeutralMode(NeutralModeValue.Coast))
-            .withFeedback(
-                new FeedbackConfigs()
-                    .withRotorToSensorRatio(1)
-                    .withSensorToMechanismRatio(TurretConstants.kTurretGearRatio))
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
-                    .withStatorCurrentLimit(Amps.of(60))
+                    .withStatorCurrentLimit(Amps.of(40))
                     .withStatorCurrentLimitEnable(true))
             .withSlot0(
                 new Slot0Configs()
@@ -47,19 +44,22 @@ public class Turret extends SubsystemBase {
                     .withKV(TurretConstants.kV)
                     .withKA(TurretConstants.kA));
 
+    cfg.Commutation.MotorArrangement = MotorArrangementValue.Minion_JST;
+
     turretMotor.getConfigurator().apply(cfg);
 
     turretMotor.getConfigurator().setPosition(TurretConstants.kInitialTurretPosition);
   }
 
   public void run(double rotations) {
-    turretMotor.setControl(turretRequest.withPosition(mod(rotations)));
+    // turretMotor.setControl(turretRequest.withPosition(mod(rotations)));
+    turretMotor.setControl(new DutyCycleOut(rotations));
   }
 
   public Command runTurret() {
     return run(
         () -> {
-          this.run(1);
+          this.run(0.08);
         });
   }
 

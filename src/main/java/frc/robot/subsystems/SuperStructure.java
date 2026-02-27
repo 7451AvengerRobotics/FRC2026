@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.Intake.IntakePivot;
 import frc.robot.subsystems.Shooters.Shooter;
+import frc.robot.subsystems.Shooters.Turret;
 
 public class SuperStructure {
   private final IntakePivot intakePivot;
@@ -13,6 +14,8 @@ public class SuperStructure {
   private final Feeder feeder;
   private final Shooter leftShooter;
   private final Shooter rightShooter;
+  private final Turret leftTurret;
+  private final IntakePivot pivot;
 
   public SuperStructure(
       Index index,
@@ -20,13 +23,17 @@ public class SuperStructure {
       IntakePivot intakePivot,
       Feeder feeder,
       Shooter leftShooter,
-      Shooter rightShooter) {
+      Shooter rightShooter,
+      Turret leftTurret,
+      IntakePivot pivot) {
     this.intakePivot = intakePivot;
     this.intake = intake;
     this.index = index;
     this.feeder = feeder;
     this.leftShooter = leftShooter;
     this.rightShooter = rightShooter;
+    this.leftTurret = leftTurret;
+    this.pivot = pivot;
   }
 
   public Command startIntake() {
@@ -64,6 +71,14 @@ public class SuperStructure {
     return index.runIndex(0.3);
   }
 
+  public Command runTurret() {
+    return leftTurret.runTurret();
+  }
+
+  public Command stopTurret() {
+    return leftTurret.stopTurret();
+  }
+
   public Command runShooters() {
     return Commands.parallel(leftShooter.runShooter(), rightShooter.runShooter());
   }
@@ -74,7 +89,7 @@ public class SuperStructure {
 
   public Command masterCommand() {
     return Commands.parallel(
-        intake.runIntake(-0.75), index.runIndex(-0.9), feeder.runFeeder(-0.9), runShooters());
+        intake.runIntake(-0.65), index.runIndex(-0.9), feeder.runFeeder(-0.9), runShooters());
   }
 
   public Command weirdMasterCommand() {
@@ -82,8 +97,31 @@ public class SuperStructure {
         intake.runIntake(-0.75), index.runIndex(0.6), feeder.runFeeder(-0.9), runShooters());
   }
 
+  public Command shooterlessMasterCommand() {
+    return Commands.parallel(
+        intake.runIntake(-0.75), index.runIndex(-0.9), feeder.runFeeder(-0.9), runShooters());
+  }
+
+  public Command intakelessMasterCommand() {
+    return Commands.parallel(
+        intake.stopIntake(), index.runIndex(-0.9), feeder.runFeeder(-0.9), runShooters());
+  }
+
+  public Command shooterlessWeirdMasterCommand() {
+    return Commands.parallel(
+        intake.runIntake(-0.75), index.runIndex(0.6), feeder.runFeeder(-0.9), runShooters());
+  }
+
   public Command stopMasterCommand() {
     return Commands.parallel(
         intake.stopIntake(), index.stopIndex(), feeder.stopFeeder(), stopShooters());
+  }
+
+  public Command deployPivot() {
+    return pivot.toPosition(IntakePivot.PivotPosition.DEPLOYED);
+  }
+
+  public Command stowPivot() {
+    return pivot.toPosition(IntakePivot.PivotPosition.STOW);
   }
 }

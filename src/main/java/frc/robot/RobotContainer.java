@@ -8,7 +8,6 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -16,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.ShooterConstants;
+import frc.robot.Constants.TurretConstants;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Feeder;
@@ -23,6 +23,7 @@ import frc.robot.subsystems.Index;
 import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.Intake.IntakePivot;
 import frc.robot.subsystems.Shooters.Shooter;
+import frc.robot.subsystems.Shooters.Turret;
 import frc.robot.subsystems.SimFiles.TurretSim;
 import frc.robot.subsystems.SuperStructure;
 import frc.robot.subsystems.drive.Drive;
@@ -44,16 +45,19 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   private final Vision vision;
-  private final TurretSim leftTurret;
-  private final TurretSim rightTurret;
+  private final Turret leftTurret = new Turret(TurretConstants.kTurretID);
+  private final TurretSim simTurret;
   private final IntakePivot intakePivot = new IntakePivot();
   private final Index index = new Index();
   private final Intake intake = new Intake();
   private final Feeder feeder = new Feeder();
+  private final IntakePivot pivot = new IntakePivot();
   private final Shooter leftShooter =
-      new Shooter(ShooterConstants.LeftShooterLeaderID, ShooterConstants.LeftShooterFollowerID);
+      new Shooter(
+          ShooterConstants.LeftShooterLeaderID, ShooterConstants.LeftShooterFollowerID, "left");
   private final Shooter rightShooter =
-      new Shooter(ShooterConstants.RightShooterLeaderID, ShooterConstants.RightShooterFollowerID);
+      new Shooter(
+          ShooterConstants.RightShooterLeaderID, ShooterConstants.RightShooterFollowerID, "right");
   private final SuperStructure superStructure;
 
   // Controller
@@ -80,9 +84,11 @@ public class RobotContainer {
             new Vision(
                 drive::addVisionMeasurement,
                 new VisionIOPhotonVision(
-                    VisionConstants.camera0Name, VisionConstants.robotToCamera0),
-                new VisionIOPhotonVision(
-                    VisionConstants.camera1Name, VisionConstants.robotToCamera1));
+                    VisionConstants.camera0Name, VisionConstants.robotToCamera0)
+                //     ,
+                // new VisionIOPhotonVision(
+                //     VisionConstants.camera1Name, VisionConstants.robotToCamera1)
+                    );
 
         // The ModuleIOTalonFXS implementation provides an example implementation for
         // TalonFXS controller connected to a CANdi with a PWM encoder. The
@@ -116,9 +122,11 @@ public class RobotContainer {
             new Vision(
                 drive::addVisionMeasurement,
                 new VisionIOPhotonVisionSim(
-                    VisionConstants.camera0Name, VisionConstants.robotToCamera0, drive::getPose),
-                new VisionIOPhotonVisionSim(
-                    VisionConstants.camera1Name, VisionConstants.robotToCamera1, drive::getPose));
+                    VisionConstants.camera0Name, VisionConstants.robotToCamera0, drive::getPose)
+                //     ,
+                // new VisionIOPhotonVisionSim(
+                //     VisionConstants.camera1Name, VisionConstants.robotToCamera1, drive::getPose)
+                    );
         break;
 
       default:
@@ -135,15 +143,18 @@ public class RobotContainer {
     }
 
     // Other subsystems
-    leftTurret =
-        new TurretSim(drive, new Transform3d(-0.17, -0.15, 0.39, new Rotation3d()), "Left");
-    rightTurret =
-        new TurretSim(drive, new Transform3d(-0.17, 0.15, 0.39, new Rotation3d()), "Right");
+    // leftTurret =
+    //     new TurretSim(drive, new Transform3d(-0.17, -0.15, 0.39, new Rotation3d()), "Left");
+    // rightTurret =
+    //     new TurretSim(drive, new Transform3d(-0.17, 0.15, 0.39, new Rotation3d()), "Right");
     superStructure =
-        new SuperStructure(index, intake, intakePivot, feeder, leftShooter, rightShooter);
+        new SuperStructure(
+            index, intake, intakePivot, feeder, leftShooter, rightShooter, leftTurret, pivot);
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+
+    simTurret = new TurretSim(drive, new Transform3d(), "Left");
 
     // Configure the bindings
     configureButtonBindings();
@@ -161,8 +172,8 @@ public class RobotContainer {
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
-            () -> controller.getLeftY(),
-            () -> controller.getLeftX(),
+            () -> -controller.getLeftY(),
+            () -> -controller.getLeftX(),
             () -> -controller.getRightX()));
 
     // // Switch to X pattern when X button is pressed
@@ -174,12 +185,16 @@ public class RobotContainer {
     // // Dropping the intake down
     // controller.L2().onTrue(superStructure.startIntake());
 
-    controller.square().onTrue(superStructure.soleIndex());
     // .toggleOnFalse(superStructure.stopIntake());
 
     controller
         .triangle()
-        .toggleOnTrue(superStructure.weirdMasterCommand())
+        .toggleOnTrue(superStructure.soleIntake())
+        .toggleOnFalse(superStructure.stopIntake());
+
+    controller
+        .circle()
+        .toggleOnTrue(superStructure.intakelessMasterCommand())
         .toggleOnFalse(superStructure.stopMasterCommand());
     // controller
     //     .triangle()
@@ -193,8 +208,8 @@ public class RobotContainer {
     // controller.L1().onTrue(superStructure.masterCommand());
     // controller.R1().onTrue(superStructure.stopMasterCommand());
 
-    controller.L1().onTrue(superStructure.runShooters());
-    controller.R1().onTrue(superStructure.stopShooters());
+    controller.L1().onTrue(simTurret.shootBallCommand());
+    controller.R1().onTrue(superStructure.stowPivot());
   }
 
   public void configureAutos() {

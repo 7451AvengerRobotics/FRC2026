@@ -17,11 +17,13 @@ public class Shooter extends SubsystemBase {
   private final SparkFlex shooterLeader;
   private final SparkFlex shooterFollower;
   private final SparkClosedLoopController closedLoopController;
+  private final String name;
 
-  public Shooter(int leaderID, int followerID) {
+  public Shooter(int leaderID, int followerID, String name) {
 
     shooterLeader = new SparkFlex(leaderID, MotorType.kBrushless);
     shooterFollower = new SparkFlex(followerID, MotorType.kBrushless);
+    this.name = name;
 
     closedLoopController = shooterLeader.getClosedLoopController();
 
@@ -73,7 +75,7 @@ public class Shooter extends SubsystemBase {
 
   @Override
   public void periodic() {
-    Logger.recordOutput("Velocity in RPM", shooterLeader.getEncoder().getVelocity());
+    Logger.recordOutput("Velocity in RPM_" + name, shooterLeader.getEncoder().getVelocity());
   }
 
   public void run(double power) {

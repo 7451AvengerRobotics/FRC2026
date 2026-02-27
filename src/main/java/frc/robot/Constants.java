@@ -32,8 +32,8 @@ public final class Constants {
 
   public static final class IntakePivotConstants {
     public static final int kIntakePivotID = 22;
-    public static final double kIntakeGearRatio = 1.0; // TODO: Set gear ratio
-    public static final double kP = 0.0;
+    public static final double kIntakeGearRatio = 4;
+    public static final double kP = 0.1;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
     public static final double kS = 0.0;
@@ -69,7 +69,7 @@ public final class Constants {
   }
 
   public static final class TurretConstants {
-    public static final int kTurretID = 47;
+    public static final int kTurretID = 20;
     public static final int kInitialTurretPosition = 0;
     public static final double kTurretGearRatio = 1.0;
     public static final double kP = 0.0;
@@ -83,5 +83,6 @@ public final class Constants {
 
   public static final class TargetConstants {
     public static final Translation2d hub = new Translation2d(11.915, 4.035);
+    public static final double yf = 1.32;
   }
 }
