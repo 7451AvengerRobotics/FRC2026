@@ -193,8 +193,8 @@ public class RobotContainer {
 
     controller
         .triangle()
-        .toggleOnTrue(superStructure.soleIntake())
-        .toggleOnFalse(superStructure.stopIntake());
+        .toggleOnTrue(superStructure.weirdMasterCommand())
+        .toggleOnFalse(superStructure.stopMasterCommand());
 
     controller
         .circle()
