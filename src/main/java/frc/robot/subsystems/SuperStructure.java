@@ -79,8 +79,16 @@ public class SuperStructure {
     return leftTurret.stopTurret();
   }
 
+  public Command leftShoot() {
+    return leftShooter.runShooter();
+  }
+
+  public Command rightShoot() {
+    return rightShooter.runShooter();
+  }
+
   public Command runShooters() {
-    return Commands.parallel(leftShooter.setVelCommand(4400), rightShooter.setVelCommand(4400));
+    return Commands.parallel(leftShooter.runShooter(), rightShooter.runShooter());
   }
 
   public Command stopShooters() {

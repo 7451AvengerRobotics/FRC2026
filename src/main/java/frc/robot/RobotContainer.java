@@ -212,8 +212,10 @@ public class RobotContainer {
     // controller.L1().onTrue(superStructure.masterCommand());
     // controller.R1().onTrue(superStructure.stopMasterCommand());
 
-    controller.L1().onTrue(simTurret.shootBallCommand());
-    controller.R1().onTrue(superStructure.stowPivot());
+    controller.L1().onTrue(superStructure.leftShoot());
+    controller.R1().onTrue(superStructure.rightShoot());
+
+    controller.PS().onTrue(superStructure.stopShooters());
   }
 
   public void configureAutos() {
