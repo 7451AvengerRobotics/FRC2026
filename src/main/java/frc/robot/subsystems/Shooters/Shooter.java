@@ -66,7 +66,8 @@ public class Shooter extends SubsystemBase {
         .allowedProfileError(1);
 
     leaderCfg.apply(globalCfg);
-    // followerCfg.apply(globalCfg).follow(shooterLeader).inverted(true);
+    leaderCfg.disableFollowerMode();
+    followerCfg.apply(globalCfg).follow(shooterLeader).inverted(true);
 
     shooterLeader.configure(
         leaderCfg, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
