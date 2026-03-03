@@ -17,8 +17,12 @@ public class ShotCalc {
   public ShotCalc() {}
 
   public double getVelocity(double xf) {
-    return Math.sqrt(
-        (-g * Math.pow(xf, 2)) / (2 * Math.pow(Math.cos(pitch), 2) * (yf - Math.tan(pitch) * xf)));
+    double numerator = g*Math.pow(xf, 2);
+    double denom1 = -yf + xf * Math.tan(pitch);
+    double denom2 = 2 * Math.pow(Math.cos(pitch), 2);
+    return Math.sqrt(numerator / (denom1 * denom2));
+    // return Math.sqrt(
+    //     (-g * Math.pow(xf, 2)) / (2 * Math.pow(Math.cos(pitch), 2) * (yf - Math.tan(pitch) * xf)));
   }
 
   public double getYaw(Pose2d robotPose) {
@@ -73,7 +77,9 @@ public class ShotCalc {
 
     double vrxHorizontalDisplacement = -vrxf * getTime(xf);
 
-    return Math.atan2(vrxHorizontalDisplacement, xf);
+    double yawAdj = Math.atan2(vrxHorizontalDisplacement, xf);
+
+    return mod(getYaw(robotPose) + yawAdj);
   }
 
   public double mod(double angle) {
