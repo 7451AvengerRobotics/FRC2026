@@ -5,7 +5,9 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.Intake.IntakePivot;
 import frc.robot.subsystems.Shooters.Shooter;
+import frc.robot.subsystems.Shooters.ShotCalc;
 import frc.robot.subsystems.Shooters.Turret;
+import frc.robot.subsystems.drive.Drive;
 
 public class SuperStructure {
   private final IntakePivot intakePivot;
@@ -67,10 +69,6 @@ public class SuperStructure {
 
   public Command reverseIndex() {
     return index.runIndex(0.3);
-  }
-
-  public Command runTurret() {
-    return leftTurret.runTurret();
   }
 
   public Command stopTurret() {

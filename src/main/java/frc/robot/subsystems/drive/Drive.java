@@ -45,6 +45,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
+import frc.robot.Constants.Side;
 import frc.robot.generated.TunerConstants;
 import frc.robot.util.LocalADStarAK;
 import java.util.Set;
@@ -418,5 +419,13 @@ public class Drive extends SubsystemBase {
   public ChassisSpeeds getRobotRelativeSpeeds() {
     return kinematics.toChassisSpeeds(
         modules[0].getState(), modules[1].getState(), modules[2].getState(), modules[3].getState());
+  }
+
+  public Command driveOverBump(Side side) {
+    if(side == Side.DEPOT) {
+      return Commands.sequence(this.driveToPose(new Pose2d(2, 5.5, new Rotation2d())), this.followPPPathCommand("DepotSideBump"));
+    } else {
+      return Commands.sequence(this.driveToPose(new Pose2d(2, 2.5, new Rotation2d())), this.followPPPathCommand("SourceSideBump"));
+    }
   }
 }
