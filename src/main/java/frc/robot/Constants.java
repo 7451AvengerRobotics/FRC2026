@@ -30,6 +30,11 @@ public final class Constants {
     REPLAY
   }
 
+  public static enum Side {
+    SOURCE,
+    DEPOT
+  }
+
   public static final class IntakePivotConstants {
     public static final int kIntakePivotID = 22;
     public static final double kIntakeGearRatio = 4;
