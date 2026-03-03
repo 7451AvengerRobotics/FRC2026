@@ -8,6 +8,7 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -47,7 +48,8 @@ public class RobotContainer {
   private final Drive drive;
   private final Vision vision;
   private final Turret leftTurret = new Turret(TurretConstants.kTurretID);
-  private final TurretSim simTurret;
+  private final TurretSim simTurretLeft;
+  private final TurretSim simTurretRight;
   private final IntakePivot intakePivot = new IntakePivot();
   private final Index index = new Index();
   private final Intake intake = new Intake();
@@ -143,20 +145,23 @@ public class RobotContainer {
     // rightTurret =
     //     new TurretSim(drive, new Transform3d(-0.17, 0.15, 0.39, new Rotation3d()), "Right");
 
-    simTurret = new TurretSim(drive, new Transform3d(), "Left");
+    simTurretLeft =
+        new TurretSim(drive, new Transform3d(-0.17, 0.15, 0.39, new Rotation3d()), "Left");
+    simTurretRight =
+        new TurretSim(drive, new Transform3d(-0.17, -0.15, 0.39, new Rotation3d()), "Right");
 
     leftShooter =
         new Shooter(
             ShooterConstants.LeftShooterLeaderID,
             ShooterConstants.LeftShooterFollowerID,
             "left",
-            simTurret);
+            simTurretLeft);
     rightShooter =
         new Shooter(
             ShooterConstants.RightShooterLeaderID,
             ShooterConstants.RightShooterFollowerID,
             "right",
-            simTurret);
+            simTurretRight);
     superStructure =
         new SuperStructure(
             index, intake, intakePivot, feeder, leftShooter, rightShooter, leftTurret, pivot);
