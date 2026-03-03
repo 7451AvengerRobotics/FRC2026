@@ -74,18 +74,18 @@ public class IntakePivot extends SubsystemBase {
     intakePivot.setControl(pivotRequest.withPosition(rotations));
   }
 
-  public boolean nearSetpoint(PivotPosition pos) {
-    double diff = intakePivot.getPosition().getValueAsDouble() - pos.rotations;
+  public boolean nearSetpoint(double rotations) {
+    double diff = intakePivot.getPosition().getValueAsDouble() - rotations;
     return Math.abs(diff) <= 0.05;
   }
 
-  public boolean atStow() {
-    return nearSetpoint(PivotPosition.STOW);
-  }
+  // public boolean atStow() {
+  //   return nearSetpoint(PivotPosition.STOW);
+  // }
 
-  public boolean atDeployed() {
-    return nearSetpoint(PivotPosition.DEPLOYED);
-  }
+  // public boolean atDeployed() {
+  //   return nearSetpoint(PivotPosition.DEPLOYED);
+  // }
 
   public Command setIntakePivotAngle(double rotations) {
     return run(
@@ -95,7 +95,7 @@ public class IntakePivot extends SubsystemBase {
   }
 
   public Command toPosition(double rotations) {
-    return setIntakePivotAngle(rotations);
+    return setIntakePivotAngle(rotations).until(() -> nearSetpoint(rotations));
   }
 
   @Override

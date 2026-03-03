@@ -11,7 +11,7 @@ import frc.robot.Constants;
 public class ShotCalc {
   double g = 9.81;
   double yf = Constants.TargetConstants.yf;
-  public double pitch = Math.toRadians(55);
+  public double pitch = Math.toRadians(60);
   Transform3d turretOffset = new Transform3d(-0.17, -0.15, 0.39, new Rotation3d());
 
   public ShotCalc() {}

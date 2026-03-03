@@ -2,6 +2,8 @@ package frc.robot.subsystems.Shooters;
 
 import static edu.wpi.first.units.Units.Amps;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -55,6 +57,11 @@ public class Turret extends SubsystemBase {
 
   public void run(double rotations) {
     turretMotor.setControl(turretRequest.withPosition(angleToEncoder(mod(rotations))));
+  }
+
+  @Override
+  public void periodic() {
+    Logger.recordOutput("Turret Encoder Counts", turretMotor.getPosition().getValueAsDouble());
   }
 
   public double angleToEncoder(double angle) {
