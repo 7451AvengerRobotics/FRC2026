@@ -14,6 +14,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.TurretConstants;
+import org.littletonrobotics.junction.Logger;
 
 public class Turret extends SubsystemBase {
 
@@ -52,6 +53,11 @@ public class Turret extends SubsystemBase {
 
   public void run(double rotations) {
     turretMotor.setControl(turretRequest.withPosition(mod(rotations)));
+  }
+
+  @Override
+  public void periodic() {
+    Logger.recordOutput("Turret Encoder Counts", turretMotor.getPosition().getValueAsDouble());
   }
 
   public Command runTurret() {
