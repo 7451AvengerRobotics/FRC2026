@@ -38,9 +38,7 @@ public class SuperStructure {
 
   public Command startIntake() {
     return Commands.parallel(
-        intakePivot.toPosition(IntakePivot.PivotPosition.DEPLOYED),
-        intake.runIntake(-0.5),
-        index.runIndex(-0.1));
+        intakePivot.toPosition(0.27), intake.runIntake(-0.5), index.runIndex(-0.1));
   }
 
   public Command soleIntake() {
@@ -97,7 +95,7 @@ public class SuperStructure {
 
   public Command masterCommand() {
     return Commands.parallel(
-        intake.runIntake(-0.65), index.runIndex(-0.9), feeder.runFeeder(-0.9), runShooters());
+        intake.runIntake(-0.9), index.runIndex(-0.9), feeder.runFeeder(-0.9), runShooters());
   }
 
   public Command weirdMasterCommand() {
@@ -125,10 +123,10 @@ public class SuperStructure {
   }
 
   public Command deployPivot() {
-    return pivot.toPosition(IntakePivot.PivotPosition.DEPLOYED);
+    return pivot.toPosition(2.8);
   }
 
   public Command stowPivot() {
-    return pivot.toPosition(IntakePivot.PivotPosition.STOW);
+    return pivot.toPosition(0);
   }
 }

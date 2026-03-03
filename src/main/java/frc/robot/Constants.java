@@ -33,7 +33,7 @@ public final class Constants {
   public static final class IntakePivotConstants {
     public static final int kIntakePivotID = 22;
     public static final double kIntakeGearRatio = 4;
-    public static final double kP = 0.1;
+    public static final double kP = 1;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
     public static final double kS = 0.0;
@@ -63,9 +63,10 @@ public final class Constants {
     public static final int RightShooterLeaderID = 52;
     public static final int RightShooterFollowerID = 53;
     public static final double kShooterGearRatio = 1.0;
-    public static final double kS = 0;
-    public static final double kP = 5;
-    public static final double kV = 0;
+    public static final double kS = 0.01;
+    public static final double kP = 0.0075 / 100 * 4;
+    public static final double kD = 0.0075 / 100 * 3;
+    public static final double kV = 0.00176;
   }
 
   public static final class TurretConstants {

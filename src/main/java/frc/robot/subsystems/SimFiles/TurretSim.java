@@ -209,6 +209,10 @@ public class TurretSim extends SubsystemBase {
         });
   }
 
+  public double getRequiredVelocity() {
+    return shotCalc.getVelocity(xf);
+  }
+
   // Helper Function:
   public double mod(double angle) {
     return ((angle % (2 * Math.PI)) + (2 * Math.PI)) % (2 * Math.PI);

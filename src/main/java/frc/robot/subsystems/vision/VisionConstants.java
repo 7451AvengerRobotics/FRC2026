@@ -19,27 +19,27 @@ public class VisionConstants {
       AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
 
   // Camera names, must match names configured on coprocessor
-  public static String camera0Name = "BackRight";
-  public static String camera1Name = "BackLeft";
+  public static String camera0Name = "BackLeft";
+  public static String camera1Name = "BackRight";
 
   // Robot to camera transforms
   // (Not used by Limelight, configure in web UI instead)
   public static Transform3d robotToCamera0 =
       new Transform3d(
-          -0.2582672,
-          -0.2620264,
-          0.1465834,
+          Units.inchesToMeters(-10.621),
+          Units.inchesToMeters(10.25),
+          Units.inchesToMeters(6.239),
           new Rotation3d(
-              Units.degreesToRadians(5), Units.degreesToRadians(15), Units.degreesToRadians(20)));
+              Units.degreesToRadians(2),
+              Units.degreesToRadians(-23),
+              Units.degreesToRadians(-198)));
   public static Transform3d robotToCamera1 =
       new Transform3d(
-          0.28,
-          -0.7,
-          0.213,
+          Units.inchesToMeters(-10.621),
+          Units.inchesToMeters(-10.25),
+          Units.inchesToMeters(6.239),
           new Rotation3d(
-              Units.degreesToRadians(-3.6),
-              Units.degreesToRadians(-11),
-              Units.degreesToRadians(183)));
+              Units.degreesToRadians(5), Units.degreesToRadians(-26), Units.degreesToRadians(202)));
 
   // Basic filtering thresholds
   public static double maxAmbiguity = 0.3;
@@ -47,8 +47,8 @@ public class VisionConstants {
 
   // Standard deviation baselines, for 1 meter distance and 1 tag
   // (Adjusted automatically based on distance and # of tags)
-  public static double linearStdDevBaseline = 0.02; // Meters
-  public static double angularStdDevBaseline = 0.06; // Radians
+  public static double linearStdDevBaseline = 0.002; // Meters
+  public static double angularStdDevBaseline = 0.006; // Radians
 
   // Standard deviation multipliers for each camera
   // (Adjust to trust some cameras more than others)

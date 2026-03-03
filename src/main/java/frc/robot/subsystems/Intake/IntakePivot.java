@@ -34,7 +34,7 @@ public class IntakePivot extends SubsystemBase {
             .withMotorOutput(
                 new MotorOutputConfigs()
                     .withInverted(InvertedValue.CounterClockwise_Positive)
-                    .withNeutralMode(NeutralModeValue.Coast))
+                    .withNeutralMode(NeutralModeValue.Brake))
             .withFeedback(
                 new FeedbackConfigs()
                     .withRotorToSensorRatio(1)
@@ -87,8 +87,8 @@ public class IntakePivot extends SubsystemBase {
         });
   }
 
-  public Command toPosition(PivotPosition pos) {
-    return setIntakePivotAngle(pos.rotations).until(() -> nearSetpoint(pos));
+  public Command toPosition(double rotations) {
+    return setIntakePivotAngle(rotations);
   }
 
   @Override

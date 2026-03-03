@@ -53,12 +53,8 @@ public class RobotContainer {
   private final Intake intake = new Intake();
   private final Feeder feeder = new Feeder();
   private final IntakePivot pivot = new IntakePivot();
-  private final Shooter leftShooter =
-      new Shooter(
-          ShooterConstants.LeftShooterLeaderID, ShooterConstants.LeftShooterFollowerID, "left");
-  private final Shooter rightShooter =
-      new Shooter(
-          ShooterConstants.RightShooterLeaderID, ShooterConstants.RightShooterFollowerID, "right");
+  private final Shooter leftShooter;
+  private final Shooter rightShooter;
   private final SuperStructure superStructure;
 
   // Controller
@@ -87,11 +83,9 @@ public class RobotContainer {
             new Vision(
                 drive::addVisionMeasurement,
                 new VisionIOPhotonVision(
-                    VisionConstants.camera0Name, VisionConstants.robotToCamera0)
-                //     ,
-                // new VisionIOPhotonVision(
-                //     VisionConstants.camera1Name, VisionConstants.robotToCamera1)
-                );
+                    VisionConstants.camera0Name, VisionConstants.robotToCamera0),
+                new VisionIOPhotonVision(
+                    VisionConstants.camera1Name, VisionConstants.robotToCamera1));
 
         // The ModuleIOTalonFXS implementation provides an example implementation for
         // TalonFXS controller connected to a CANdi with a PWM encoder. The
@@ -125,11 +119,9 @@ public class RobotContainer {
             new Vision(
                 drive::addVisionMeasurement,
                 new VisionIOPhotonVisionSim(
-                    VisionConstants.camera0Name, VisionConstants.robotToCamera0, drive::getPose)
-                //     ,
-                // new VisionIOPhotonVisionSim(
-                //     VisionConstants.camera1Name, VisionConstants.robotToCamera1, drive::getPose)
-                );
+                    VisionConstants.camera0Name, VisionConstants.robotToCamera0, drive::getPose),
+                new VisionIOPhotonVisionSim(
+                    VisionConstants.camera1Name, VisionConstants.robotToCamera1, drive::getPose));
         break;
 
       default:
@@ -150,6 +142,21 @@ public class RobotContainer {
     //     new TurretSim(drive, new Transform3d(-0.17, -0.15, 0.39, new Rotation3d()), "Left");
     // rightTurret =
     //     new TurretSim(drive, new Transform3d(-0.17, 0.15, 0.39, new Rotation3d()), "Right");
+
+    simTurret = new TurretSim(drive, new Transform3d(), "Left");
+
+    leftShooter =
+        new Shooter(
+            ShooterConstants.LeftShooterLeaderID,
+            ShooterConstants.LeftShooterFollowerID,
+            "left",
+            simTurret);
+    rightShooter =
+        new Shooter(
+            ShooterConstants.RightShooterLeaderID,
+            ShooterConstants.RightShooterFollowerID,
+            "right",
+            simTurret);
     superStructure =
         new SuperStructure(
             index, intake, intakePivot, feeder, leftShooter, rightShooter, leftTurret, pivot);
@@ -157,8 +164,6 @@ public class RobotContainer {
     // Set up auto routines
     autos = new AutoRoutines(drive, superStructure);
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
-
-    simTurret = new TurretSim(drive, new Transform3d(), "Left");
 
     // Configure the bindings
     configureButtonBindings();
@@ -191,23 +196,11 @@ public class RobotContainer {
 
     // .toggleOnFalse(superStructure.stopIntake());
 
-    controller
-        .triangle()
-        .toggleOnTrue(superStructure.weirdMasterCommand())
-        .toggleOnFalse(superStructure.stopMasterCommand());
+    controller.triangle().onTrue(superStructure.weirdMasterCommand());
+    controller.circle().onTrue(superStructure.stopMasterCommand());
+    controller.cross().onTrue(superStructure.masterCommand());
 
-    controller
-        .circle()
-        .toggleOnTrue(superStructure.intakelessMasterCommand())
-        .toggleOnFalse(superStructure.stopMasterCommand());
-    // controller
-    //     .triangle()
-    //     .toggleOnTrue(superStructure.soleIndex())
-    //     .toggleOnFalse(superStructure.stopIndex());
-    controller
-        .cross()
-        .toggleOnTrue(superStructure.masterCommand())
-        .toggleOnFalse(superStructure.stopMasterCommand());
+    controller.square().onTrue(superStructure.deployPivot());
 
     // controller.L1().onTrue(superStructure.masterCommand());
     // controller.R1().onTrue(superStructure.stopMasterCommand());
@@ -217,6 +210,37 @@ public class RobotContainer {
 
     controller.PS().onTrue(superStructure.stopShooters());
   }
+
+  // public Command driveOverSourceSideBump(){
+  //   return Commands.sequence(Commands.run(() -> {
+  //     drive.driveToPose(new Pose2d(0, 0, null))
+  //   }, null))
+  // }
+
+  /*
+  > Task :discoverroborio
+  Discovering Target roborio
+  admin @ 10.74.51.2: Resolved but not connected.
+    Reason: TimeoutException
+    Discovery timed out.
+  admin @ 172.22.11.2: Resolved but not connected.
+    Reason: TimeoutException
+    Discovery timed out.
+  admin @ roborio-7451-FRC.lan: Resolved but not connected.
+    Reason: TimeoutException
+    Discovery timed out.
+  admin @ roborio-7451-FRC: Resolved but not connected.
+    Reason: TimeoutException
+    Discovery timed out.
+  admin @ roborio-7451-FRC.local: Resolved but not connected.
+    Reason: TimeoutException
+    Discovery timed out.
+  admin @ null: Resolved but not connected.
+    Reason: TimeoutException
+    Discovery timed out.
+  admin @ roborio-7451-FRC.frc-field.local: Failed resolution.
+    Reason: RuntimeException
+    Unknown Host */
 
   public void configureAutos() {
     // AdvantageKit autos
