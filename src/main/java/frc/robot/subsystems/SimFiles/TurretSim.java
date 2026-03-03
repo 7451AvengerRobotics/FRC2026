@@ -199,8 +199,7 @@ public class TurretSim extends SubsystemBase {
         new FuelSim(
             shotCalc.getMovingVelocity(xf, Vr, drive.getPose()),
             shotCalc.pitch,
-            shotCalc.getYaw(drive.getPose())
-                - shotCalc.getMovingYaw(xf, Vr, drive.getPose())
+            shotCalc.getMovingYaw(xf, Vr, drive.getPose())
                 + drive.getPose().getRotation().getRadians(),
             turretPositionPose2d,
             Vr.vxMetersPerSecond,
