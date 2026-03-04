@@ -23,18 +23,17 @@ public class Shooter extends SubsystemBase {
   private final SparkFlex shooterLeader;
   private final SparkFlex shooterFollower;
   private final SparkClosedLoopController closedLoopController;
-  private final ShotCalc shotCalc = new ShotCalc();
+  private final ShotCalc shotCalc;
   private final String name;
-  private final TurretSim simTurret;
 
   private GenericEntry speed = Shuffleboard.getTab("Flywheel").add("Speed", 0).getEntry();
 
-  public Shooter(int leaderID, int followerID, String name, TurretSim simTurret) {
+  public Shooter(int leaderID, int followerID, String name, ShotCalc shotCalc) {
 
     shooterLeader = new SparkFlex(leaderID, MotorType.kBrushless);
     shooterFollower = new SparkFlex(followerID, MotorType.kBrushless);
     this.name = name;
-    this.simTurret = simTurret;
+    this.shotCalc = shotCalc;
 
     closedLoopController = shooterLeader.getClosedLoopController();
 

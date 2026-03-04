@@ -5,16 +5,48 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.Constants;
+import frc.robot.Constants.TargetConstants;
+import frc.robot.Constants.TurretConstants;
+import frc.robot.subsystems.drive.Drive;
 
 public class ShotCalc {
-  double g = 9.81;
-  double yf = Constants.TargetConstants.yf;
-  public double pitch = Math.toRadians(60);
-  Transform3d turretOffset = new Transform3d(-0.17, -0.15, 0.39, new Rotation3d());
+  private double g = 9.81;
+  private double xf;
+  private double yf;
+  private ChassisSpeeds vr;
+  private double vxr;
+  private double vyr;
+  private double pitch = Math.toRadians(55);
+  private Transform3d turretOffset = new Transform3d(-0.17, -0.15, 0.39, new Rotation3d());
+  private Drive drive;
+  private Translation2d target;
 
-  public ShotCalc() {}
+  public ShotCalc(Drive drive) {
+    this.drive = drive;
+  }
+
+  public void setTarget(Translation2d newTarget) {
+    target = newTarget;
+  }
+
+  public void setCurrState() {
+    turretPositionPose2d = drive.getPose().plus();
+    vr = ChassisSpeeds.fromRobotRelativeSpeeds(drive.getRobotRelativeSpeeds(), drive.getPose().getRotation());
+    vxr = vr.vxMetersPerSecond;
+    vyr = vr.vyMetersPerSecond;
+
+    xf =
+        Math.sqrt(
+            Math.pow(
+                    (target.getX() - turretPositionPose2d.getX()) + vxr * TurretConstants.latency,
+                    2)
+                + Math.pow(
+                    (target.getY() - turretPositionPose2d.getY()) + vyr * TurretConstants.latency,
+                    2));
+  }
 
   public double getVelocity(double xf) {
     double numerator = g*Math.pow(xf, 2);

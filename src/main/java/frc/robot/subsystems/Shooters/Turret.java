@@ -2,8 +2,6 @@ package frc.robot.subsystems.Shooters;
 
 import static edu.wpi.first.units.Units.Amps;
 
-import org.littletonrobotics.junction.Logger;
-
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -19,6 +17,7 @@ import frc.robot.Constants.RobotSide;
 import frc.robot.Constants.TurretConstants;
 import frc.robot.subsystems.SimFiles.TurretSim;
 import frc.robot.subsystems.drive.Drive;
+import org.littletonrobotics.junction.Logger;
 
 public class Turret extends SubsystemBase {
 
@@ -75,8 +74,8 @@ public class Turret extends SubsystemBase {
   public double angleToEncoder(double angle) {
     double minEncoderCount = 0;
     double maxEncoderCount = 0;
-    double encoderRange = maxEncoderCount-minEncoderCount;
-    double angleRange = 2*Math.PI;
+    double encoderRange = maxEncoderCount - minEncoderCount;
+    double angleRange = 2 * Math.PI;
 
     return ((angle * encoderRange) / angleRange) + minEncoderCount;
   }

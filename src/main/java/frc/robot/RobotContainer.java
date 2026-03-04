@@ -8,6 +8,7 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -51,6 +52,8 @@ public class RobotContainer {
   private final Turret leftTurret;
   private final Turret rightTurret;
   private final TurretSim simTurret;
+  private final TurretSim simTurretLeft;
+  private final TurretSim simTurretRight;
   private final IntakePivot intakePivot = new IntakePivot();
   private final Index index = new Index();
   private final Intake intake = new Intake();
@@ -149,6 +152,10 @@ public class RobotContainer {
 
     simTurret = new TurretSim(drive, new Transform3d(), "Left");
     shotCalc = new ShotCalc(drive);
+    simTurretLeft =
+        new TurretSim(drive, new Transform3d(-0.17, 0.15, 0.39, new Rotation3d()), "Left");
+    simTurretRight =
+        new TurretSim(drive, new Transform3d(-0.17, -0.15, 0.39, new Rotation3d()), "Right");
 
     leftShooter =
         new Shooter(

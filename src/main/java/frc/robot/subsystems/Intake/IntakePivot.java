@@ -1,6 +1,9 @@
 package frc.robot.subsystems.Intake;
 
-import org.littletonrobotics.junction.Logger;
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Second;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
@@ -12,16 +15,10 @@ import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
-import static edu.wpi.first.units.Units.Second;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.IntakePivotConstants;
+import org.littletonrobotics.junction.Logger;
 
 /* TODO
  * 1. Find proper inverted value
@@ -33,7 +30,8 @@ import frc.robot.Constants.IntakePivotConstants;
 public class IntakePivot extends SubsystemBase {
   private final TalonFX intakePivot = new TalonFX(IntakePivotConstants.kIntakePivotID);
   private final MotionMagicVoltage pivotRequest = new MotionMagicVoltage(0);
-  private final NetworkTable pivotTable = NetworkTableInstance.getDefault().getTable("Intake Pivot");
+  // private final NetworkTable pivotTable =
+  //     NetworkTableInstance.getDefault().getTable("Intake Pivot");
 
   public IntakePivot() {
     TalonFXConfiguration cfg =
@@ -101,8 +99,6 @@ public class IntakePivot extends SubsystemBase {
   @Override
   public void periodic() {
     Logger.recordOutput("IntakePivot Rotations", intakePivot.getPosition().getValueAsDouble());
-
-    pivotTable.getEntry("IntakePivot Rotations").setDouble(intakePivot.getPosition().getValueAsDouble());
   }
 
   public enum PivotPosition {

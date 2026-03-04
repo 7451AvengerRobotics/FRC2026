@@ -422,10 +422,14 @@ public class Drive extends SubsystemBase {
   }
 
   public Command driveOverBump(Side side) {
-    if(side == Side.DEPOT) {
-      return Commands.sequence(this.driveToPose(new Pose2d(2, 5.5, new Rotation2d())), this.followPPPathCommand("DepotSideBump"));
+    if (side == Side.DEPOT) {
+      return Commands.sequence(
+          this.driveToPose(new Pose2d(2, 5.5, new Rotation2d())),
+          this.followPPPathCommand("DepotSideBump"));
     } else {
-      return Commands.sequence(this.driveToPose(new Pose2d(2, 2.5, new Rotation2d())), this.followPPPathCommand("SourceSideBump"));
+      return Commands.sequence(
+          this.driveToPose(new Pose2d(2, 2.5, new Rotation2d())),
+          this.followPPPathCommand("SourceSideBump"));
     }
   }
 }
