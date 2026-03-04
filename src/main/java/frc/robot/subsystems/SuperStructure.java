@@ -98,7 +98,7 @@ public class SuperStructure {
   }
 
   public Command weirdMasterCommand() {
-    return Commands.parallel(intake.runIntake(-0.75), index.runIndex(0.6), feeder.runFeeder(-0.9));
+    return Commands.parallel(intake.runIntake(-0.5), index.runIndex(0.6), feeder.runFeeder(-0.9));
   }
 
   public Command shooterlessMasterCommand() {

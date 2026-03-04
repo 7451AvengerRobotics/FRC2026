@@ -1,8 +1,12 @@
 package frc.robot.subsystems.Shooters;
 
 import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Second;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXSConfiguration;
@@ -46,6 +50,11 @@ public class Turret extends SubsystemBase {
                 new CurrentLimitsConfigs()
                     .withStatorCurrentLimit(Amps.of(40))
                     .withStatorCurrentLimitEnable(true))
+            .withMotionMagic(
+                new MotionMagicConfigs()
+                    .withMotionMagicCruiseVelocity(RotationsPerSecond.of(5))
+                    .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(10))
+                    .withMotionMagicJerk(RotationsPerSecondPerSecond.per(Second).of(100)))
             .withSlot0(
                 new Slot0Configs()
                     .withKP(TurretConstants.kP)
@@ -59,7 +68,12 @@ public class Turret extends SubsystemBase {
 
     turretMotor.getConfigurator().apply(cfg);
 
-    turretMotor.getConfigurator().setPosition((this.robotSide == RobotSide.RIGHT) ? TurretConstants.kInitialTurretPosition : -TurretConstants.kInitialTurretPosition);
+    turretMotor
+        .getConfigurator()
+        .setPosition(
+            (this.robotSide == RobotSide.RIGHT)
+                ? TurretConstants.kInitialTurretPosition
+                : -TurretConstants.kInitialTurretPosition);
   }
 
   public void run(double rotations) {
@@ -74,11 +88,19 @@ public class Turret extends SubsystemBase {
 
     double targetYaw = shotCalc.getRobotRelativeYaw(this.drive.getPose()) - Math.PI / 2;
     if (this.robotSide == RobotSide.RIGHT) {
-      targetYaw = targetYaw + Math.PI;
+      targetYaw = targetYaw - Math.PI;
     }
 
     Logger.recordOutput(
-        "Suggested Encoder Count" + (robotSide == RobotSide.LEFT ? " Left" : " Right"), targetYaw);
+        "Suggested Encoder Count" + (robotSide == RobotSide.LEFT ? " Left" : " Right"),
+        angleToEncoder(mod(targetYaw)));
+
+    Logger.recordOutput(
+        "Turret Voltage" + (robotSide == RobotSide.LEFT ? " Left" : " Right"),
+        turretMotor.getMotorVoltage().getValueAsDouble());
+    Logger.recordOutput(
+        "Turret Current" + (robotSide == RobotSide.LEFT ? " Left" : " Right"),
+        turretMotor.getSupplyCurrent().getValueAsDouble());
   }
 
   public Command followHub() {
@@ -86,9 +108,9 @@ public class Turret extends SubsystemBase {
         () -> {
           double targetYaw = shotCalc.getRobotRelativeYaw(this.drive.getPose()) - Math.PI / 2;
           if (this.robotSide == RobotSide.RIGHT) {
-            targetYaw = targetYaw + Math.PI;
+            targetYaw = targetYaw - Math.PI;
           }
-          this.run(targetYaw);
+          run(targetYaw);
         });
   }
 
@@ -117,6 +139,13 @@ public class Turret extends SubsystemBase {
     return run(
         () -> {
           this.run(0);
+        });
+  }
+
+  public Command goToThree() {
+    return run(
+        () -> {
+          run(0);
         });
   }
 
