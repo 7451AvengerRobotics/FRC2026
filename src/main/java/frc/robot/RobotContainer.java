@@ -62,7 +62,8 @@ public class RobotContainer {
   private final Shooter leftShooter;
   private final Shooter rightShooter;
   private final SuperStructure superStructure;
-  private ShotCalc shotCalc;
+  private ShotCalc leftShotCalc;
+  private ShotCalc rightShotCalc;
 
   // Controller
   private final CommandPS5Controller controller = new CommandPS5Controller(0);
@@ -151,7 +152,8 @@ public class RobotContainer {
     //     new TurretSim(drive, new Transform3d(-0.17, 0.15, 0.39, new Rotation3d()), "Right");
 
     simTurret = new TurretSim(drive, new Transform3d(), "Left");
-    shotCalc = new ShotCalc(drive);
+    leftShotCalc = new ShotCalc(drive, new Transform3d(-0.17, -0.15, 0.39, new Rotation3d()));
+    rightShotCalc = new ShotCalc(drive, new Transform3d(-0.17, -0.15, 0.39, new Rotation3d()));
     simTurretLeft =
         new TurretSim(drive, new Transform3d(-0.17, 0.15, 0.39, new Rotation3d()), "Left");
     simTurretRight =
@@ -161,15 +163,15 @@ public class RobotContainer {
         new Shooter(
             ShooterConstants.LeftShooterLeaderID,
             ShooterConstants.LeftShooterFollowerID,
-            "left", shotCalc);
+            "left", leftShotCalc);
     rightShooter =
         new Shooter(
             ShooterConstants.RightShooterLeaderID,
             ShooterConstants.RightShooterFollowerID,
-            "right", shotCalc);
+            "right", rightShotCalc);
 
-    leftTurret = new Turret(TurretConstants.kTurretID, drive, RobotSide.LEFT, shotCalc);
-    rightTurret = new Turret(TurretConstants.kTurretID, drive, RobotSide.RIGHT, shotCalc);
+    leftTurret = new Turret(TurretConstants.kTurretID, drive, RobotSide.LEFT, leftShotCalc);
+    rightTurret = new Turret(TurretConstants.kTurretID, drive, RobotSide.RIGHT, rightShotCalc);
     superStructure =
         new SuperStructure(
             index, intake, intakePivot, feeder, leftShooter, rightShooter, leftTurret, rightTurret, pivot);

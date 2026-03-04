@@ -21,19 +21,31 @@ public class ShotCalc {
   private double vyr;
   private double pitch = Math.toRadians(55);
   private Transform3d turretOffset = new Transform3d(-0.17, -0.15, 0.39, new Rotation3d());
+  private Transform2d turretOffsetTransform2d;
+  private Pose2d turretPositionPose2d;
   private Drive drive;
   private Translation2d target;
 
-  public ShotCalc(Drive drive) {
+  public ShotCalc(Drive drive, Transform3d turretOffset) {
     this.drive = drive;
+    turretOffsetTransform2d =
+        new Transform2d(turretOffset.getX(), turretOffset.getY(), new Rotation2d());
   }
 
   public void setTarget(Translation2d newTarget) {
     target = newTarget;
   }
 
-  public void setCurrState() {
-    turretPositionPose2d = drive.getPose().plus();
+  public double getXf() {
+    return this.xf;
+  }
+
+  public double getPitch() {
+    return this.pitch;
+  }
+
+  public void updateState() {
+    turretPositionPose2d = drive.getPose().plus(turretOffsetTransform2d);
     vr = ChassisSpeeds.fromRobotRelativeSpeeds(drive.getRobotRelativeSpeeds(), drive.getPose().getRotation());
     vxr = vr.vxMetersPerSecond;
     vyr = vr.vyMetersPerSecond;
@@ -72,7 +84,7 @@ public class ShotCalc {
     return mod(theta);
   }
 
-  public double getTime(double xf) {
+  public double getTime() {
     return xf / (getVelocity(xf) * Math.cos(pitch));
   }
 
@@ -88,7 +100,7 @@ public class ShotCalc {
 
     double vrxf = Math.cos(transformedVelocityAngle) * robotVelocityMag;
 
-    double vrxHorizontalDisplacement = -vrxf * getTime(xf);
+    double vrxHorizontalDisplacement = -vrxf * getTime();
 
     double newxf = Math.sqrt(Math.pow(xf, 2) + Math.pow(vrxHorizontalDisplacement, 2));
 
@@ -107,7 +119,7 @@ public class ShotCalc {
 
     double vrxf = Math.cos(transformedVelocityAngle) * robotVelocityMag;
 
-    double vrxHorizontalDisplacement = -vrxf * getTime(xf);
+    double vrxHorizontalDisplacement = -vrxf * getTime();
 
     double yawAdj = Math.atan2(vrxHorizontalDisplacement, xf);
 

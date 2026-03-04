@@ -39,12 +39,13 @@ public class TurretSim extends SubsystemBase {
   double g = 9.8;
   double a = -g;
 
-  private final ShotCalc shotCalc = new ShotCalc();
+  private final ShotCalc shotCalc;
 
   public TurretSim(Drive drive, Transform3d turretOffset, String name) {
     this.drive = drive;
     this.turretOffset = turretOffset;
     this.name = name;
+    this.shotCalc = new ShotCalc(drive, turretOffset);
 
     turretOffsetTransform2d =
         new Transform2d(turretOffset.getX(), turretOffset.getY(), new Rotation2d());
@@ -103,7 +104,7 @@ public class TurretSim extends SubsystemBase {
         activeFuel.stream().map(FuelSim::getPose).toArray(Pose3d[]::new));
 
     Logger.recordOutput("Shooter Velocity", shotCalc.getVelocity(xf));
-    Logger.recordOutput("Shooter Pitch", shotCalc.pitch * 180 / Math.PI);
+    Logger.recordOutput("Shooter Pitch", shotCalc.getPitch() * 180 / Math.PI);
     Logger.recordOutput("Shooter Yaw", shotCalc.getYaw(drive.getPose()) * 180 / Math.PI);
 
     SmartDashboard.putNumber("Yaw", calcYaw());
@@ -198,7 +199,7 @@ public class TurretSim extends SubsystemBase {
     activeFuel.add(
         new FuelSim(
             shotCalc.getMovingVelocity(xf, Vr, drive.getPose()),
-            shotCalc.pitch,
+            shotCalc.getPitch(),
             shotCalc.getMovingYaw(xf, Vr, drive.getPose())
                 + drive.getPose().getRotation().getRadians(),
             turretPositionPose2d,

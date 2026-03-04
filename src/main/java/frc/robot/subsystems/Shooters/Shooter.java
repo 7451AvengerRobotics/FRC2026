@@ -111,7 +111,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public Command runShooter() {
-    double velocityRequired = simTurret.getRequiredVelocity();
+    double velocityRequired = shotCalc.getVelocity(shotCalc.getXf());
     double a = -0.0773318;
     double b = 5.49489;
     double flywheelVel =
@@ -123,7 +123,7 @@ public class Shooter extends SubsystemBase {
   } 
 
   public double flywheelVel() {
-    double velocityRequired = simTurret.getRequiredVelocity();
+    double velocityRequired = shotCalc.getVelocity(shotCalc.getXf());
     double a = -0.0773318;
     double b = 5.49489;
     double flywheelVel =

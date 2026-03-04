@@ -28,7 +28,6 @@ public class Turret extends SubsystemBase {
   private final RobotSide robotSide;
 
   public Turret(int leaderID, Drive drive, RobotSide robotSide, ShotCalc shotCalc) {
-
     turretMotor = new TalonFXS(leaderID);
     this.shotCalc = shotCalc;
     this.drive = drive;
@@ -67,6 +66,7 @@ public class Turret extends SubsystemBase {
   @Override
   public void periodic() {
     Logger.recordOutput("Turret Encoder Counts", turretMotor.getPosition().getValueAsDouble());
+    shotCalc.updateState();
     double targetYaw = shotCalc.getYaw(drive.getPose());
     this.setTurretPos(targetYaw * (robotSide == RobotSide.RIGHT ? -1 : 1));
   }
