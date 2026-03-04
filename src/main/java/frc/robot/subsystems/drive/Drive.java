@@ -421,15 +421,25 @@ public class Drive extends SubsystemBase {
         modules[0].getState(), modules[1].getState(), modules[2].getState(), modules[3].getState());
   }
 
-  public Command driveOverBump(Side side) {
-    if (side == Side.DEPOT) {
+  public Command driveOverBump() {
+    if (this.getPose().getY() > 4 && this.getPose().getX() < 4) {
       return Commands.sequence(
           this.driveToPose(new Pose2d(2, 5.5, new Rotation2d())),
           this.followPPPathCommand("DepotSideBump"));
-    } else {
+    } else if (this.getPose().getY() < 4 && this.getPose().getX() < 4) {
       return Commands.sequence(
           this.driveToPose(new Pose2d(2, 2.5, new Rotation2d())),
           this.followPPPathCommand("SourceSideBump"));
+    } else if (this.getPose().getY() > 4 && this.getPose().getX() > 5.7) {
+      return Commands.sequence(
+          this.driveToPose(new Pose2d(2, 2.5, new Rotation2d())),
+          this.followPPPathCommand("DepotSideBumpOpposite"));
+    } else if (this.getPose().getY() < 4 && this.getPose().getX() > 5.7) {
+      return Commands.sequence(
+          this.driveToPose(new Pose2d(2, 2.5, new Rotation2d())),
+          this.followPPPathCommand("SourceSideBumpOpposite"));
+    } else {
+      return Commands.none();
     }
   }
 }

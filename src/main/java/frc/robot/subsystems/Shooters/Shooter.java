@@ -9,6 +9,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.subsystems.SimFiles.TurretSim;
@@ -24,6 +25,7 @@ public class Shooter extends SubsystemBase {
   private final String name;
   private TurretSim simTurret;
   private Drive drive;
+  private double velOffset;
 
   private double ballRequiredVel;
 
@@ -84,6 +86,16 @@ public class Shooter extends SubsystemBase {
         followerCfg, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
 
+  public void setVelOffset(double offset) {
+    this.velOffset = offset;
+  }
+
+  public Command offsetVel(double offset) {
+    return Commands.run(() -> {
+      this.setVelOffset(this.velOffset+offset);
+    });
+  }
+
   @Override
   public void periodic() {
     Logger.recordOutput("Velocity in RPM_" + name, shooterLeader.getEncoder().getVelocity());
@@ -101,7 +113,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public void setVel(double rpm) {
-    closedLoopController.setSetpoint(rpm, ControlType.kMAXMotionVelocityControl);
+    closedLoopController.setSetpoint(rpm+velOffset, ControlType.kMAXMotionVelocityControl);
   }
 
   public Command setVelCommand(double rpm) {

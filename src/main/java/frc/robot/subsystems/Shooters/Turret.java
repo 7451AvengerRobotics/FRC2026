@@ -13,6 +13,7 @@ import com.ctre.phoenix6.signals.MotorArrangementValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.RobotSide;
 import frc.robot.Constants.TurretConstants;
@@ -27,6 +28,7 @@ public class Turret extends SubsystemBase {
   private final RobotSide robotSide;
   private final Drive drive;
   private final Transform3d turretOffset;
+  private double yawOffset;
 
   public Turret(int leaderID, RobotSide robotSide, Drive drive, Transform3d turretOffset) {
 
@@ -62,6 +64,16 @@ public class Turret extends SubsystemBase {
     turretMotor.getConfigurator().setPosition((this.robotSide == RobotSide.RIGHT) ? TurretConstants.kInitialTurretPosition : -TurretConstants.kInitialTurretPosition);
   }
 
+  public void setYawOffset(double yawOffset){
+    this.yawOffset = yawOffset;
+  }
+
+  public Command offsetYaw(double offset) {
+    return Commands.run(() -> {
+      this.setYawOffset(this.yawOffset+offset);
+    });
+  }
+
   public void run(double rotations) {
     turretMotor.setControl(turretRequest.withPosition(angleToEncoder(mod(rotations))));
   }
@@ -88,7 +100,7 @@ public class Turret extends SubsystemBase {
           if (this.robotSide == RobotSide.RIGHT) {
             targetYaw = targetYaw + Math.PI;
           }
-          this.run(targetYaw);
+          this.run(targetYaw + yawOffset);
         });
   }
 
