@@ -229,9 +229,9 @@ public class RobotContainer {
 
     // .toggleOnFalse(superStructure.stopIntake());
 
-    // controller.triangle().onTrue(superStructure.weirdMasterCommand());
+    controller.triangle().onTrue(superStructure.weirdMasterCommand());
     controller.circle().onTrue(superStructure.stopMasterCommand());
-    // controller.cross().whileTrue(superStructure.masterCommand());
+    controller.cross().toggleOnTrue(superStructure.masterCommand());
 
     controller.square().onTrue(superStructure.deployPivot());
 
@@ -255,6 +255,10 @@ public class RobotContainer {
     manip.povRight().onTrue(superStructure.offsetTurrets(5 * Math.PI / 180));
     manip.L1().whileTrue(superStructure.offsetShooters(-10));
     manip.R1().whileTrue(superStructure.offsetShooters(10));
+
+    controller.PS().onTrue(superStructure.stopShooters());
+
+    controller.touchpad().onTrue(rightTurret.goToThree());
   }
 
   // public Command driveOverSourceSideBump(){

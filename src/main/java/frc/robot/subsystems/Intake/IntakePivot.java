@@ -52,7 +52,7 @@ public class IntakePivot extends SubsystemBase {
                     .withStatorCurrentLimitEnable(true))
             .withMotionMagic(
                 new MotionMagicConfigs()
-                    .withMotionMagicCruiseVelocity(RotationsPerSecond.of(0.75))
+                    .withMotionMagicCruiseVelocity(RotationsPerSecond.of(1.5))
                     .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(7))
                     .withMotionMagicJerk(RotationsPerSecondPerSecond.per(Second).of(100)))
             .withSlot0(
