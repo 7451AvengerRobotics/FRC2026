@@ -17,6 +17,7 @@ public class SuperStructure {
   private final Shooter leftShooter;
   private final Shooter rightShooter;
   private final Turret leftTurret;
+  private final Turret rightTurret;
   private final IntakePivot pivot;
 
   public SuperStructure(
@@ -27,6 +28,7 @@ public class SuperStructure {
       Shooter leftShooter,
       Shooter rightShooter,
       Turret leftTurret,
+      Turret rightTurret,
       IntakePivot pivot) {
     this.intakePivot = intakePivot;
     this.intake = intake;
@@ -35,6 +37,7 @@ public class SuperStructure {
     this.leftShooter = leftShooter;
     this.rightShooter = rightShooter;
     this.leftTurret = leftTurret;
+    this.rightTurret = rightTurret;
     this.pivot = pivot;
   }
 

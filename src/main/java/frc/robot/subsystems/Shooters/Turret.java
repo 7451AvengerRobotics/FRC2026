@@ -15,7 +15,9 @@ import com.ctre.phoenix6.signals.MotorArrangementValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.RobotSide;
 import frc.robot.Constants.TurretConstants;
+import frc.robot.subsystems.SimFiles.TurretSim;
 import frc.robot.subsystems.drive.Drive;
 
 public class Turret extends SubsystemBase {
@@ -23,11 +25,15 @@ public class Turret extends SubsystemBase {
   private final TalonFXS turretMotor;
   private final MotionMagicVoltage turretRequest = new MotionMagicVoltage(0);
   private final ShotCalc shotCalc;
+  private final Drive drive;
+  private final RobotSide robotSide;
 
-  public Turret(int leaderID) {
+  public Turret(int leaderID, Drive drive, RobotSide robotSide, ShotCalc shotCalc) {
 
     turretMotor = new TalonFXS(leaderID);
-    shotCalc = new ShotCalc();
+    this.shotCalc = shotCalc;
+    this.drive = drive;
+    this.robotSide = robotSide;
 
     TalonFXSConfiguration cfg =
         new TalonFXSConfiguration()
@@ -62,6 +68,8 @@ public class Turret extends SubsystemBase {
   @Override
   public void periodic() {
     Logger.recordOutput("Turret Encoder Counts", turretMotor.getPosition().getValueAsDouble());
+    double targetYaw = shotCalc.getYaw(drive.getPose());
+    this.setTurretPos(targetYaw * (robotSide == RobotSide.RIGHT ? -1 : 1));
   }
 
   public double angleToEncoder(double angle) {

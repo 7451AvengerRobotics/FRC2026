@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.Constants.RobotSide;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.TurretConstants;
 import frc.robot.commands.AutoRoutines;
@@ -24,6 +25,7 @@ import frc.robot.subsystems.Index;
 import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.Intake.IntakePivot;
 import frc.robot.subsystems.Shooters.Shooter;
+import frc.robot.subsystems.Shooters.ShotCalc;
 import frc.robot.subsystems.Shooters.Turret;
 import frc.robot.subsystems.SimFiles.TurretSim;
 import frc.robot.subsystems.SuperStructure;
@@ -46,7 +48,8 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   private final Vision vision;
-  private final Turret leftTurret = new Turret(TurretConstants.kTurretID);
+  private final Turret leftTurret;
+  private final Turret rightTurret;
   private final TurretSim simTurret;
   private final IntakePivot intakePivot = new IntakePivot();
   private final Index index = new Index();
@@ -56,6 +59,7 @@ public class RobotContainer {
   private final Shooter leftShooter;
   private final Shooter rightShooter;
   private final SuperStructure superStructure;
+  private ShotCalc shotCalc;
 
   // Controller
   private final CommandPS5Controller controller = new CommandPS5Controller(0);
@@ -144,22 +148,24 @@ public class RobotContainer {
     //     new TurretSim(drive, new Transform3d(-0.17, 0.15, 0.39, new Rotation3d()), "Right");
 
     simTurret = new TurretSim(drive, new Transform3d(), "Left");
+    shotCalc = new ShotCalc(drive);
 
     leftShooter =
         new Shooter(
             ShooterConstants.LeftShooterLeaderID,
             ShooterConstants.LeftShooterFollowerID,
-            "left",
-            simTurret);
+            "left", shotCalc);
     rightShooter =
         new Shooter(
             ShooterConstants.RightShooterLeaderID,
             ShooterConstants.RightShooterFollowerID,
-            "right",
-            simTurret);
+            "right", shotCalc);
+
+    leftTurret = new Turret(TurretConstants.kTurretID, drive, RobotSide.LEFT, shotCalc);
+    rightTurret = new Turret(TurretConstants.kTurretID, drive, RobotSide.RIGHT, shotCalc);
     superStructure =
         new SuperStructure(
-            index, intake, intakePivot, feeder, leftShooter, rightShooter, leftTurret, pivot);
+            index, intake, intakePivot, feeder, leftShooter, rightShooter, leftTurret, rightTurret, pivot);
 
     // Set up auto routines
     autos = new AutoRoutines(drive, superStructure);
@@ -209,6 +215,7 @@ public class RobotContainer {
     controller.R1().onTrue(superStructure.rightShoot());
 
     controller.PS().onTrue(superStructure.stopShooters());
+ 
   }
 
   // public Command driveOverSourceSideBump(){
