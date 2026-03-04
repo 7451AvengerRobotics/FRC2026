@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -26,6 +27,7 @@ public class TurretSim extends SubsystemBase {
   Transform2d turretOffsetTransform2d;
   Pose2d turretPositionPose2d;
 
+  ChassisSpeeds VrRobot;
   ChassisSpeeds Vr;
   double vxr;
   double vyr;
@@ -37,12 +39,13 @@ public class TurretSim extends SubsystemBase {
   double g = 9.8;
   double a = -g;
 
-  private final ShotCalc shotCalc = new ShotCalc();
+  private final ShotCalc shotCalc;
 
   public TurretSim(Drive drive, Transform3d turretOffset, String name) {
     this.drive = drive;
     this.turretOffset = turretOffset;
     this.name = name;
+    this.shotCalc = new ShotCalc();
 
     turretOffsetTransform2d =
         new Transform2d(turretOffset.getX(), turretOffset.getY(), new Rotation2d());
@@ -62,9 +65,10 @@ public class TurretSim extends SubsystemBase {
   @Override
   public void periodic() {
     turretPositionPose2d = drive.getPose().plus(turretOffsetTransform2d);
-    Vr = drive.getRobotRelativeSpeeds();
-    vxr = Vr.vxMetersPerSecond;
-    vyr = Vr.vyMetersPerSecond;
+    VrRobot = drive.getRobotRelativeSpeeds();
+    Vr = ChassisSpeeds.fromRobotRelativeSpeeds(VrRobot, drive.getPose().getRotation());
+    vxr = Math.abs(Vr.vxMetersPerSecond) < 0.01 ? 0 : Vr.vxMetersPerSecond;
+    vyr = Math.abs(Vr.vyMetersPerSecond) < 0.01 ? 0 : Vr.vyMetersPerSecond;
 
     xf =
         Math.sqrt(
@@ -80,6 +84,14 @@ public class TurretSim extends SubsystemBase {
         "FinalPoses_" + name,
         new Pose3d[] {new Pose3d(turretOffset.getTranslation(), new Rotation3d(0, 0, calcYaw()))});
     Logger.recordOutput("Target", targetPose3d());
+
+    Logger.recordOutput(
+        "Stationary Vel_" + name,
+        new Pose3d[] {
+          new Pose3d(
+              new Translation3d(),
+              new Rotation3d(0, 0, velocityYaw() - drive.getPose().getRotation().getRadians()))
+        });
 
     activeFuel.removeIf(
         fuel -> {
@@ -132,6 +144,10 @@ public class TurretSim extends SubsystemBase {
 
   public double calcYawForSimBall(double yaw) {
     return yaw + drive.getPose().getRotation().getRadians();
+  }
+
+  public double velocityYaw() {
+    return Math.atan2(vyr, vxr) - Math.PI / 2;
   }
 
   public double calcVelocity(double xf) {
