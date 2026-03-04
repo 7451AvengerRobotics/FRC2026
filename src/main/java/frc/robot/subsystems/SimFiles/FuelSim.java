@@ -6,7 +6,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Constants.TurretConstants;
+import frc.robot.Constants;
 
 public class FuelSim {
   double pitch;
@@ -19,8 +19,8 @@ public class FuelSim {
   double interval = 0.02;
   double time = 0;
   double accel = 9.8;
-  double height = 0.5;
-  Translation2d hub = new Translation2d(11.915, 4.035);
+  double height = 0.39;
+  Translation2d hub = Constants.TargetConstants.hub;
 
   double xChange;
   double yChange;
@@ -43,15 +43,11 @@ public class FuelSim {
   }
 
   public double getX() {
-    return initialPos.getX()
-        + velocity * Math.cos(pitch) * Math.cos(yaw) * time
-        + vxr * (time + TurretConstants.latency);
+    return initialPos.getX() + velocity * Math.cos(pitch) * Math.cos(yaw) * time;
   }
 
   public double getY() {
-    return initialPos.getY()
-        + velocity * Math.cos(pitch) * Math.sin(yaw) * time
-        + vyr * (time + TurretConstants.latency);
+    return initialPos.getY() + velocity * Math.cos(pitch) * Math.sin(yaw) * time;
   }
 
   public double getZ() {

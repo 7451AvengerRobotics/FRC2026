@@ -8,14 +8,11 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.subsystems.SimFiles.TurretSim;
+import frc.robot.subsystems.drive.Drive;
 import org.littletonrobotics.junction.Logger;
 
 public class Shooter extends SubsystemBase {
@@ -23,20 +20,22 @@ public class Shooter extends SubsystemBase {
   private final SparkFlex shooterLeader;
   private final SparkFlex shooterFollower;
   private final SparkClosedLoopController closedLoopController;
-  private final ShotCalc shotCalc = new ShotCalc();
+  private final ShotCalc shotCalc;
   private final String name;
-  private final TurretSim simTurret;
+  private TurretSim simTurret;
+  private Drive drive;
 
-  private GenericEntry speed = Shuffleboard.getTab("Flywheel").add("Speed", 0).getEntry();
+  private double ballRequiredVel;
 
-  public Shooter(int leaderID, int followerID, String name, TurretSim simTurret) {
+  public Shooter(int leaderID, int followerID, String name, TurretSim simTurret, Drive drive) {
 
     shooterLeader = new SparkFlex(leaderID, MotorType.kBrushless);
     shooterFollower = new SparkFlex(followerID, MotorType.kBrushless);
     this.name = name;
     this.simTurret = simTurret;
-
+    this.drive = drive;
     closedLoopController = shooterLeader.getClosedLoopController();
+    this.shotCalc = new ShotCalc(simTurret.getTurretOffset());
 
     // TalonFXConfiguration cfg =
     //     new TalonFXConfiguration()
@@ -83,8 +82,6 @@ public class Shooter extends SubsystemBase {
         leaderCfg, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     shooterFollower.configure(
         followerCfg, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
-    
   }
 
   @Override
@@ -93,6 +90,9 @@ public class Shooter extends SubsystemBase {
     Logger.recordOutput("Voltage in Volts_" + name, shooterLeader.getAppliedOutput());
     Logger.recordOutput("Current in Amps_" + name, shooterLeader.getOutputCurrent());
     Logger.recordOutput("Flywheel" + name, this.flywheelVel());
+
+    ballRequiredVel = simTurret.getRequiredVelocity();
+    Logger.recordOutput("Required Velocity" + name, ballRequiredVel);
   }
 
   public void run(double power) {
@@ -112,26 +112,48 @@ public class Shooter extends SubsystemBase {
   }
 
   public Command runShooter() {
-    double velocityRequired = simTurret.getRequiredVelocity();
-    double a = -0.0773318;
-    double b = 5.49489;
-    double flywheelVel =
-        (a * Math.pow(velocityRequired, 2) + b * velocityRequired)
-            * 60
-            / (2 * Math.PI * 4 * 0.0254);
-    MathUtil.clamp(flywheelVel, 0, 5000);
-    return setVelCommand(speed.getDouble(3000));
-  } 
+    return run(
+        () -> {
+          //   double target = Constants.TargetConstants.hub;
+          //   double xf =
+          // Math.sqrt(
+          //     Math.pow(
+          //             (target.getX() - turretPositionPose2d.getX()) + vxr *
+          // TurretConstants.latency,
+          //             2)
+          //         + Math.pow(
+          //             (target.getY() - turretPositionPose2d.getY()) + vyr *
+          // TurretConstants.latency,
+          //             2));
+          // double numerator = g * Math.pow(xf, 2);
+          // double denom1 = -yf + xf * Math.tan(pitch);
+          // double denom2 = 2 * Math.pow(Math.cos(pitch), 2);
+          //  Math.sqrt(numerator / (denom1 * denom2));
+          ballRequiredVel = simTurret.getRequiredVelocity();
+
+          // Compute flywheel target
+          double velocityRequired = ballRequiredVel;
+          double a = -0.123001;
+          double b = 5.95629;
+          double flywheelVel =
+              (a * Math.pow(velocityRequired, 2) + b * velocityRequired)
+                  * 60
+                  / (2 * Math.PI * 4 * 0.0254);
+
+          // Command the motor
+          setVel(flywheelVel);
+        });
+  }
 
   public double flywheelVel() {
-    double velocityRequired = simTurret.getRequiredVelocity();
-    double a = -0.0773318;
-    double b = 5.49489;
+    double velocityRequired = ballRequiredVel;
+    double a = -0.123001;
+    double b = 5.95629;
     double flywheelVel =
         (a * Math.pow(velocityRequired, 2) + b * velocityRequired)
             * 60
             / (2 * Math.PI * 4 * 0.0254);
-    return flywheelVel;
+    return flywheelVel * 1.2;
   }
 
   public Command stopShooter() {

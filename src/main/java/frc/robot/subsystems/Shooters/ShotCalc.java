@@ -2,7 +2,6 @@ package frc.robot.subsystems.Shooters;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -12,17 +11,20 @@ public class ShotCalc {
   double g = 9.81;
   double yf = Constants.TargetConstants.yf;
   public double pitch = Math.toRadians(60);
-  Transform3d turretOffset = new Transform3d(-0.17, -0.15, 0.39, new Rotation3d());
+  Transform3d turretOffset = new Transform3d();
 
-  public ShotCalc() {}
+  public ShotCalc(Transform3d turretOffset) {
+    this.turretOffset = turretOffset;
+  }
 
   public double getVelocity(double xf) {
-    double numerator = g*Math.pow(xf, 2);
+    double numerator = g * Math.pow(xf, 2);
     double denom1 = -yf + xf * Math.tan(pitch);
     double denom2 = 2 * Math.pow(Math.cos(pitch), 2);
     return Math.sqrt(numerator / (denom1 * denom2));
     // return Math.sqrt(
-    //     (-g * Math.pow(xf, 2)) / (2 * Math.pow(Math.cos(pitch), 2) * (yf - Math.tan(pitch) * xf)));
+    //     (-g * Math.pow(xf, 2)) / (2 * Math.pow(Math.cos(pitch), 2) * (yf - Math.tan(pitch) *
+    // xf)));
   }
 
   public double getYaw(Pose2d robotPose) {
@@ -38,6 +40,10 @@ public class ShotCalc {
     double theta = (initTheta - robotPose.getRotation().getRadians());
 
     return mod(theta);
+  }
+
+  public double getRobotRelativeYaw(Pose2d robotPose) {
+    return getYaw(robotPose) + robotPose.getRotation().getRadians();
   }
 
   public double getTime(double xf) {

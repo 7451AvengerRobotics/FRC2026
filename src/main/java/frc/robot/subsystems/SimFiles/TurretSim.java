@@ -45,11 +45,12 @@ public class TurretSim extends SubsystemBase {
     this.drive = drive;
     this.turretOffset = turretOffset;
     this.name = name;
-    this.shotCalc = new ShotCalc();
 
     turretOffsetTransform2d =
         new Transform2d(turretOffset.getX(), turretOffset.getY(), new Rotation2d());
     turretPositionPose2d = drive.getPose().plus(turretOffsetTransform2d);
+
+    this.shotCalc = new ShotCalc(turretOffset);
 
     target = TargetConstants.hub;
   }
@@ -60,6 +61,10 @@ public class TurretSim extends SubsystemBase {
 
   public Translation2d getTarget() {
     return this.target;
+  }
+
+  public Transform3d getTurretOffset() {
+    return this.turretOffset;
   }
 
   @Override

@@ -35,6 +35,11 @@ public final class Constants {
     DEPOT
   }
 
+  public static enum RobotSide {
+    LEFT,
+    RIGHT
+  }
+
   public static final class IntakePivotConstants {
     public static final int kIntakePivotID = 22;
     public static final double kIntakeGearRatio = 4;
@@ -70,15 +75,16 @@ public final class Constants {
     public static final double kShooterGearRatio = 1.0;
     public static final double kS = 0.01;
     public static final double kP = 0.0075 / 100 * 4;
-    public static final double kD = 0.0075 / 100 * 3;
-    public static final double kV = 0.00176;
+    public static final double kD = 0.0075 / 100 * 4;
+    public static final double kV = 0.00256;
   }
 
   public static final class TurretConstants {
-    public static final int kTurretID = 20;
-    public static final int kInitialTurretPosition = 0;
+    public static final int kLeftTurretID = 20;
+    public static final int kRightTurretID = 21;
+    public static final double kInitialTurretPosition = 2.5;
     public static final double kTurretGearRatio = 1.0;
-    public static final double kP = 0.0;
+    public static final double kP = 5.0;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
     public static final double kS = 0.0;
