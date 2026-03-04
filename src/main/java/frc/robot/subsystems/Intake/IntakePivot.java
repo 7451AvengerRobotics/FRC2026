@@ -50,8 +50,8 @@ public class IntakePivot extends SubsystemBase {
                     .withStatorCurrentLimitEnable(true))
             .withMotionMagic(
                 new MotionMagicConfigs()
-                    .withMotionMagicCruiseVelocity(RotationsPerSecond.of(0.75))
-                    .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(7))
+                    .withMotionMagicCruiseVelocity(RotationsPerSecond.of(1.5))
+                    .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(15))
                     .withMotionMagicJerk(RotationsPerSecondPerSecond.per(Second).of(100)))
             .withSlot0(
                 new Slot0Configs()
@@ -86,7 +86,7 @@ public class IntakePivot extends SubsystemBase {
   // }
 
   public Command setIntakePivotAngle(double rotations) {
-    return run(
+    return runOnce(
         () -> {
           pivotIntake(rotations);
         });

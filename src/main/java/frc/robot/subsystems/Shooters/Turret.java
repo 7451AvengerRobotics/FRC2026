@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.RobotSide;
 import frc.robot.Constants.TurretConstants;
-import frc.robot.subsystems.SimFiles.TurretSim;
 import frc.robot.subsystems.drive.Drive;
 import org.littletonrobotics.junction.Logger;
 
@@ -66,14 +65,16 @@ public class Turret extends SubsystemBase {
   @Override
   public void periodic() {
     Logger.recordOutput("Turret Encoder Counts", turretMotor.getPosition().getValueAsDouble());
+
     shotCalc.updateState();
     double targetYaw = shotCalc.getYaw(drive.getPose());
+    Logger.recordOutput("targetYaw", targetYaw);
     this.setTurretPos(targetYaw * (robotSide == RobotSide.RIGHT ? -1 : 1));
   }
 
   public double angleToEncoder(double angle) {
     double minEncoderCount = 0;
-    double maxEncoderCount = 0;
+    double maxEncoderCount = 10;
     double encoderRange = maxEncoderCount - minEncoderCount;
     double angleRange = 2 * Math.PI;
 

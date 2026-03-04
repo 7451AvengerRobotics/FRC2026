@@ -91,9 +91,11 @@ public class RobotContainer {
             new Vision(
                 drive::addVisionMeasurement,
                 new VisionIOPhotonVision(
-                    VisionConstants.camera0Name, VisionConstants.robotToCamera0),
-                new VisionIOPhotonVision(
-                    VisionConstants.camera1Name, VisionConstants.robotToCamera1));
+                    VisionConstants.camera0Name, VisionConstants.robotToCamera0)
+                //     ,
+                // new VisionIOPhotonVision(
+                //     VisionConstants.camera1Name, VisionConstants.robotToCamera1)
+                );
 
         // The ModuleIOTalonFXS implementation provides an example implementation for
         // TalonFXS controller connected to a CANdi with a PWM encoder. The
@@ -127,9 +129,11 @@ public class RobotContainer {
             new Vision(
                 drive::addVisionMeasurement,
                 new VisionIOPhotonVisionSim(
-                    VisionConstants.camera0Name, VisionConstants.robotToCamera0, drive::getPose),
-                new VisionIOPhotonVisionSim(
-                    VisionConstants.camera1Name, VisionConstants.robotToCamera1, drive::getPose));
+                    VisionConstants.camera0Name, VisionConstants.robotToCamera0, drive::getPose)
+                //     ,
+                // new VisionIOPhotonVisionSim(
+                //     VisionConstants.camera1Name, VisionConstants.robotToCamera1, drive::getPose)
+                );
         break;
 
       default:
@@ -163,18 +167,28 @@ public class RobotContainer {
         new Shooter(
             ShooterConstants.LeftShooterLeaderID,
             ShooterConstants.LeftShooterFollowerID,
-            "left", leftShotCalc);
+            "left",
+            leftShotCalc);
     rightShooter =
         new Shooter(
             ShooterConstants.RightShooterLeaderID,
             ShooterConstants.RightShooterFollowerID,
-            "right", rightShotCalc);
+            "right",
+            rightShotCalc);
 
     leftTurret = new Turret(TurretConstants.kTurretID, drive, RobotSide.LEFT, leftShotCalc);
     rightTurret = new Turret(TurretConstants.kTurretID, drive, RobotSide.RIGHT, rightShotCalc);
     superStructure =
         new SuperStructure(
-            index, intake, intakePivot, feeder, leftShooter, rightShooter, leftTurret, rightTurret, pivot);
+            index,
+            intake,
+            intakePivot,
+            feeder,
+            leftShooter,
+            rightShooter,
+            leftTurret,
+            rightTurret,
+            pivot);
 
     // Set up auto routines
     autos = new AutoRoutines(drive, superStructure);
@@ -220,11 +234,11 @@ public class RobotContainer {
     // controller.L1().onTrue(superStructure.masterCommand());
     // controller.R1().onTrue(superStructure.stopMasterCommand());
 
-    controller.L1().onTrue(superStructure.leftShoot());
+    // controller.L1().onTrue(superStructure.leftShoot());
+    controller.L1().onTrue(simTurretLeft.shootBallCommand());
     controller.R1().onTrue(superStructure.rightShoot());
 
     controller.PS().onTrue(superStructure.stopShooters());
- 
   }
 
   // public Command driveOverSourceSideBump(){

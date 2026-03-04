@@ -8,14 +8,9 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ShooterConstants;
-import frc.robot.subsystems.SimFiles.TurretSim;
 import org.littletonrobotics.junction.Logger;
 
 public class Shooter extends SubsystemBase {
@@ -26,7 +21,7 @@ public class Shooter extends SubsystemBase {
   private final ShotCalc shotCalc;
   private final String name;
 
-  private GenericEntry speed = Shuffleboard.getTab("Flywheel").add("Speed", 0).getEntry();
+  // private GenericEntry speed = Shuffleboard.getTab("Flywheel").add("Speed", 0).getEntry();
 
   public Shooter(int leaderID, int followerID, String name, ShotCalc shotCalc) {
 
@@ -82,8 +77,6 @@ public class Shooter extends SubsystemBase {
         leaderCfg, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     shooterFollower.configure(
         followerCfg, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
-    
   }
 
   @Override
@@ -111,21 +104,13 @@ public class Shooter extends SubsystemBase {
   }
 
   public Command runShooter() {
-    double velocityRequired = shotCalc.getVelocity(shotCalc.getXf());
-    double a = -0.0773318;
-    double b = 5.49489;
-    double flywheelVel =
-        (a * Math.pow(velocityRequired, 2) + b * velocityRequired)
-            * 60
-            / (2 * Math.PI * 4 * 0.0254);
-    MathUtil.clamp(flywheelVel, 0, 5000);
-    return setVelCommand(speed.getDouble(3000));
-  } 
+    return setVelCommand(2360);
+  }
 
   public double flywheelVel() {
     double velocityRequired = shotCalc.getVelocity(shotCalc.getXf());
-    double a = -0.0773318;
-    double b = 5.49489;
+    double a = -0.0661338;
+    double b = 5.15403;
     double flywheelVel =
         (a * Math.pow(velocityRequired, 2) + b * velocityRequired)
             * 60

@@ -196,12 +196,13 @@ public class TurretSim extends SubsystemBase {
     //             target.getX() - turretPositionPose2d.getX() + vxr * TurretConstants.latency,
     //             target.getY() - turretPositionPose2d.getY() + vyr * TurretConstants.latency));
 
+    shotCalc.updateState();
+
     activeFuel.add(
         new FuelSim(
-            shotCalc.getMovingVelocity(xf, Vr, drive.getPose()),
+            shotCalc.getVelocity(xf),
             shotCalc.getPitch(),
-            shotCalc.getMovingYaw(xf, Vr, drive.getPose())
-                + drive.getPose().getRotation().getRadians(),
+            shotCalc.getYaw(drive.getPose()) + drive.getPose().getRotation().getRadians(),
             turretPositionPose2d,
             Vr.vxMetersPerSecond,
             Vr.vyMetersPerSecond));
@@ -226,6 +227,10 @@ public class TurretSim extends SubsystemBase {
 
   public double getRequiredVelocity() {
     return shotCalc.getVelocity(xf);
+  }
+
+  public double returnXF() {
+    return xf;
   }
 
   // Helper Function:

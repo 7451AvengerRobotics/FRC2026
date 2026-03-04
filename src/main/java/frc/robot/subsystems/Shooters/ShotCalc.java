@@ -19,12 +19,12 @@ public class ShotCalc {
   private ChassisSpeeds vr;
   private double vxr;
   private double vyr;
-  private double pitch = Math.toRadians(55);
+  private double pitch = Math.toRadians(60);
   private Transform3d turretOffset = new Transform3d(-0.17, -0.15, 0.39, new Rotation3d());
   private Transform2d turretOffsetTransform2d;
   private Pose2d turretPositionPose2d;
   private Drive drive;
-  private Translation2d target;
+  private Translation2d target = TargetConstants.hub;
 
   public ShotCalc(Drive drive, Transform3d turretOffset) {
     this.drive = drive;
@@ -46,27 +46,30 @@ public class ShotCalc {
 
   public void updateState() {
     turretPositionPose2d = drive.getPose().plus(turretOffsetTransform2d);
-    vr = ChassisSpeeds.fromRobotRelativeSpeeds(drive.getRobotRelativeSpeeds(), drive.getPose().getRotation());
+    vr =
+        ChassisSpeeds.fromRobotRelativeSpeeds(
+            drive.getRobotRelativeSpeeds(), drive.getPose().getRotation());
     vxr = vr.vxMetersPerSecond;
     vyr = vr.vyMetersPerSecond;
 
     xf =
         Math.sqrt(
             Math.pow(
-                    (target.getX() - turretPositionPose2d.getX()) + vxr * TurretConstants.latency,
+                    (target.getX() - turretPositionPose2d.getX()),
                     2)
                 + Math.pow(
-                    (target.getY() - turretPositionPose2d.getY()) + vyr * TurretConstants.latency,
+                    (target.getY() - turretPositionPose2d.getY()),
                     2));
   }
 
   public double getVelocity(double xf) {
-    double numerator = g*Math.pow(xf, 2);
-    double denom1 = -yf + xf * Math.tan(pitch);
+    double numerator = g * Math.pow(xf, 2);
+    double denom1 = (xf * Math.tan(pitch)) - yf;
     double denom2 = 2 * Math.pow(Math.cos(pitch), 2);
     return Math.sqrt(numerator / (denom1 * denom2));
     // return Math.sqrt(
-    //     (-g * Math.pow(xf, 2)) / (2 * Math.pow(Math.cos(pitch), 2) * (yf - Math.tan(pitch) * xf)));
+    //     (-g * Math.pow(xf, 2)) / (2 * Math.pow(Math.cos(pitch), 2) * (yf - Math.tan(pitch) *
+    // xf)));
   }
 
   public double getYaw(Pose2d robotPose) {
