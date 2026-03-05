@@ -25,6 +25,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -47,6 +48,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.Constants.Side;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.Shooters.ShotCalc;
 import frc.robot.util.LocalADStarAK;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
@@ -419,6 +421,24 @@ public class Drive extends SubsystemBase {
   public ChassisSpeeds getRobotRelativeSpeeds() {
     return kinematics.toChassisSpeeds(
         modules[0].getState(), modules[1].getState(), modules[2].getState(), modules[3].getState());
+  }
+
+  public Command alignToHub() {
+    return Commands.run(() -> {
+
+      double deltax = Constants.TargetConstants.hub.getX();
+      double deltay = Constants.TargetConstants.hub.getY();
+
+      double initTheta = Math.PI - Math.atan2(deltay, -deltax);
+
+      double theta = (initTheta - this.getPose().getRotation().getRadians());
+
+      this.setPose(this.getPose().rotateBy(new Rotation2d(mod(theta))));
+    });
+  }
+
+  public double mod(double angle) {
+    return ((angle % (2 * Math.PI)) + (2 * Math.PI)) % (2 * Math.PI);
   }
 
   public Command driveOverBump() {

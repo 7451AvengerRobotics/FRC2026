@@ -150,4 +150,8 @@ public class SuperStructure {
   public Command stowPivot() {
     return pivot.toPosition(0);
   }
+
+  public Command resetShooters() {
+    return Commands.parallel(leftTurret.setTurretPos(2 * Math.PI/3), rightTurret.setTurretPos(Math.PI/3));
+  }
 }

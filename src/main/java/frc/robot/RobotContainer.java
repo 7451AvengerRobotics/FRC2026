@@ -239,7 +239,7 @@ public class RobotContainer {
     // controller.R1().onTrue(superStructure.stopMasterCommand());
 
     // controller.L1().onTrue(simTurretLeft.shootBallCommand());
-    controller.L1().toggleOnTrue(leftTurret.followHub());
+    controller.L1().toggleOnTrue(Commands.sequence(superStructure.resetShooters(), drive.alignToHub()));
     controller.R1().toggleOnTrue(superStructure.runShooters());
 
     controller.square().onTrue(Commands.parallel(simTurretLeft.setTargetCommand(TargetConstants.hub), simTurretRight.setTargetCommand((TargetConstants.hub))));
