@@ -239,13 +239,33 @@ public class RobotContainer {
     // controller.R1().onTrue(superStructure.stopMasterCommand());
 
     // controller.L1().onTrue(simTurretLeft.shootBallCommand());
-    controller.L1().toggleOnTrue(Commands.sequence(superStructure.resetShooters(), drive.alignToHub()));
-    controller.R1().toggleOnTrue(superStructure.runShooters());
+    controller.L1().onTrue(Commands.parallel(drive.alignToHub(), leftTurret.goToTwoFive()));
+    controller.R1().toggleOnTrue(superStructure.stopTurret());
 
-    controller.square().onTrue(Commands.parallel(simTurretLeft.setTargetCommand(TargetConstants.hub), simTurretRight.setTargetCommand((TargetConstants.hub))));
-    controller.triangle().onTrue(Commands.parallel(simTurretLeft.setTargetCommand(TargetConstants.hub), simTurretRight.setTargetCommand((TargetConstants.hub))));
-    controller.circle().onTrue(Commands.parallel(simTurretLeft.setTargetCommand(TargetConstants.hub), simTurretRight.setTargetCommand((TargetConstants.hub))));
-    controller.cross().onTrue(Commands.parallel(simTurretLeft.setTargetCommand(TargetConstants.hub), simTurretRight.setTargetCommand((TargetConstants.hub))));
+    controller
+        .square()
+        .onTrue(
+            Commands.parallel(
+                simTurretLeft.setTargetCommand(TargetConstants.hub),
+                simTurretRight.setTargetCommand((TargetConstants.hub))));
+    controller
+        .triangle()
+        .onTrue(
+            Commands.parallel(
+                simTurretLeft.setTargetCommand(TargetConstants.hub),
+                simTurretRight.setTargetCommand((TargetConstants.hub))));
+    controller
+        .circle()
+        .onTrue(
+            Commands.parallel(
+                simTurretLeft.setTargetCommand(TargetConstants.hub),
+                simTurretRight.setTargetCommand((TargetConstants.hub))));
+    controller
+        .cross()
+        .onTrue(
+            Commands.parallel(
+                simTurretLeft.setTargetCommand(TargetConstants.hub),
+                simTurretRight.setTargetCommand((TargetConstants.hub))));
 
     controller.touchpad().onTrue(drive.driveOverBump());
 

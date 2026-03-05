@@ -25,7 +25,6 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -46,9 +45,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
-import frc.robot.Constants.Side;
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.Shooters.ShotCalc;
 import frc.robot.util.LocalADStarAK;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
@@ -89,6 +86,7 @@ public class Drive extends SubsystemBase {
   private final PIDController headingController = new PIDController(4, 0.0, 0.0);
   private boolean holonomicControllerActive = false;
   private Pose2d holonomicPoseTarget = new Pose2d();
+  private Rotation2d rotation2d = new Rotation2d();
   private final HolonomicDriveWithPIDController holonomicDriveWithPIDController;
 
   static final Lock odometryLock = new ReentrantLock();
@@ -418,23 +416,49 @@ public class Drive extends SubsystemBase {
         .finallyDo(() -> holonomicControllerActive = false);
   }
 
+  public Command driveToRotation(Rotation2d rotation) {
+    return Commands.sequence(
+            runOnce(
+                () -> {
+                  holonomicControllerActive = true;
+                  holonomicDriveWithPIDController.reset(getPose(), getRobotRelativeSpeeds());
+                }),
+            run(() -> {
+                  this.rotation2d = rotation;
+                  runVelocity(
+                      holonomicDriveWithPIDController.calculateRotations(getPose(), rotation2d));
+                  SmartDashboard.putBoolean(
+                      "x controller", holonomicDriveWithPIDController.xReferenceReached());
+                  SmartDashboard.putBoolean(
+                      "y controller", holonomicDriveWithPIDController.yReferenceReached());
+                  SmartDashboard.putBoolean(
+                      "rotation controller",
+                      holonomicDriveWithPIDController.rotationReferenceReached());
+                })
+                .until(holonomicDriveWithPIDController::atReference),
+            runOnce(this::stop))
+        .finallyDo(() -> holonomicControllerActive = false);
+  }
+
   public ChassisSpeeds getRobotRelativeSpeeds() {
     return kinematics.toChassisSpeeds(
         modules[0].getState(), modules[1].getState(), modules[2].getState(), modules[3].getState());
   }
 
   public Command alignToHub() {
-    return Commands.run(() -> {
 
-      double deltax = Constants.TargetConstants.hub.getX();
-      double deltay = Constants.TargetConstants.hub.getY();
+    return Commands.defer(
+        () -> {
+          double deltax = 11.915 - getPose().getX();
+          double deltay = 4.035 - getPose().getY();
 
-      double initTheta = Math.PI - Math.atan2(deltay, -deltax);
+          double initTheta = Math.atan2(deltay, deltax);
 
-      double theta = (initTheta - this.getPose().getRotation().getRadians());
+          double theta = (initTheta);
 
-      this.setPose(this.getPose().rotateBy(new Rotation2d(mod(theta))));
-    });
+          return driveToRotation(new Rotation2d(theta + Math.PI));
+        },
+        Set.of(this));
   }
 
   public double mod(double angle) {

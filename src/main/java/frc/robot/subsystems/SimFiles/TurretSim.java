@@ -61,9 +61,10 @@ public class TurretSim extends SubsystemBase {
   }
 
   public Command setTargetCommand(Translation2d newTarget) {
-    return Commands.run(() -> {
-      this.setTarget(newTarget);
-    });
+    return Commands.run(
+        () -> {
+          this.setTarget(newTarget);
+        });
   }
 
   public Translation2d getTarget() {

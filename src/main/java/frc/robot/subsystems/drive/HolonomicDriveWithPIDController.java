@@ -2,6 +2,7 @@ package frc.robot.subsystems.drive;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 public class HolonomicDriveWithPIDController {
@@ -66,6 +67,22 @@ public class HolonomicDriveWithPIDController {
     final double rotationFeedback =
         rotationController.calculate(
             currentPose.getRotation().getRadians(), targetPose.getRotation().getRadians());
+
+    return ChassisSpeeds.fromFieldRelativeSpeeds(
+        xFeedback * scale,
+        yFeedback * scale,
+        rotationFeedback * rotationScale,
+        currentPose.getRotation());
+  }
+
+  public ChassisSpeeds calculateRotations(
+      final Pose2d currentPose, final Rotation2d targetRotation) {
+
+    final double xFeedback = xController.calculate(currentPose.getX(), currentPose.getX());
+    final double yFeedback = yController.calculate(currentPose.getY(), currentPose.getY());
+    final double rotationFeedback =
+        rotationController.calculate(
+            currentPose.getRotation().getRadians(), targetRotation.getRadians());
 
     return ChassisSpeeds.fromFieldRelativeSpeeds(
         xFeedback * scale,

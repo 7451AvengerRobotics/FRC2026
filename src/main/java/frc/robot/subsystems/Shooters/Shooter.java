@@ -91,9 +91,10 @@ public class Shooter extends SubsystemBase {
   }
 
   public Command offsetVel(double offset) {
-    return Commands.run(() -> {
-      this.setVelOffset(this.velOffset+offset);
-    });
+    return Commands.run(
+        () -> {
+          this.setVelOffset(this.velOffset + offset);
+        });
   }
 
   @Override
@@ -113,7 +114,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public void setVel(double rpm) {
-    closedLoopController.setSetpoint(rpm+velOffset, ControlType.kMAXMotionVelocityControl);
+    closedLoopController.setSetpoint(rpm + velOffset, ControlType.kMAXMotionVelocityControl);
   }
 
   public Command setVelCommand(double rpm) {

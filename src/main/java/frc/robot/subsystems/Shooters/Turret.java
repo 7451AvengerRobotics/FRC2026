@@ -79,18 +79,19 @@ public class Turret extends SubsystemBase {
                 : -TurretConstants.kInitialTurretPosition);
   }
 
-  public void setYawOffset(double yawOffset){
+  public void setYawOffset(double yawOffset) {
     this.yawOffset = yawOffset;
   }
 
   public Command offsetYaw(double offset) {
-    return Commands.run(() -> {
-      this.setYawOffset(this.yawOffset+offset);
-    });
+    return Commands.run(
+        () -> {
+          this.setYawOffset(this.yawOffset + offset);
+        });
   }
 
   public void run(double rotations) {
-    turretMotor.setControl(turretRequest.withPosition(angleToEncoder(mod(rotations))));
+    turretMotor.setControl(turretRequest.withPosition(angleToEncoder(-mod(rotations))));
   }
 
   public Command runCommand(double rotations) {
@@ -160,7 +161,7 @@ public class Turret extends SubsystemBase {
     return run(() -> {
           this.run(angle);
         })
-        .until(() -> nearSetpoint(angle))
+        .until(() -> nearSetpoint(angleToEncoder(-mod(angle))))
         .andThen(stopTurret());
   }
 
