@@ -251,10 +251,10 @@ public class RobotContainer {
 
     controller.PS().onTrue(superStructure.stopShooters());
 
-    manip.povLeft().onTrue(superStructure.offsetTurrets(-5 * Math.PI / 180));
-    manip.povRight().onTrue(superStructure.offsetTurrets(5 * Math.PI / 180));
-    manip.L1().whileTrue(superStructure.offsetShooters(-10));
-    manip.R1().whileTrue(superStructure.offsetShooters(10));
+    // manip.povLeft().onTrue(superStructure.offsetTurrets(-5 * Math.PI / 180));
+    // manip.povRight().onTrue(superStructure.offsetTurrets(5 * Math.PI / 180));
+    // manip.L1().whileTrue(superStructure.offsetShooters(-10));
+    // manip.R1().whileTrue(superStructure.offsetShooters(10));
 
     controller.PS().onTrue(superStructure.stopShooters());
 

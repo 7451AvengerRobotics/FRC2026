@@ -39,12 +39,12 @@ public class SuperStructure {
     this.pivot = pivot;
   }
 
-  public Command offsetTurrets(double offset) {
-    return Commands.run(() -> {
-      leftTurret.offsetYaw(offset);
-      rightTurret.offsetYaw(-offset);
-    });
-  }
+  // public Command offsetTurrets(double offset) {
+  //   return Commands.run(() -> {
+  //     leftTurret.offsetYaw(offset);
+  //     rightTurret.offsetYaw(-offset);
+  //   });
+  // }
 
   public Command offsetShooters(double offset) {
     return Commands.run(() -> {
