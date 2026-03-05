@@ -17,6 +17,7 @@ import com.ctre.phoenix6.signals.MotorArrangementValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.RobotSide;
 import frc.robot.Constants.TurretConstants;
@@ -78,6 +79,16 @@ public class Turret extends SubsystemBase {
                 ? TurretConstants.kInitialTurretPosition
                 : -TurretConstants.kInitialTurretPosition);
   }
+
+  // public void setYawOffset(double yawOffset){
+  //   this.yawOffset = yawOffset;
+  // }
+
+  // public Command offsetYaw(double offset) {
+  //   return Commands.run(() -> {
+  //     this.setYawOffset(this.yawOffset+offset);
+  //   });
+  // }
 
   public void run(double rotations) {
     if (Math.abs(turretMotor.getStatorCurrent().getValueAsDouble()) > 3) {

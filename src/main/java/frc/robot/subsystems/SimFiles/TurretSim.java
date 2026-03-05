@@ -11,6 +11,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.TargetConstants;
 import frc.robot.Constants.TurretConstants;
@@ -57,6 +58,12 @@ public class TurretSim extends SubsystemBase {
 
   public void setTarget(Translation2d newTarget) {
     this.target = newTarget;
+  }
+
+  public Command setTargetCommand(Translation2d newTarget) {
+    return Commands.run(() -> {
+      this.setTarget(newTarget);
+    });
   }
 
   public Translation2d getTarget() {
