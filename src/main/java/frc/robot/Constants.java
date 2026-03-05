@@ -73,10 +73,12 @@ public final class Constants {
     public static final int RightShooterLeaderID = 52;
     public static final int RightShooterFollowerID = 53;
     public static final double kShooterGearRatio = 1.0;
-    public static final double kS = 0.01;
-    public static final double kP = 0.0075 / 100 * 4;
-    public static final double kD = 0.0075 / 100 * 4;
-    public static final double kV = 0.00256;
+    public static final double kS = 0;
+    public static final double kP = 0.0075 / 100 * 0.05;
+    public static final double kD = 0.0075 / 100 * 2;
+    public static final double kI = 0.0075 / 100 * 4;
+    public static final double kV = 0.0022;
+    public static final double kA = 0;
   }
 
   public static final class TurretConstants {

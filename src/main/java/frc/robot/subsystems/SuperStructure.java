@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.Intake.IntakePivot;
 import frc.robot.subsystems.Shooters.Shooter;
@@ -118,12 +119,27 @@ public class SuperStructure {
   }
 
   public Command masterCommand() {
-    return Commands.parallel(
-        intake.runIntake(-0.5), index.runIndex(-0.9), feeder.runFeeder(-0.9), runShooters());
+    return Commands.parallel( // These run immediately
+        intake.runIntake(-0.5),
+        runShooters(),
+        feeder.runFeeder(-0.9),
+
+        // This branch waits, then starts feeder/index
+        Commands.sequence(new WaitCommand(0), Commands.parallel(index.runIndex(-0.9))));
+  }
+
+  public Command startupMasterCommand() {
+    return Commands.parallel( // These run immediately
+        intake.runIntake(-0.5),
+        runShooters(),
+        feeder.runFeeder(-0.9),
+
+        // This branch waits, then starts feeder/index
+        Commands.sequence(new WaitCommand(1.5), Commands.parallel(index.runIndex(-0.9))));
   }
 
   public Command weirdMasterCommand() {
-    return Commands.parallel(intake.runIntake(-0.5), index.runIndex(0.6), feeder.runFeeder(-0.9));
+    return Commands.parallel(intake.runIntake(-0.5), index.runIndex(0.6), feeder.runFeeder(0.6));
   }
 
   public Command shooterlessMasterCommand() {

@@ -73,10 +73,7 @@ public class Turret extends SubsystemBase {
 
     turretMotor
         .getConfigurator()
-        .setPosition(
-            (this.robotSide == RobotSide.RIGHT)
-                ? TurretConstants.kInitialTurretPosition
-                : -TurretConstants.kInitialTurretPosition);
+        .setPosition(turretSignage(TurretConstants.kInitialTurretPosition));
   }
 
   public void setYawOffset(double yawOffset) {
@@ -91,7 +88,8 @@ public class Turret extends SubsystemBase {
   }
 
   public void run(double rotations) {
-    turretMotor.setControl(turretRequest.withPosition(angleToEncoder(-mod(rotations))));
+    turretMotor.setControl(
+        turretRequest.withPosition(angleToEncoder(turretSignage(mod(rotations)))));
   }
 
   public Command runCommand(double rotations) {
@@ -173,18 +171,25 @@ public class Turret extends SubsystemBase {
   }
 
   public Command goToFive() {
-    return runCommand(-7.5).until(() -> nearSetpoint(-7.5)).andThen(stopTurret());
+    return runCommand(turretSignage(7.5))
+        .until(() -> nearSetpoint(turretSignage(7.5)))
+        .andThen(stopTurret());
   }
 
   public Command goToTwoFive() {
     return runOnce(
         () -> {
-          runEncoder(-2.5);
+          runEncoder(turretSignage(2.5));
         });
   }
 
   // Helper Function
   public double mod(double angle) {
     return ((angle % (2 * Math.PI)) + (2 * Math.PI)) % (2 * Math.PI);
+  }
+
+  public double turretSignage(double value) {
+    double signage = this.robotSide == RobotSide.RIGHT ? 1 : -1;
+    return value * signage;
   }
 }

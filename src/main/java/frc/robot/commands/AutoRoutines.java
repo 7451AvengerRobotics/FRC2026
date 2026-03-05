@@ -19,7 +19,7 @@ public class AutoRoutines {
 
   public Command depotSideAuto() {
     return Commands.sequence(
-        drive.driveToPose(new Pose2d(3.5, 6.5, new Rotation2d(0))),
+        drive.driveToPose(new Pose2d(3.5, 6.5, new Rotation2d(Math.toRadians(75)))),
         Commands.parallel(
             superStruc.deployPivot(), drive.followPPPathCommand("DepotSideStartToSource")),
         Commands.waitSeconds(3),
