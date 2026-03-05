@@ -45,7 +45,7 @@ public class Turret extends SubsystemBase {
             .withMotorOutput(
                 new MotorOutputConfigs()
                     .withInverted(InvertedValue.CounterClockwise_Positive)
-                    .withNeutralMode(NeutralModeValue.Coast))
+                    .withNeutralMode(NeutralModeValue.Brake))
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
                     .withStatorCurrentLimit(Amps.of(40))
@@ -62,7 +62,8 @@ public class Turret extends SubsystemBase {
                     .withKD(TurretConstants.kD)
                     .withKS(TurretConstants.kS)
                     .withKV(TurretConstants.kV)
-                    .withKA(TurretConstants.kA));
+                    .withKA(TurretConstants.kA)
+                    .withKG(TurretConstants.kG));
 
     cfg.Commutation.MotorArrangement = MotorArrangementValue.Minion_JST;
 
@@ -78,6 +79,21 @@ public class Turret extends SubsystemBase {
 
   public void run(double rotations) {
     turretMotor.setControl(turretRequest.withPosition(angleToEncoder(mod(rotations))));
+  }
+
+  public Command runCommand(double rotations) {
+    return run(
+        () -> {
+          this.runEncoder(rotations);
+        });
+  }
+
+  public void runEncoder(double count) {
+    turretMotor.setControl(turretRequest.withPosition(count));
+  }
+
+  public boolean nearSetpoint(double count) {
+    return (Math.abs(turretMotor.getPosition().getValueAsDouble() - count) <= 0.05);
   }
 
   @Override
@@ -129,23 +145,28 @@ public class Turret extends SubsystemBase {
   // }
 
   public Command setTurretPos(double angle) {
-    return run(
-        () -> {
+    return run(() -> {
           this.run(angle);
-        });
+        })
+        .until(() -> nearSetpoint(angle))
+        .andThen(stopTurret());
   }
 
   public Command stopTurret() {
     return run(
         () -> {
-          this.run(0);
+          turretMotor.set(0);
         });
   }
 
-  public Command goToThree() {
-    return run(
+  public Command goToFive() {
+    return runCommand(-7.5).until(() -> nearSetpoint(-7.5)).andThen(stopTurret());
+  }
+
+  public Command goToTwoFive() {
+    return runOnce(
         () -> {
-          run(0);
+          runEncoder(-2.5);
         });
   }
 

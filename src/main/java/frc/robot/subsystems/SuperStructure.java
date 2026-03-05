@@ -84,6 +84,15 @@ public class SuperStructure {
     return rightShooter.runShooter();
   }
 
+  public Command playThrough() {
+    return Commands.sequence(
+        leftTurret.followHub()
+        // ,
+        // leftTurret.goToFive().withTimeout(1.5),
+        // leftTurret.stopTurret()
+        );
+  }
+
   public Command runShooters() {
     return Commands.parallel(leftShooter.runShooter(), rightShooter.runShooter());
   }
