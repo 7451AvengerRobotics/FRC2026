@@ -258,7 +258,7 @@ public class RobotContainer {
 
     controller.PS().onTrue(superStructure.stopShooters());
 
-    controller.touchpad().onTrue(rightTurret.goToThree());
+    controller.touchpad().toggleOnTrue(superStructure.playThrough());
   }
 
   // public Command driveOverSourceSideBump(){
