@@ -17,7 +17,6 @@ import com.ctre.phoenix6.signals.MotorArrangementValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.RobotSide;
 import frc.robot.Constants.TurretConstants;
@@ -91,15 +90,15 @@ public class Turret extends SubsystemBase {
   // }
 
   public void run(double rotations) {
-    if (Math.abs(turretMotor.getStatorCurrent().getValueAsDouble()) > 3) {
-      if (turretMotor.getPosition().getValueAsDouble() < 2.5) {
-        turretMotor.set(0.1);
-      } else {
-        turretMotor.set(-0.1);
-      }
-    } else {
-      turretMotor.setControl(turretRequest.withPosition(angleToEncoder(-mod(rotations))));
-    }
+    // if (Math.abs(turretMotor.getStatorCurrent().getValueAsDouble()) > 3) {
+    //   if (turretMotor.getPosition().getValueAsDouble() < 2.5) {
+    //     turretMotor.set(0.1);
+    //   } else {
+    //     turretMotor.set(-0.1);
+    //   }
+    // } else {
+    turretMotor.setControl(turretRequest.withPosition(angleToEncoder(-mod(rotations))));
+    // }
   }
 
   public Command runCommand(double rotations) {
@@ -142,14 +141,14 @@ public class Turret extends SubsystemBase {
 
   public Command followHub() {
     return run(() -> {
-          targetYaw = shotCalc.getRobotRelativeYaw(this.drive.getPose());
-          if (this.robotSide == RobotSide.RIGHT) {
-            targetYaw = targetYaw - Math.PI;
-          }
+          targetYaw = shotCalc.getRobotRelativeYaw(this.drive.getPose()) - Math.PI / 2;
+          // if (this.robotSide == RobotSide.RIGHT) {
+          //   targetYaw = targetYaw;
+          // }
           if (Math.abs(
                   turretMotor.getPosition().getValueAsDouble() - angleToEncoder(-mod(targetYaw)))
               <= 0.1) {
-            turretMotor.set(0.01);
+            turretMotor.set(0);
           } else {
             this.run(targetYaw);
           }

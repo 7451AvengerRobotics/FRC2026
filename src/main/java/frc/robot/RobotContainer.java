@@ -242,19 +242,39 @@ public class RobotContainer {
     controller.L1().toggleOnTrue(leftTurret.followHub());
     controller.R1().toggleOnTrue(superStructure.runShooters());
 
-    controller.square().onTrue(Commands.parallel(simTurretLeft.setTargetCommand(TargetConstants.hub), simTurretRight.setTargetCommand((TargetConstants.hub))));
-    controller.triangle().onTrue(Commands.parallel(simTurretLeft.setTargetCommand(TargetConstants.hub), simTurretRight.setTargetCommand((TargetConstants.hub))));
-    controller.circle().onTrue(Commands.parallel(simTurretLeft.setTargetCommand(TargetConstants.hub), simTurretRight.setTargetCommand((TargetConstants.hub))));
-    controller.cross().onTrue(Commands.parallel(simTurretLeft.setTargetCommand(TargetConstants.hub), simTurretRight.setTargetCommand((TargetConstants.hub))));
+    controller
+        .square()
+        .onTrue(
+            Commands.parallel(
+                simTurretLeft.setTargetCommand(TargetConstants.hub),
+                simTurretRight.setTargetCommand((TargetConstants.hub))));
+    controller
+        .triangle()
+        .onTrue(
+            Commands.parallel(
+                simTurretLeft.setTargetCommand(TargetConstants.hub),
+                simTurretRight.setTargetCommand((TargetConstants.hub))));
+    controller
+        .circle()
+        .onTrue(
+            Commands.parallel(
+                simTurretLeft.setTargetCommand(TargetConstants.hub),
+                simTurretRight.setTargetCommand((TargetConstants.hub))));
+    controller
+        .cross()
+        .onTrue(
+            Commands.parallel(
+                simTurretLeft.setTargetCommand(TargetConstants.hub),
+                simTurretRight.setTargetCommand((TargetConstants.hub))));
 
-    controller.touchpad().onTrue(drive.driveOverBump());
+    // controller.touchpad().onTrue(drive.driveOverBump());
 
     controller.PS().onTrue(superStructure.stopShooters());
 
-    manip.povLeft().onTrue(superStructure.offsetTurrets(-5 * Math.PI / 180));
-    manip.povRight().onTrue(superStructure.offsetTurrets(5 * Math.PI / 180));
-    manip.L1().whileTrue(superStructure.offsetShooters(-10));
-    manip.R1().whileTrue(superStructure.offsetShooters(10));
+    // manip.povLeft().onTrue(superStructure.offsetTurrets(-5 * Math.PI / 180));
+    // manip.povRight().onTrue(superStructure.offsetTurrets(5 * Math.PI / 180));
+    // manip.L1().whileTrue(superStructure.offsetShooters(-10));
+    // manip.R1().whileTrue(superStructure.offsetShooters(10));
 
     controller.PS().onTrue(superStructure.stopShooters());
 
