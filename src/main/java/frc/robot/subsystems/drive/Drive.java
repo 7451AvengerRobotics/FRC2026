@@ -465,6 +465,22 @@ public class Drive extends SubsystemBase {
     return ((angle % (2 * Math.PI)) + (2 * Math.PI)) % (2 * Math.PI);
   }
 
+  public Command driveUnderTrenchToNeutral() {
+    if(this.getPose().getY() > 4) {
+      return Commands.sequence(this.driveToPose(new Pose2d(3.75, 7.375, new Rotation2d())), this.followPPPathCommand("DepotSideTrench"));
+    } else {
+        return Commands.sequence(this.driveToPose(new Pose2d(3.75, 0.625, new Rotation2d())), this.followPPPathCommand("SourceSideTrench"));
+    }
+  }
+
+  public Command driveUnderTrenchToAlliance() {
+    if(this.getPose().getY() > 4) {
+      return Commands.sequence(this.driveToPose(new Pose2d(5.25, 7.375, new Rotation2d(Math.PI))), this.followPPPathCommand("DepotSideTrenchOpposite"));
+    } else {
+        return Commands.sequence(this.driveToPose(new Pose2d(5.25, 0.625, new Rotation2d(Math.PI))), this.followPPPathCommand("SourceSideTrenchOpposite"));
+    }
+  }
+
   public Command driveOverBump() {
     if (this.getPose().getY() > 4 && this.getPose().getX() < 4) {
       return Commands.sequence(
