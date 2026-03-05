@@ -242,12 +242,32 @@ public class RobotContainer {
     controller.L1().toggleOnTrue(leftTurret.followHub());
     controller.R1().toggleOnTrue(superStructure.runShooters());
 
-    controller.square().onTrue(Commands.parallel(simTurretLeft.setTargetCommand(TargetConstants.hub), simTurretRight.setTargetCommand((TargetConstants.hub))));
-    controller.triangle().onTrue(Commands.parallel(simTurretLeft.setTargetCommand(TargetConstants.hub), simTurretRight.setTargetCommand((TargetConstants.hub))));
-    controller.circle().onTrue(Commands.parallel(simTurretLeft.setTargetCommand(TargetConstants.hub), simTurretRight.setTargetCommand((TargetConstants.hub))));
-    controller.cross().onTrue(Commands.parallel(simTurretLeft.setTargetCommand(TargetConstants.hub), simTurretRight.setTargetCommand((TargetConstants.hub))));
+    controller
+        .square()
+        .onTrue(
+            Commands.parallel(
+                simTurretLeft.setTargetCommand(TargetConstants.hub),
+                simTurretRight.setTargetCommand((TargetConstants.hub))));
+    controller
+        .triangle()
+        .onTrue(
+            Commands.parallel(
+                simTurretLeft.setTargetCommand(TargetConstants.hub),
+                simTurretRight.setTargetCommand((TargetConstants.hub))));
+    controller
+        .circle()
+        .onTrue(
+            Commands.parallel(
+                simTurretLeft.setTargetCommand(TargetConstants.hub),
+                simTurretRight.setTargetCommand((TargetConstants.hub))));
+    controller
+        .cross()
+        .onTrue(
+            Commands.parallel(
+                simTurretLeft.setTargetCommand(TargetConstants.hub),
+                simTurretRight.setTargetCommand((TargetConstants.hub))));
 
-    controller.touchpad().onTrue(drive.driveOverBump());
+    // controller.touchpad().onTrue(drive.driveOverBump());
 
     controller.PS().onTrue(superStructure.stopShooters());
 

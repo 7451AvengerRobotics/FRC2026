@@ -40,18 +40,21 @@ public class SuperStructure {
   }
 
   // public Command offsetTurrets(double offset) {
-  //   return Commands.run(() -> {
-  //     leftTurret.offsetYaw(offset);
-  //     rightTurret.offsetYaw(-offset);
-  //   });
+  //   return Commands.run(
+  //       () -> {
+  //         leftTurret.offsetYaw(offset);
+  //         rightTurret.offsetYaw(-offset);
+  //       });
   // }
 
-  public Command offsetShooters(double offset) {
-    return Commands.run(() -> {
-      leftShooter.offsetVel(offset);
-      rightShooter.offsetVel(offset);
-    });
-  }
+  // public Command offsetShooters(double offset) {
+  //   return Commands.run(
+  //       () -> {
+  //         leftShooter.offsetVel(offset);
+  //         rightShooter.offsetVel(offset);
+  //       });
+  // }
+
   public Command startIntake() {
     return Commands.parallel(
         intakePivot.toPosition(0.27), intake.runIntake(-0.5), index.runIndex(-0.1));
