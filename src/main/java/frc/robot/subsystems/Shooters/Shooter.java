@@ -8,6 +8,8 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -65,10 +67,16 @@ public class Shooter extends SubsystemBase {
 
     globalCfg.idleMode(IdleMode.kCoast);
 
-    globalCfg.smartCurrentLimit(80);
+    globalCfg.smartCurrentLimit(40);
+    globalCfg.voltageCompensation(12.0);
 
     globalCfg.closedLoop.p(ShooterConstants.kP).d(ShooterConstants.kD);
-    globalCfg.closedLoop.feedForward.kS(ShooterConstants.kS).kV(ShooterConstants.kV);
+    globalCfg
+        .closedLoop
+        .feedForward
+        .kS(ShooterConstants.kS)
+        .kV(ShooterConstants.kV)
+        .kA(ShooterConstants.kA);
 
     globalCfg
         .closedLoop
@@ -152,6 +160,12 @@ public class Shooter extends SubsystemBase {
               (a * Math.pow(velocityRequired, 2) + b * velocityRequired)
                   * 60
                   / (2 * Math.PI * 4 * 0.0254);
+
+          double battery = RobotController.getBatteryVoltage();
+          double factor = -0.1333 * battery + 2.3663;
+
+          // Optional: clamp to prevent crazy values
+          factor = MathUtil.clamp(factor, 0.8, 1.4);
 
           // Command the motor
           setVel(flywheelVel);

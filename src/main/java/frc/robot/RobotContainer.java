@@ -235,6 +235,8 @@ public class RobotContainer {
 
     controller.square().onTrue(superStructure.deployPivot());
 
+    controller.povUp().toggleOnTrue(superStructure.startupMasterCommand());
+
     // controller.L1().onTrue(superStructure.masterCommand());
     // controller.R1().onTrue(superStructure.stopMasterCommand());
 
