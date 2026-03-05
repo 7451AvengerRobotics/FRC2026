@@ -240,7 +240,7 @@ public class RobotContainer {
 
     controller.PS().onTrue(superStructure.stopShooters());
 
-    controller.touchpad().toggleOnTrue(superStructure.playThrough());
+    controller.touchpad().toggleOnTrue(leftTurret.followHub());
   }
 
   // public Command driveOverSourceSideBump(){
