@@ -46,6 +46,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.generated.TunerConstants;
+import frc.robot.util.AllianceFlipUtil;
 import frc.robot.util.LocalADStarAK;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
@@ -467,36 +468,36 @@ public class Drive extends SubsystemBase {
 
   public Command driveUnderTrenchToNeutral() {
     if(this.getPose().getY() > 4) {
-      return Commands.sequence(this.driveToPose(new Pose2d(3.75, 7.375, new Rotation2d())), this.followPPPathCommand("DepotSideTrench"));
+      return Commands.sequence(this.driveToPose(AllianceFlipUtil.apply(new Pose2d(3.75, 7.375, new Rotation2d()))), this.followPPPathCommand("DepotSideTrench"));
     } else {
-        return Commands.sequence(this.driveToPose(new Pose2d(3.75, 0.625, new Rotation2d())), this.followPPPathCommand("SourceSideTrench"));
+        return Commands.sequence(this.driveToPose(AllianceFlipUtil.apply(new Pose2d(3.75, 0.625, new Rotation2d()))), this.followPPPathCommand("SourceSideTrench"));
     }
   }
 
   public Command driveUnderTrenchToAlliance() {
     if(this.getPose().getY() > 4) {
-      return Commands.sequence(this.driveToPose(new Pose2d(5.25, 7.375, new Rotation2d(Math.PI))), this.followPPPathCommand("DepotSideTrenchOpposite"));
+      return Commands.sequence(this.driveToPose(AllianceFlipUtil.apply(new Pose2d(3.75, 7.375, new Rotation2d()))), this.followPPPathCommand("DepotSideTrenchOpposite"));
     } else {
-        return Commands.sequence(this.driveToPose(new Pose2d(5.25, 0.625, new Rotation2d(Math.PI))), this.followPPPathCommand("SourceSideTrenchOpposite"));
+        return Commands.sequence(this.driveToPose(AllianceFlipUtil.apply(new Pose2d(3.75, 0.625, new Rotation2d()))), this.followPPPathCommand("SourceSideTrenchOpposite"));
     }
   }
 
   public Command driveOverBump() {
     if (this.getPose().getY() > 4 && this.getPose().getX() < 4) {
       return Commands.sequence(
-          this.driveToPose(new Pose2d(2, 5.5, new Rotation2d())),
+          this.driveToPose(AllianceFlipUtil.apply(new Pose2d(2, 5.5, new Rotation2d()))),
           this.followPPPathCommand("DepotSideBump"));
     } else if (this.getPose().getY() < 4 && this.getPose().getX() < 4) {
       return Commands.sequence(
-          this.driveToPose(new Pose2d(2, 2.5, new Rotation2d())),
+          this.driveToPose(AllianceFlipUtil.apply(new Pose2d(2, 2.5, new Rotation2d()))),
           this.followPPPathCommand("SourceSideBump"));
     } else if (this.getPose().getY() > 4 && this.getPose().getX() > 5.7) {
       return Commands.sequence(
-          this.driveToPose(new Pose2d(2, 2.5, new Rotation2d())),
+          this.driveToPose(AllianceFlipUtil.apply(new Pose2d(2, 2.5, new Rotation2d()))),
           this.followPPPathCommand("DepotSideBumpOpposite"));
     } else if (this.getPose().getY() < 4 && this.getPose().getX() > 5.7) {
       return Commands.sequence(
-          this.driveToPose(new Pose2d(2, 2.5, new Rotation2d())),
+          this.driveToPose(AllianceFlipUtil.apply(new Pose2d(2, 2.5, new Rotation2d()))),
           this.followPPPathCommand("SourceSideBumpOpposite"));
     } else {
       return Commands.none();
