@@ -154,12 +154,16 @@ public class Shooter extends SubsystemBase {
 
           // Compute flywheel target
           double velocityRequired = ballRequiredVel;
-          double a = -0.123001;
-          double b = 5.95629;
-          double flywheelVel =
-              (a * Math.pow(velocityRequired, 2) + b * velocityRequired)
-                  * 60
-                  / (2 * Math.PI * 4 * 0.0254);
+
+          // double a = -0.12001;
+          // double b = 5.97629;
+          // double flywheelVel =
+          //     (a * Math.pow(velocityRequired, 2) + b * velocityRequired)
+          //         * 60
+          //         / (2 * Math.PI * 4 * 0.0254);
+
+          double a2 = 4.7665;
+          double flywheelVel = (a2) * velocityRequired * 60 / (2 * Math.PI * 4 * 0.0254);
 
           double battery = RobotController.getBatteryVoltage();
           double factor = -0.1333 * battery + 2.3663;
@@ -168,7 +172,7 @@ public class Shooter extends SubsystemBase {
           factor = MathUtil.clamp(factor, 0.8, 1.4);
 
           // Command the motor
-          setVel(flywheelVel);
+          setVel(flywheelVel * 0.92);
         });
   }
 

@@ -34,6 +34,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -82,6 +83,9 @@ public class Drive extends SubsystemBase {
               TunerConstants.FrontLeft.SlipCurrent,
               1),
           getModuleTranslations());
+
+  public static double fieldWidth = Units.feetToMeters(26.0) + Units.inchesToMeters(5.7);
+  public static double fieldLength = Units.feetToMeters(54.0) + Units.inchesToMeters(3.2);
 
   private final PIDController headingController = new PIDController(4, 0.0, 0.0);
   private boolean holonomicControllerActive = false;
@@ -392,6 +396,61 @@ public class Drive extends SubsystemBase {
         Set.of(this));
   }
 
+  public double applyX(double x) {
+    return shouldFlip() ? fieldLength - x : x;
+  }
+
+  public double applyY(double y) {
+    return shouldFlip() ? fieldWidth - y : y;
+  }
+
+  public Translation2d apply(Translation2d translation) {
+    return new Translation2d(applyX(translation.getX()), applyY(translation.getY()));
+  }
+
+  public Rotation2d apply(Rotation2d rotation) {
+    return shouldFlip() ? rotation.rotateBy(Rotation2d.kPi) : rotation;
+  }
+
+  public Pose2d apply(Pose2d pose) {
+    return shouldFlip()
+        ? new Pose2d(apply(pose.getTranslation()), apply(pose.getRotation()))
+        : pose;
+  }
+
+  public boolean shouldFlip() {
+    return this.isRedAlliance();
+  }
+
+  public Command driveToStartingPose1() {
+    return Commands.defer(
+        () -> {
+          return driveToPose(
+              new Pose2d(applyX(3.5), applyY(6.5), apply(new Rotation2d(120 / 180 * Math.PI))));
+        },
+        Set.of(this));
+  }
+
+  public Command driveToStartingPose2() {
+    return Commands.defer(
+        () -> {
+          return driveToPose(new Pose2d(applyX(3.5), applyY(4), apply(new Rotation2d(0))));
+        },
+        Set.of(this));
+  }
+
+  public Command driveToStartingPose3() {
+    return Commands.defer(
+        () -> {
+          return driveToPose(new Pose2d(applyX(3.5), applyY(1.5), apply(new Rotation2d(0))));
+        },
+        Set.of(this));
+  }
+
+  public boolean isRedAlliance() {
+    return AutoBuilder.shouldFlip();
+  }
+
   public Command driveToPose(Pose2d pose) {
     return Commands.sequence(
             runOnce(
@@ -449,8 +508,8 @@ public class Drive extends SubsystemBase {
 
     return Commands.defer(
         () -> {
-          double deltax = 11.915 - getPose().getX();
-          double deltay = 4.035 - getPose().getY();
+          double deltax = applyX(fieldLength - 11.915) - getPose().getX();
+          double deltay = applyY(fieldWidth - 4.035) - getPose().getY();
 
           double initTheta = Math.atan2(deltay, deltax);
 
@@ -466,18 +525,26 @@ public class Drive extends SubsystemBase {
   }
 
   public Command driveUnderTrenchToNeutral() {
-    if(this.getPose().getY() > 4) {
-      return Commands.sequence(this.driveToPose(new Pose2d(3.75, 7.375, new Rotation2d())), this.followPPPathCommand("DepotSideTrench"));
+    if (this.getPose().getY() > 4) {
+      return Commands.sequence(
+          this.driveToPose(new Pose2d(3.75, 7.375, new Rotation2d())),
+          this.followPPPathCommand("DepotSideTrench"));
     } else {
-        return Commands.sequence(this.driveToPose(new Pose2d(3.75, 0.625, new Rotation2d())), this.followPPPathCommand("SourceSideTrench"));
+      return Commands.sequence(
+          this.driveToPose(new Pose2d(3.75, 0.625, new Rotation2d())),
+          this.followPPPathCommand("SourceSideTrench"));
     }
   }
 
   public Command driveUnderTrenchToAlliance() {
-    if(this.getPose().getY() > 4) {
-      return Commands.sequence(this.driveToPose(new Pose2d(5.25, 7.375, new Rotation2d(Math.PI))), this.followPPPathCommand("DepotSideTrenchOpposite"));
+    if (this.getPose().getY() > 4) {
+      return Commands.sequence(
+          this.driveToPose(new Pose2d(5.25, 7.375, new Rotation2d(Math.PI))),
+          this.followPPPathCommand("DepotSideTrenchOpposite"));
     } else {
-        return Commands.sequence(this.driveToPose(new Pose2d(5.25, 0.625, new Rotation2d(Math.PI))), this.followPPPathCommand("SourceSideTrenchOpposite"));
+      return Commands.sequence(
+          this.driveToPose(new Pose2d(5.25, 0.625, new Rotation2d(Math.PI))),
+          this.followPPPathCommand("SourceSideTrenchOpposite"));
     }
   }
 

@@ -132,10 +132,10 @@ public class SuperStructure {
     return Commands.parallel( // These run immediately
         intake.runIntake(-0.5),
         runShooters(),
-        feeder.runFeeder(-0.9),
 
         // This branch waits, then starts feeder/index
-        Commands.sequence(new WaitCommand(1.5), Commands.parallel(index.runIndex(-0.9))));
+        Commands.sequence(
+            new WaitCommand(1.5), Commands.parallel(index.runIndex(-0.9), feeder.runFeeder(-0.9))));
   }
 
   public Command weirdMasterCommand() {
