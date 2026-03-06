@@ -47,6 +47,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.generated.TunerConstants;
+import frc.robot.util.AllianceFlipUtil;
 import frc.robot.util.LocalADStarAK;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
@@ -551,19 +552,19 @@ public class Drive extends SubsystemBase {
   public Command driveOverBump() {
     if (this.getPose().getY() > 4 && this.getPose().getX() < 4) {
       return Commands.sequence(
-          this.driveToPose(new Pose2d(2, 5.5, new Rotation2d())),
+          this.driveToPose(AllianceFlipUtil.apply(new Pose2d(2, 5.5, new Rotation2d()))),
           this.followPPPathCommand("DepotSideBump"));
     } else if (this.getPose().getY() < 4 && this.getPose().getX() < 4) {
       return Commands.sequence(
-          this.driveToPose(new Pose2d(2, 2.5, new Rotation2d())),
+          this.driveToPose(AllianceFlipUtil.apply(new Pose2d(2, 2.5, new Rotation2d()))),
           this.followPPPathCommand("SourceSideBump"));
     } else if (this.getPose().getY() > 4 && this.getPose().getX() > 5.7) {
       return Commands.sequence(
-          this.driveToPose(new Pose2d(2, 2.5, new Rotation2d())),
+          this.driveToPose(AllianceFlipUtil.apply(new Pose2d(2, 2.5, new Rotation2d()))),
           this.followPPPathCommand("DepotSideBumpOpposite"));
     } else if (this.getPose().getY() < 4 && this.getPose().getX() > 5.7) {
       return Commands.sequence(
-          this.driveToPose(new Pose2d(2, 2.5, new Rotation2d())),
+          this.driveToPose(AllianceFlipUtil.apply(new Pose2d(2, 2.5, new Rotation2d()))),
           this.followPPPathCommand("SourceSideBumpOpposite"));
     } else {
       return Commands.none();
