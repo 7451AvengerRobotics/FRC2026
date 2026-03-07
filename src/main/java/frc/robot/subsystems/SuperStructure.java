@@ -19,6 +19,8 @@ public class SuperStructure {
   private final Turret rightTurret;
   private final IntakePivot pivot;
 
+  private boolean passing = false;
+
   public SuperStructure(
       Index index,
       Intake intake,
@@ -53,6 +55,13 @@ public class SuperStructure {
         () -> {
           leftShooter.offsetVel(offset);
           rightShooter.offsetVel(offset);
+        });
+  }
+
+  public Command setPassing(boolean passing) {
+    return Commands.runOnce(
+        () -> {
+          this.passing = passing;
         });
   }
 
@@ -114,6 +123,10 @@ public class SuperStructure {
     return Commands.parallel(leftShooter.runShooter(), rightShooter.runShooter());
   }
 
+  public Command runShooters5000() {
+    return Commands.parallel(leftShooter.runShooter5000(), rightShooter.runShooter5000());
+  }
+
   public Command stopShooters() {
     return Commands.parallel(leftShooter.stopShooter(), rightShooter.stopShooter());
   }
@@ -135,11 +148,14 @@ public class SuperStructure {
 
         // This branch waits, then starts feeder/index
         Commands.sequence(
-            new WaitCommand(1.5), Commands.parallel(index.runIndex(-0.9), feeder.runFeeder(-0.9))));
+            new WaitCommand(1.5), Commands.parallel(index.runIndex(-1), feeder.runFeeder(-1))));
   }
 
   public Command weirdMasterCommand() {
-    return Commands.parallel(intake.runIntake(-0.5), index.runIndex(0.6), feeder.runFeeder(0.6));
+    return Commands.sequence(
+        setPassing(false),
+        Commands.parallel(
+            intake.runIntake(-0.5), index.runIndex(0.6), feeder.runFeeder(0.6), runShooters()));
   }
 
   public Command shooterlessMasterCommand() {
@@ -164,6 +180,10 @@ public class SuperStructure {
 
   public Command deployPivot() {
     return pivot.toPosition(2.8);
+  }
+
+  public Command jiggle() {
+    return Commands.sequence(stowPivot().withTimeout(2), deployPivot());
   }
 
   public Command stowPivot() {

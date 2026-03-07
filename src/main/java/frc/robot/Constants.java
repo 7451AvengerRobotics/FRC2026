@@ -97,7 +97,10 @@ public final class Constants {
   }
 
   public static final class TargetConstants {
-    public static final Translation2d hub = new Translation2d(11.915, 4.035);
+    public static final Translation2d hub =
+        new Translation2d(
+            // 16.54 -
+            11.915, 4.035);
     public static final double yf = 1.32;
   }
 }

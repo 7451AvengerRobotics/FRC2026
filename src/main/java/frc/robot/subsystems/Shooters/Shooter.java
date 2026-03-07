@@ -27,7 +27,7 @@ public class Shooter extends SubsystemBase {
   private final String name;
   private TurretSim simTurret;
   private Drive drive;
-  private double velOffset;
+  private double velOffset = 1;
 
   private double ballRequiredVel;
 
@@ -98,11 +98,20 @@ public class Shooter extends SubsystemBase {
     this.velOffset = offset;
   }
 
+  public double getVelOffset() {
+    return this.velOffset;
+  }
+
   public Command offsetVel(double offset) {
-    return Commands.run(
+    return Commands.runOnce(
         () -> {
           this.setVelOffset(this.velOffset + offset);
+          this.runShooter();
         });
+  }
+
+  public double getRPM() {
+    return shooterLeader.getEncoder().getVelocity();
   }
 
   @Override
@@ -122,7 +131,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public void setVel(double rpm) {
-    closedLoopController.setSetpoint(rpm + velOffset, ControlType.kMAXMotionVelocityControl);
+    closedLoopController.setSetpoint(rpm, ControlType.kMAXMotionVelocityControl);
   }
 
   public Command setVelCommand(double rpm) {
@@ -170,9 +179,17 @@ public class Shooter extends SubsystemBase {
 
           // Optional: clamp to prevent crazy values
           factor = MathUtil.clamp(factor, 0.8, 1.4);
+          flywheelVel = MathUtil.clamp(flywheelVel, 0, 5000);
 
           // Command the motor
-          setVel(flywheelVel * 0.92);
+          setVel(flywheelVel * velOffset * 0.95);
+        });
+  }
+
+  public Command runShooter5000() {
+    return run(
+        () -> {
+          setVel(4500);
         });
   }
 

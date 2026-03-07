@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.ShooterConstants;
-import frc.robot.Constants.TargetConstants;
 import frc.robot.Constants.TurretConstants;
 import frc.robot.commands.AutoRoutines;
 import frc.robot.commands.DriveCommands;
@@ -237,50 +236,53 @@ public class RobotContainer {
 
     controller.povUp().toggleOnTrue(superStructure.startupMasterCommand());
 
+    controller.touchpad().toggleOnTrue(superStructure.runShooters());
+
     // controller.L1().onTrue(superStructure.masterCommand());
     // controller.R1().onTrue(superStructure.stopMasterCommand());
 
     // controller.L1().onTrue(simTurretLeft.shootBallCommand());
-    controller.L1().onTrue(Commands.parallel(drive.alignToHub(), leftTurret.goToTwoFive()));
-    controller.R1().toggleOnTrue(superStructure.stopTurret());
+    controller.L1().onTrue(Commands.parallel(drive.alignToHub().withTimeout(3)));
+    controller.R1().onTrue(superStructure.runShooters5000());
 
-    controller
-        .square()
-        .onTrue(
-            Commands.parallel(
-                simTurretLeft.setTargetCommand(TargetConstants.hub),
-                simTurretRight.setTargetCommand((TargetConstants.hub))));
-    controller
-        .triangle()
-        .onTrue(
-            Commands.parallel(
-                simTurretLeft.setTargetCommand(TargetConstants.hub),
-                simTurretRight.setTargetCommand((TargetConstants.hub))));
-    controller
-        .circle()
-        .onTrue(
-            Commands.parallel(
-                simTurretLeft.setTargetCommand(TargetConstants.hub),
-                simTurretRight.setTargetCommand((TargetConstants.hub))));
-    controller
-        .cross()
-        .onTrue(
-            Commands.parallel(
-                simTurretLeft.setTargetCommand(TargetConstants.hub),
-                simTurretRight.setTargetCommand((TargetConstants.hub))));
+    // controller
+    //     .square()
+    //     .onTrue(
+    //         Commands.parallel(
+    //             simTurretLeft.setTargetCommand(TargetConstants.hub),
+    //             simTurretRight.setTargetCommand((TargetConstants.hub))));
+    // controller
+    //     .triangle()
+    //     .onTrue(
+    //         Commands.parallel(
+    //             simTurretLeft.setTargetCommand(TargetConstants.hub),
+    //             simTurretRight.setTargetCommand((TargetConstants.hub))));
+    // controller
+    //     .circle()
+    //     .onTrue(
+    //         Commands.parallel(
+    //             simTurretLeft.setTargetCommand(TargetConstants.hub),
+    //             simTurretRight.setTargetCommand((TargetConstants.hub))));
+    // controller
+    //     .cross()
+    //     .onTrue(
+    //         Commands.parallel(
+    //             simTurretLeft.setTargetCommand(TargetConstants.hub),
+    //             simTurretRight.setTargetCommand((TargetConstants.hub))));
 
-    controller.touchpad().onTrue(drive.driveOverBump());
-
-    controller.PS().onTrue(superStructure.stopShooters());
-
-    manip.povLeft().onTrue(superStructure.offsetTurrets(-5 * Math.PI / 180));
-    manip.povRight().onTrue(superStructure.offsetTurrets(5 * Math.PI / 180));
-    manip.L1().whileTrue(superStructure.offsetShooters(-10));
-    manip.R1().whileTrue(superStructure.offsetShooters(10));
+    // controller.touchpad().onTrue(drive.driveOverBump());
 
     controller.PS().onTrue(superStructure.stopShooters());
 
-    controller.touchpad().toggleOnTrue(superStructure.playThrough());
+    // manip.povLeft().onTrue(superStructure.offsetTurrets(-5 * Math.PI / 180));
+    // manip.povRight().onTrue(superStructure.offsetTurrets(5 * Math.PI / 180));
+    manip.L1().whileTrue(pivot.runPivot(-0.18)).onFalse(pivot.runPivot(0.1));
+    manip.R1().onTrue(superStructure.deployPivot());
+    // manip.R1().onTrue(superStructure.offsetShooters(0.025));
+
+    // controller.PS().onTrue(superStructure.stopShooters());
+
+    // controller.touchpad().toggleOnTrue(superStructure.playThrough());
   }
 
   // public Command driveOverSourceSideBump(){

@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.SuperStructure;
 import frc.robot.subsystems.drive.Drive;
-import frc.robot.util.AllianceFlipUtil;
 
 public class AutoRoutines {
   private final Drive drive;
@@ -63,6 +62,7 @@ public class AutoRoutines {
 
   public Command singleAuto() {
     return Commands.sequence(
+        // drive.jostle(),
         superStruc.deployPivot().withTimeout(1),
         drive.alignToHub(),
         superStruc.startupMasterCommand().withTimeout(6));

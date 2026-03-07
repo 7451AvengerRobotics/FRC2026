@@ -46,6 +46,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
+import frc.robot.Robot;
 import frc.robot.generated.TunerConstants;
 import frc.robot.util.AllianceFlipUtil;
 import frc.robot.util.LocalADStarAK;
@@ -420,7 +421,7 @@ public class Drive extends SubsystemBase {
   }
 
   public boolean shouldFlip() {
-    return this.isRedAlliance();
+    return !Robot.IsRedAlliance.getAsBoolean();
   }
 
   public Command driveToStartingPose1() {
@@ -505,18 +506,56 @@ public class Drive extends SubsystemBase {
         modules[0].getState(), modules[1].getState(), modules[2].getState(), modules[3].getState());
   }
 
+  public Command jostle() {
+    return Commands.defer(
+        () -> {
+          return Commands.run(
+                  () -> {
+                    this.runVelocity(new ChassisSpeeds(1, 0, 0));
+                  })
+              .withTimeout(0.3)
+              .andThen(
+                  Commands.run(
+                      () -> {
+                        this.runVelocity(new ChassisSpeeds(0, 0, 0));
+                      }));
+        },
+        Set.of(this));
+  }
+
   public Command alignToHub() {
 
     return Commands.defer(
         () -> {
-          double deltax = applyX(fieldLength - 11.915) - getPose().getX();
-          double deltay = applyY(fieldWidth - 4.035) - getPose().getY();
+          double deltax =
+              (
+                  // 16.54 -
+                  11.915)
+                  - getPose().getX();
+          double deltay = 4.035 - getPose().getY();
 
           double initTheta = Math.atan2(deltay, deltax);
 
           double theta = (initTheta);
 
           return driveToRotation(new Rotation2d(theta + Math.PI));
+        },
+        Set.of(this));
+  }
+
+  public Command alignForTrench() {
+    return Commands.defer(
+        () -> {
+          boolean flipped = this.getPose().getX() > 4;
+
+          return Commands.run(
+              () -> {
+                this.driveToPose(
+                    new Pose2d(
+                        this.getPose().getX(),
+                        this.getPose().getY(),
+                        this.apply(new Rotation2d(flipped ? Math.PI : 0))));
+              });
         },
         Set.of(this));
   }
