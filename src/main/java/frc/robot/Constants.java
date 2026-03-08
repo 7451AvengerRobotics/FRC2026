@@ -78,6 +78,10 @@ public final class Constants {
     public static final double kP = 0.0075 / 100 * 4;
     public static final double kD = 0.0075 / 100 * 3;
     public static final double kV = 0.00176;
+    /** Fixed launch speed (m/s) for the ball. Only the hood angle varies with distance. */
+    public static final double kFixedLaunchVelocityMetersPerSecond = 15.0;
+    /** Fixed flywheel RPM when shooting (matches fixed launch velocity). */
+    public static final double kFixedShooterRPM = 2360;
   }
 
   public static final class TurretConstants {

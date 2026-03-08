@@ -234,8 +234,8 @@ public class RobotContainer {
             () -> -controller.getRightX()));
 
     // Hood default: track hub angle from distance
-    leftHood.setDefaultCommand(leftHood.trackHub());
-    rightHood.setDefaultCommand(rightHood.trackHub());
+    // leftHood.setDefaultCommand(leftHood.trackHub());
+    // rightHood.setDefaultCommand(rightHood.trackHub());
 
     // // Switch to X pattern when X button is pressed
     // controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));

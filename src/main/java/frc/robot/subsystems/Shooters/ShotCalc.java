@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.TargetConstants;
 import frc.robot.subsystems.drive.Drive;
 
@@ -71,24 +72,25 @@ public class ShotCalc {
 
   /**
    * Required launch angle (pitch) in radians for the given horizontal range so the ball reaches the
-   * target height {@code yf}. Uses the same ballistic solution as TurretSim so velocity and pitch
-   * stay consistent. Hood should use this for its setpoint.
+   * target height {@code yf} when launched at the fixed speed {@link
+   * ShooterConstants#kFixedLaunchVelocityMetersPerSecond}. Only the hood angle varies with
+   * distance; shooter speed is fixed.
    */
   public double getPitchForDistance(double xf) {
-    double v = getVelocityForDistance(xf);
+    double v = ShooterConstants.kFixedLaunchVelocityMetersPerSecond;
     double A = a * Math.pow(xf, 2) / (2 * Math.pow(v, 2));
     double B = xf;
     double C = A - yf;
     double discriminant = Math.pow(B, 2) - 4 * A * C;
     if (discriminant < 0) {
-      return Math.toRadians(60); // fallback to default pitch
+      return Math.toRadians(60); // fallback when no solution for this speed (e.g. out of range)
     }
     return Math.atan((-B - Math.sqrt(discriminant)) / (2 * A));
   }
 
   /**
-   * Launch speed (m/s) for the given horizontal range. Empirical formula consistent with
-   * TurretSim's calcVelocity; used by getPitchForDistance.
+   * Launch speed (m/s) for the given horizontal range. Empirical formula; kept for legacy use
+   * (e.g. getVelocity, moving-shot). Hood uses fixed speed via getPitchForDistance.
    */
   private double getVelocityForDistance(double xf) {
     return Math.sqrt(g * yf + g * Math.sqrt(Math.pow(xf, 2) + Math.pow(yf, 2))) + 0.5;

@@ -104,18 +104,12 @@ public class Shooter extends SubsystemBase {
   }
 
   public Command runShooter() {
-    return setVelCommand(2360);
+    return setVelCommand(ShooterConstants.kFixedShooterRPM);
   }
 
+  /** Fixed flywheel RPM used when shooting (only hood angle varies with distance). */
   public double flywheelVel() {
-    double velocityRequired = shotCalc.getVelocity(shotCalc.getXf());
-    double a = -0.0661338;
-    double b = 5.15403;
-    double flywheelVel =
-        (a * Math.pow(velocityRequired, 2) + b * velocityRequired)
-            * 60
-            / (2 * Math.PI * 4 * 0.0254);
-    return flywheelVel;
+    return ShooterConstants.kFixedShooterRPM;
   }
 
   public Command stopShooter() {
