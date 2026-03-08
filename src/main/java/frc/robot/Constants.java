@@ -7,7 +7,6 @@
 
 package frc.robot;
 
-import com.ctre.phoenix6.CANBus;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.RobotBase;
 
@@ -103,16 +102,14 @@ public final class Constants {
   }
 
   public static final class HoodConstants {
-    public static final CANBus kHoodCANBus = new CANBus("rio");
     public static final int kLeftHoodMotorID = 30;
     public static final int kRightHoodMotorID = 31;
-    public static final int kLeftHoodCancoderID = 42;
-    public static final int kRightHoodCancoderID = 43;
+    /** Sensor (rotor) to mechanism ratio: motor rotations per one hood rotation. */
     public static final double kHoodGearRatio = 1.0;
-    /** CANcoder position (rotations) when hood is at zero angle. */
-    public static final double kCancoderOffsetRotations = 0.0;
-    /** Hood angle (radians) per CANcoder rotation. */
-    public static final double kCancoderToHoodRadiansPerRotation = 2 * Math.PI;
+    /** Encoder position (rotations) when hood is at zero angle. Set at boot or calibrate. */
+    public static final double kEncoderOffsetRotations = 0.0;
+    /** Hood angle (radians) per encoder rotation (e.g. 2π for 1:1). */
+    public static final double kEncoderToHoodRadiansPerRotation = 2 * Math.PI;
 
     public static final double kHoodMinAngleRad = 0.0;
     public static final double kHoodMaxAngleRad = Math.toRadians(60);

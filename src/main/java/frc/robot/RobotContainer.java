@@ -186,13 +186,11 @@ public class RobotContainer {
     leftHood =
         new Hood(
             HoodConstants.kLeftHoodMotorID,
-            HoodConstants.kLeftHoodCancoderID,
             RobotSide.LEFT,
             leftShotCalc);
     rightHood =
         new Hood(
             HoodConstants.kRightHoodMotorID,
-            HoodConstants.kRightHoodCancoderID,
             RobotSide.RIGHT,
             rightShotCalc);
     superStructure =

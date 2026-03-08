@@ -13,40 +13,39 @@ import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Second;
 import static frc.robot.Constants.HoodConstants.*;
 
-import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
-import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.TalonFXSConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
-import com.ctre.phoenix6.hardware.CANcoder;
-import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
+import com.ctre.phoenix6.hardware.TalonFXS;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.MotorArrangementValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.RobotSide;
 import org.littletonrobotics.junction.Logger;
 
+/**
+ * Hood subsystem using a CTRE Minion motor with a Phoenix (TalonFXS) controller. Encoder feedback
+ * comes from the controller (rotor/integrated); no external CANcoder.
+ */
 public class Hood extends SubsystemBase {
-  private final TalonFX motor;
-  private final CANcoder cancoder;
+  private final TalonFXS motor;
   private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0);
   private final ShotCalc shotCalc;
   private final String logPrefix;
   private double lastSetpointRad = 0;
 
-  public Hood(int motorID, int cancoderID, RobotSide side, ShotCalc shotCalc) {
+  public Hood(int motorID, RobotSide side, ShotCalc shotCalc) {
     this.shotCalc = shotCalc;
     this.logPrefix = "Hood/" + (side == RobotSide.LEFT ? "Left" : "Right");
 
-    motor = new TalonFX(motorID, kHoodCANBus);
-    cancoder = new CANcoder(cancoderID, kHoodCANBus);
+    motor = new TalonFXS(motorID);
 
-    var motorConfig = new TalonFXConfiguration();
+    var motorConfig = new TalonFXSConfiguration();
     motorConfig.MotorOutput =
         new MotorOutputConfigs()
             .withInverted(InvertedValue.CounterClockwise_Positive)
@@ -55,12 +54,8 @@ public class Hood extends SubsystemBase {
         new CurrentLimitsConfigs()
             .withStatorCurrentLimit(Amps.of(40))
             .withStatorCurrentLimitEnable(true);
-    motorConfig.Feedback =
-        new FeedbackConfigs()
-            .withFeedbackSensorSource(FeedbackSensorSourceValue.RemoteCANcoder)
-            .withFeedbackRemoteSensorID(cancoderID)
-            .withRotorToSensorRatio(kHoodGearRatio)
-            .withSensorToMechanismRatio(1.0);
+    // TalonFXS uses integrated rotor (Minion encoder) by default; we scale in code via
+    // kEncoderToHoodRadiansPerRotation and kEncoderOffsetRotations.
     motorConfig.MotionMagic =
         new MotionMagicConfigs()
             .withMotionMagicCruiseVelocity(RotationsPerSecond.of(kMotionMagicCruiseVelocity))
@@ -69,14 +64,12 @@ public class Hood extends SubsystemBase {
     motorConfig.Slot0 =
         new Slot0Configs().withKP(kP).withKI(kI).withKD(kD).withKS(kS).withKV(kV).withKA(kA);
 
+    motorConfig.Commutation.MotorArrangement = MotorArrangementValue.Minion_JST;
+
     motor.getConfigurator().apply(motorConfig);
 
-    CANcoderConfiguration cancoderConfig = new CANcoderConfiguration();
-    cancoder.getConfigurator().apply(cancoderConfig);
-
-    // Sync TalonFX position to current CANcoder reading so setpoints are relative to real position
-    double cancoderRotations = cancoder.getPosition().getValueAsDouble();
-    motor.getConfigurator().setPosition(cancoderRotations);
+    // Optional: set position to 0 at boot so offset matches mechanism zero
+    motor.getConfigurator().setPosition(kEncoderOffsetRotations);
   }
 
   /** Sets the hood angle setpoint in radians. Clamped to [kHoodMinAngleRad, kHoodMaxAngleRad]. */
@@ -84,7 +77,7 @@ public class Hood extends SubsystemBase {
     double clamped = Math.max(kHoodMinAngleRad, Math.min(kHoodMaxAngleRad, angleRad));
     lastSetpointRad = clamped;
     double setpointRotations =
-        clamped / kCancoderToHoodRadiansPerRotation + kCancoderOffsetRotations;
+        clamped / kEncoderToHoodRadiansPerRotation + kEncoderOffsetRotations;
     motor.setControl(positionRequest.withPosition(setpointRotations));
   }
 
@@ -93,10 +86,10 @@ public class Hood extends SubsystemBase {
     setAngleRad(Math.toRadians(angleDeg));
   }
 
-  /** Returns the current hood angle in radians (from CANcoder via TalonFX position). */
+  /** Returns the current hood angle in radians (from controller encoder). */
   public double getAngleRad() {
     double positionRotations = motor.getPosition().getValueAsDouble();
-    return (positionRotations - kCancoderOffsetRotations) * kCancoderToHoodRadiansPerRotation;
+    return (positionRotations - kEncoderOffsetRotations) * kEncoderToHoodRadiansPerRotation;
   }
 
   /** Returns true if current angle is within tolerance of the last setpoint. */
