@@ -13,8 +13,10 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.Constants.HoodConstants;
 import frc.robot.Constants.RobotSide;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.TurretConstants;
@@ -25,6 +27,7 @@ import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Index;
 import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.Intake.IntakePivot;
+import frc.robot.subsystems.Shooters.Hood;
 import frc.robot.subsystems.Shooters.Shooter;
 import frc.robot.subsystems.Shooters.ShotCalc;
 import frc.robot.subsystems.Shooters.Turret;
@@ -61,6 +64,8 @@ public class RobotContainer {
   private final IntakePivot pivot = new IntakePivot();
   private final Shooter leftShooter;
   private final Shooter rightShooter;
+  private final Hood leftHood;
+  private final Hood rightHood;
   private final SuperStructure superStructure;
   private ShotCalc leftShotCalc;
   private ShotCalc rightShotCalc;
@@ -178,6 +183,18 @@ public class RobotContainer {
 
     leftTurret = new Turret(TurretConstants.kTurretID, drive, RobotSide.LEFT, leftShotCalc);
     rightTurret = new Turret(TurretConstants.kTurretID, drive, RobotSide.RIGHT, rightShotCalc);
+    leftHood =
+        new Hood(
+            HoodConstants.kLeftHoodMotorID,
+            HoodConstants.kLeftHoodCancoderID,
+            RobotSide.LEFT,
+            leftShotCalc);
+    rightHood =
+        new Hood(
+            HoodConstants.kRightHoodMotorID,
+            HoodConstants.kRightHoodCancoderID,
+            RobotSide.RIGHT,
+            rightShotCalc);
     superStructure =
         new SuperStructure(
             index,
@@ -188,6 +205,8 @@ public class RobotContainer {
             rightShooter,
             leftTurret,
             rightTurret,
+            leftHood,
+            rightHood,
             pivot);
 
     // Set up auto routines
@@ -214,6 +233,10 @@ public class RobotContainer {
             () -> -controller.getLeftX(),
             () -> -controller.getRightX()));
 
+    // Hood default: track hub angle from distance
+    leftHood.setDefaultCommand(leftHood.trackHub());
+    rightHood.setDefaultCommand(rightHood.trackHub());
+
     // // Switch to X pattern when X button is pressed
     // controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
@@ -239,6 +262,21 @@ public class RobotContainer {
     controller.R1().onTrue(superStructure.rightShoot());
 
     controller.PS().onTrue(superStructure.stopShooters());
+
+    // Test: hold L2 to lock both turrets and both hoods onto the hub
+    controller.L2().whileTrue(lockOntoHubCommand());
+  }
+
+  /**
+   * Command that runs both turrets and both hoods tracking the hub. Use for testing (e.g. hold L2).
+   * While this runs, all four subsystems aim at the hub using ShotCalc.
+   */
+  private Command lockOntoHubCommand() {
+    return Commands.parallel(
+        leftTurret.trackHubCommand(),
+        rightTurret.trackHubCommand(),
+        leftHood.trackHub(),
+        rightHood.trackHub());
   }
 
   // public Command driveOverSourceSideBump(){

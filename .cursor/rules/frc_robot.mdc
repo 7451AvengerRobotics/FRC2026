@@ -1,0 +1,101 @@
+---
+description: FRC robot coding patterns and WPILib command-based architecture (Java)
+globs: src/main/java/frc/robot/**/*.java
+alwaysApply: false
+---
+
+# FRC Robot Codebase Conventions
+
+Use these patterns when generating or modifying code in this project. All patterns below are taken from the existing codebase.
+
+---
+
+## General Java Style
+
+- **Package**: Root is `frc.robot`. Subsystems live in `frc.robot.subsystems` with optional subpackages: `drive`, `vision`, `Intake`, `Shooters`, `SimFiles`. Commands in `frc.robot.commands`. Constants in `frc.robot` or subsystem-specific (e.g. `frc.robot.subsystems.vision.VisionConstants`). Generated code in `frc.robot.generated`.
+- **Imports**: Use full imports; group WPILib, vendor (CTRE, REV), then project. Static imports are used for units (e.g. `Units.Amps`) or constants (e.g. `VisionConstants.*`).
+- **Copyright**: Some files include a Littleton Robotics/BSD copyright block at the top; match existing files in the same directory.
+- **Class layout**: Fields first (`private final` for dependencies and hardware), then constructor, then public methods. Use `private final` for subsystems and IO; avoid mutable static state except in Constants.
+- **Config pattern**: For CTRE/REV, build a config object (e.g. `TalonFXConfiguration`) with chained `.withX(...)` calls, then `motor.getConfigurator().apply(cfg)` (or equivalent) in the constructor.
+
+---
+
+## WPILib Command-Based Architecture
+
+- **Robot.java**: Extends `LoggedRobot`. Constructor creates `RobotContainer` only. In `robotPeriodic()`, only call `CommandScheduler.getInstance().run()`. In `autonomousInit()`, schedule `robotContainer.getAutonomousCommand()` if non-null. In `teleopInit()`, cancel the autonomous command. Do not put subsystem logic or bindings in Robot.
+- **RobotContainer**: Holds all subsystems, the driver controller, and the autonomous chooser. Constructor (1) instantiates subsystems, (2) calls `configureButtonBindings()`, (3) calls `configureAutos()`. Expose `getAutonomousCommand()` returning the chooser’s selected command. Use a single controller type (e.g. `CommandPS5Controller`) and bind with `.onTrue(command)` / `.onFalse(command)`.
+- **Default command**: Set via `subsystem.setDefaultCommand(command)` in `configureButtonBindings()`. The drive default is typically a field-relative joystick command that requires the Drive subsystem.
+
+---
+
+## Subsystem Design Patterns
+
+- **SubsystemBase**: All hardware subsystems extend `edu.wpi.first.wpilibj2.command.SubsystemBase`. Exception: **SuperStructure** does not extend SubsystemBase; it composes other subsystems and exposes command factories.
+- **Constructor**: Takes only what’s needed (constants via class refs, or injected dependencies like `Drive`, `ShotCalc`, `VisionIO`). Configure hardware (motors, config apply) in the constructor; do not schedule commands there.
+- **State methods**: Expose `public void` methods for raw control (e.g. `run(double speed)`, `run(double rotations)`). These are called from commands or from other `public Command` methods.
+- **Command factories**: For continuous actions, expose `public Command runX(double power)` that returns `run(() -> this.run(power), this)`. For stop, return `run(() -> this.run(0), this)`. Use the subsystem as the requirement (second argument to `run`).
+- **Constants**: Read from `frc.robot.Constants.XxxConstants` (e.g. `FeederConstants.kFeederID`) or from subsystem-specific classes (e.g. `VisionConstants.camera0Name`). Do not hardcode IDs or gains in subsystems.
+- **IO abstraction**: For hardware that differs by mode (real/sim/replay), use an interface (e.g. `ModuleIO`, `GyroIO`, `VisionIO`) with an `@AutoLog` inner inputs class and default no-op methods. Implementations: `ModuleIOTalonFX`, `ModuleIOSim`, `GyroIOPigeon2`, `VisionIOPhotonVision`, `VisionIOPhotonVisionSim`. The subsystem takes the IO in its constructor; RobotContainer chooses the implementation in a `switch (Constants.currentMode)`.
+
+---
+
+## Command Design Patterns
+
+- **No custom Command subclasses**: Use `Commands.run`, `Commands.runOnce`, `Commands.parallel`, `Commands.sequence`, `Commands.waitSeconds`, `Commands.defer`, and the subsystem’s `run(() -> ..., this)` / `runOnce(...)`.
+- **Command factories**: Prefer static methods or instance methods that return a `Command`. Pass the subsystem( s) as requirements so the scheduler knows requirements. Example: `Commands.run(() -> drive.runVelocity(speeds), drive)`.
+- **Static command classes**: For drive (or similar), use a utility class with a **private constructor** and **public static** methods that take the subsystem and suppliers/lambdas and return a `Command` (e.g. `DriveCommands.joystickDrive(drive, xSupplier, ySupplier, omegaSupplier)`). Keep command-local constants as `private static final` in that class.
+- **Auto / routine classes**: Use a class that receives dependencies in the constructor (e.g. `AutoRoutines(Drive drive, SuperStructure superStructure)`) and exposes instance methods that return a `Command` (e.g. `depotSideAuto()`). Build sequences with `Commands.sequence(...)` and `Commands.parallel(...)`; use `drive.followPPPathCommand("PathName")` and `drive.driveToPose(pose)` for paths and pose targets.
+- **Coordinator commands**: SuperStructure (and similar) methods return `Commands.parallel(subsystemA.runX(...), subsystemB.runY(...))` or `Commands.sequence(...)`. They do not extend SubsystemBase; they hold references to subsystems and compose their command methods.
+
+---
+
+## Dependency Injection
+
+- **RobotContainer** constructs everything. Subsystems that need other subsystems receive them in the constructor (e.g. `Turret(..., Drive drive, ..., ShotCalc shotCalc)`, `Shooter(..., ShotCalc shotCalc)`, `Vision(VisionConsumer consumer, VisionIO... io)` with `consumer = drive::addVisionMeasurement`). SuperStructure receives all relevant subsystems in its constructor.
+- **Commands** receive subsystems (and optionally suppliers) as parameters; they do not construct subsystems. Example: `joystickDrive(Drive drive, DoubleSupplier x, DoubleSupplier y, DoubleSupplier omega)`.
+- **AutoRoutines** receives Drive and SuperStructure (or equivalent) in the constructor and uses them in methods that return Command.
+
+---
+
+## Constants
+
+- **Main constants**: In `frc.robot.Constants`, use nested **public static final class** per logical group (e.g. `IntakePivotConstants`, `FeederConstants`, `ShooterConstants`, `TurretConstants`, `TargetConstants`). Use **public static enum** for modes/sides (e.g. `Mode`, `Side`, `RobotSide`). Fields are `public static final` with names like `kIntakePivotID`, `kP`, `kI`, `kFeederID` (k-prefix common; some IDs use PascalCase e.g. `LeftShooterLeaderID`).
+- **Subsystem constants**: For vision, use a separate class in the subsystem package (e.g. `VisionConstants`) with layout, camera names, transforms, and tuning values. Use `static import` in the subsystem when appropriate (e.g. `import static frc.robot.subsystems.vision.VisionConstants.*`).
+- **Generated constants**: Drivetrain/motor config lives in `frc.robot.generated.TunerConstants` (or similar); do not edit generated files. Reference them from RobotContainer and Drive (e.g. `TunerConstants.FrontLeft`, `TunerConstants.kSpeedAt12Volts`).
+- **Access**: Subsystems reference constants as `Constants.XxxConstants.kFieldName` or `XxxConstants.kFieldName` when statically imported. RobotContainer uses `Constants.currentMode`, `Constants.RobotSide`, etc.
+
+---
+
+## Naming Conventions
+
+- **Subsystems**: PascalCase, noun (Drive, Vision, Turret, Shooter, Intake, IntakePivot, Index, Feeder, SuperStructure). IO implementations: `ModuleIOTalonFX`, `ModuleIOSim`, `GyroIOPigeon2`, `VisionIOPhotonVision`.
+- **Commands**: Method names are verb or verb phrase: `joystickDrive`, `runFeeder`, `stopFeeder`, `masterCommand`, `stopMasterCommand`, `deployPivot`, `startIntake`, `leftShoot`, `rightShoot`, `depotSideAuto`, `sourceSideAuto`.
+- **Variables**: camelCase. Use descriptive names: `feederMotor`, `motorDutyCycleOut`, `leftShooter`, `intakePivot`, `poseEstimator`.
+- **Constants (local)**: In command classes, `private static final` with UPPER_SNAKE_CASE (e.g. `DEADBAND`, `ANGLE_KP`, `FF_START_DELAY`).
+
+---
+
+## Directory Structure and File Placement
+
+- **New subsystems**: Place in `src/main/java/frc/robot/subsystems/`. Use a subpackage for a logical group (e.g. `subsystems/drive/`, `subsystems/vision/`, `subsystems/Intake/`, `subsystems/Shooters/`, `subsystems/SimFiles/`). Put the main subsystem class and its IO interface/implementations in that package.
+- **New commands**: Place in `src/main/java/frc/robot/commands/`. Use static factory methods in a class (e.g. `DriveCommands`) or an instance-based routine class (e.g. `AutoRoutines`). Do not create one-off command classes unless the codebase already does.
+- **New constants**: Add nested classes to `Constants.java`, or add a dedicated constants class in the subsystem package (e.g. `VisionConstants`). Robot-wide or mode enums stay in `Constants`.
+- **RobotContainer**: Add new subsystems as `private final` fields, construct them in the constructor (inside the appropriate `currentMode` branch if they depend on Drive/Vision-style IO), add default command or button bindings in `configureButtonBindings()`, and add auto options in `configureAutos()` if needed.
+
+---
+
+## RobotContainer Wiring
+
+- **Sections**: Group fields as (1) Subsystems, (2) Controller, (3) Dashboard / auto chooser. In the constructor, instantiate subsystems (with a `switch (Constants.currentMode)` for Drive and Vision), then build any coordinator (e.g. SuperStructure, AutoRoutines), then create the auto chooser (e.g. `LoggedDashboardChooser` plus PathPlanner’s `AutoBuilder.buildAutoChooser()`), then call `configureButtonBindings()` and `configureAutos()`.
+- **Drive and Vision**: Built only in the constructor switch: REAL uses real IO (e.g. `GyroIOPigeon2`, `ModuleIOTalonFX`, `VisionIOPhotonVision`), SIM uses sim IO (e.g. `ModuleIOSim`, `VisionIOPhotonVisionSim`), REPLAY uses no-op IO. Vision is constructed with `drive::addVisionMeasurement` and one or more VisionIO instances.
+- **Button bindings**: In `configureButtonBindings()`, set the default command for drive (and any other subsystem that should have one). Use `controller.<button>().onTrue(command)` or `onFalse(command)`. Pass lambda or method reference; prefer `superStructure.method()` or `DriveCommands.staticMethod(drive, ...)` so the command is created at bind time.
+- **Autos**: In `configureAutos()`, add options to the auto chooser: characterization commands (e.g. wheel radius, feedforward, SysId), then named autos from AutoRoutines (e.g. `autos.depotSideAuto()`). `getAutonomousCommand()` returns `autoChooser.get()`.
+
+---
+
+## Vision, Drivetrain, and Shooter Interaction
+
+- **Vision → Drive**: Vision is given a consumer (e.g. `drive::addVisionMeasurement`). In Vision’s `periodic()`, after filtering observations, it calls `consumer.accept(pose2d, timestamp, stdDevs)`, which updates the drive’s pose estimator. Do not have Vision hold a direct Drive reference for anything other than this callback.
+- **Drive → Shooting**: ShotCalc and Turret (and TurretSim) take `Drive` in the constructor. They call `drive.getPose()` and `drive.getRobotRelativeSpeeds()` in `periodic()` or in command logic to compute aim and velocity. The drivetrain does not reference shooters or turrets.
+- **ShotCalc**: Uses robot pose and a fixed target (e.g. `TargetConstants.hub`). Exposes `updateState()`, `getYaw(Pose2d)`, `getVelocity(double xf)`, and optionally moving-shot helpers. Turret and Shooter (and TurretSim) use ShotCalc; ShotCalc depends only on Drive and constants.
+- **Shooter / Turret**: Shooter may take ShotCalc to compute flywheel speed; Turret takes Drive and ShotCalc to compute yaw. Commands that “shoot” typically run the shooter (and optionally feeder/index) or trigger a sim shot (e.g. TurretSim.shootBallCommand()). Keep this dependency direction: Drive and Vision have no knowledge of shooter or turret.

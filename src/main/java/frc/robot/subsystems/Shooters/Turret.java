@@ -11,6 +11,7 @@ import com.ctre.phoenix6.hardware.TalonFXS;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorArrangementValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.RobotSide;
@@ -58,27 +59,43 @@ public class Turret extends SubsystemBase {
     turretMotor.getConfigurator().setPosition(TurretConstants.kInitialTurretPosition);
   }
 
-  public void run(double rotations) {
-    turretMotor.setControl(turretRequest.withPosition(angleToEncoder(mod(rotations))));
+  /** Encoder range [0, 10] corresponds to one full turret revolution [0, 2π] rad. */
+  private static final double ENCODER_RANGE = 10.0;
+
+  private static final double ANGLE_RANGE_RAD = 2 * Math.PI;
+
+  /**
+   * Commands the turret to the given angle in radians (robot-relative yaw). Use [0, 2π). The
+   * controller will move to the corresponding encoder setpoint.
+   */
+  public void run(double angleRad) {
+    turretMotor.setControl(turretRequest.withPosition(angleToEncoder(mod(angleRad))));
   }
 
   @Override
   public void periodic() {
-    Logger.recordOutput("Turret Encoder Counts", turretMotor.getPosition().getValueAsDouble());
+    double encoderPos = turretMotor.getPosition().getValueAsDouble();
+    Logger.recordOutput("Turret Encoder Counts", encoderPos);
 
     shotCalc.updateState();
-    double targetYaw = shotCalc.getYaw(drive.getPose());
+    Pose2d pose = drive.getPose();
+    double currentTurretRad = encoderToAngleRad(encoderPos);
+    double targetYaw = shotCalc.getYaw(pose);
+    double targetForTurret = (robotSide == RobotSide.RIGHT) ? shotCalc.mod(-targetYaw) : targetYaw;
+    double setpointRad = shotCalc.getYawEquivalentClosestTo(targetForTurret, currentTurretRad);
     Logger.recordOutput("targetYaw", targetYaw);
-    this.setTurretPos(targetYaw * (robotSide == RobotSide.RIGHT ? -1 : 1));
+    Logger.recordOutput("Turret/SetpointRad", setpointRad);
+    this.run(setpointRad);
   }
 
-  public double angleToEncoder(double angle) {
-    double minEncoderCount = 0;
-    double maxEncoderCount = 10;
-    double encoderRange = maxEncoderCount - minEncoderCount;
-    double angleRange = 2 * Math.PI;
+  /** Converts angle in radians [0, 2π) to encoder position [0, ENCODER_RANGE]. */
+  public double angleToEncoder(double angleRad) {
+    return (mod(angleRad) / ANGLE_RANGE_RAD) * ENCODER_RANGE;
+  }
 
-    return ((angle * encoderRange) / angleRange) + minEncoderCount;
+  /** Converts encoder position to angle in radians. */
+  private double encoderToAngleRad(double encoderPosition) {
+    return (encoderPosition % ENCODER_RANGE) * (ANGLE_RANGE_RAD / ENCODER_RANGE);
   }
 
   // public Command followHub() {
@@ -90,6 +107,26 @@ public class Turret extends SubsystemBase {
     return run(
         () -> {
           this.run(angle);
+        });
+  }
+
+  /**
+   * Returns a command that continuously aims the turret at the hub (shortest path). Use with
+   * Commands.parallel() to run both turrets and hoods together for testing.
+   */
+  public Command trackHubCommand() {
+    return run(
+        () -> {
+          shotCalc.updateState();
+          Pose2d pose = drive.getPose();
+          double encoderPos = turretMotor.getPosition().getValueAsDouble();
+          double currentTurretRad = encoderToAngleRad(encoderPos);
+          double targetYaw = shotCalc.getYaw(pose);
+          double targetForTurret =
+              (robotSide == RobotSide.RIGHT) ? shotCalc.mod(-targetYaw) : targetYaw;
+          double setpointRad =
+              shotCalc.getYawEquivalentClosestTo(targetForTurret, currentTurretRad);
+          this.run(setpointRad);
         });
   }
 

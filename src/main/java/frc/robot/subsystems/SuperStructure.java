@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.Intake.IntakePivot;
+import frc.robot.subsystems.Shooters.Hood;
 import frc.robot.subsystems.Shooters.Shooter;
 import frc.robot.subsystems.Shooters.Turret;
 
@@ -16,6 +17,8 @@ public class SuperStructure {
   private final Shooter rightShooter;
   private final Turret leftTurret;
   private final Turret rightTurret;
+  private final Hood leftHood;
+  private final Hood rightHood;
   private final IntakePivot pivot;
 
   public SuperStructure(
@@ -27,6 +30,8 @@ public class SuperStructure {
       Shooter rightShooter,
       Turret leftTurret,
       Turret rightTurret,
+      Hood leftHood,
+      Hood rightHood,
       IntakePivot pivot) {
     this.intakePivot = intakePivot;
     this.intake = intake;
@@ -36,6 +41,8 @@ public class SuperStructure {
     this.rightShooter = rightShooter;
     this.leftTurret = leftTurret;
     this.rightTurret = rightTurret;
+    this.leftHood = leftHood;
+    this.rightHood = rightHood;
     this.pivot = pivot;
   }
 
