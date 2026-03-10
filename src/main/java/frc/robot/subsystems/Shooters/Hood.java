@@ -76,8 +76,7 @@ public class Hood extends SubsystemBase {
   public void setAngleRad(double angleRad) {
     double clamped = Math.max(kHoodMinAngleRad, Math.min(kHoodMaxAngleRad, angleRad));
     lastSetpointRad = clamped;
-    double setpointRotations =
-        clamped / kEncoderToHoodRadiansPerRotation + kEncoderOffsetRotations;
+    double setpointRotations = clamped / kEncoderToHoodRadiansPerRotation + kEncoderOffsetRotations;
     motor.setControl(positionRequest.withPosition(setpointRotations));
   }
 

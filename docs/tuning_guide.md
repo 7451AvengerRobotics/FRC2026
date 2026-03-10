@@ -20,22 +20,22 @@ This guide covers tuning all position- and velocity-controlled mechanisms on the
 
 ### PID + Feedforward
 
-- **P (Proportional)**  
+- **P (Proportional)**
   Output proportional to position (or velocity) error. Higher kP = faster correction but more overshoot and risk of oscillation. Primary gain for “getting there.”
 
-- **I (Integral)**  
+- **I (Integral)**
   Output proportional to accumulated error over time. Removes steady-state error but can cause overshoot and **windup** if the mechanism can’t reach setpoint (e.g. binding or hitting a stop). Often left at 0 until P and feedforward are good.
 
-- **D (Derivative)**  
+- **D (Derivative)**
   Output proportional to rate of change of error. Dampens overshoot and can reduce oscillation. Sensitive to **noise** (encoder jitter); too high kD can cause jitter or screaming.
 
-- **kS (Static friction)**  
+- **kS (Static friction)**
   Constant voltage to overcome static friction so the mechanism starts moving. Helps at very low speeds.
 
-- **kV (Velocity feedforward)**  
+- **kV (Velocity feedforward)**
   Voltage per unit velocity. Lets the controller “drive” at the right speed so P doesn’t have to do all the work. Reduces overshoot and oscillation and makes motion smoother.
 
-- **kA (Acceleration feedforward)**  
+- **kA (Acceleration feedforward)**
   Voltage per unit acceleration. Used with Motion Magic / motion profiling to track aggressive trajectories. Optional for many mechanisms.
 
 ### Open-loop vs closed-loop

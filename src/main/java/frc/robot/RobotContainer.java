@@ -181,18 +181,10 @@ public class RobotContainer {
             "right",
             rightShotCalc);
 
-    leftTurret = new Turret(TurretConstants.kTurretID, drive, RobotSide.LEFT, leftShotCalc);
-    rightTurret = new Turret(TurretConstants.kTurretID, drive, RobotSide.RIGHT, rightShotCalc);
-    leftHood =
-        new Hood(
-            HoodConstants.kLeftHoodMotorID,
-            RobotSide.LEFT,
-            leftShotCalc);
-    rightHood =
-        new Hood(
-            HoodConstants.kRightHoodMotorID,
-            RobotSide.RIGHT,
-            rightShotCalc);
+    leftTurret = new Turret(TurretConstants.kTurretIDLeft, drive, RobotSide.LEFT, leftShotCalc);
+    rightTurret = new Turret(TurretConstants.kTurretIDRight, drive, RobotSide.RIGHT, rightShotCalc);
+    leftHood = new Hood(HoodConstants.kLeftHoodMotorID, RobotSide.LEFT, leftShotCalc);
+    rightHood = new Hood(HoodConstants.kRightHoodMotorID, RobotSide.RIGHT, rightShotCalc);
     superStructure =
         new SuperStructure(
             index,
@@ -251,18 +243,19 @@ public class RobotContainer {
     controller.cross().onTrue(superStructure.masterCommand());
 
     controller.square().onTrue(superStructure.deployPivot());
-
+    // hi sriram u bum :)
     // controller.L1().onTrue(superStructure.masterCommand());
     // controller.R1().onTrue(superStructure.stopMasterCommand());
 
     // controller.L1().onTrue(superStructure.leftShoot());
     controller.L1().onTrue(simTurretLeft.shootBallCommand());
-    controller.R1().onTrue(superStructure.rightShoot());
+    // controller.R1().onTrue(superStructure.rightShoot());
 
     controller.PS().onTrue(superStructure.stopShooters());
 
     // Test: hold L2 to lock both turrets and both hoods onto the hub
-    controller.L2().whileTrue(lockOntoHubCommand());
+    controller.L1().whileTrue(rightTurret.runDutyCycle(0.8));
+    controller.R1().whileTrue(rightTurret.runDutyCycle(0));
   }
 
   /**

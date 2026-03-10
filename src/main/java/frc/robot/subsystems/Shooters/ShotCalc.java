@@ -89,8 +89,8 @@ public class ShotCalc {
   }
 
   /**
-   * Launch speed (m/s) for the given horizontal range. Empirical formula; kept for legacy use
-   * (e.g. getVelocity, moving-shot). Hood uses fixed speed via getPitchForDistance.
+   * Launch speed (m/s) for the given horizontal range. Empirical formula; kept for legacy use (e.g.
+   * getVelocity, moving-shot). Hood uses fixed speed via getPitchForDistance.
    */
   private double getVelocityForDistance(double xf) {
     return Math.sqrt(g * yf + g * Math.sqrt(Math.pow(xf, 2) + Math.pow(yf, 2))) + 0.5;

@@ -1,11 +1,16 @@
 package frc.robot.subsystems.Shooters;
 
 import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Second;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXSConfiguration;
+import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFXS;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -17,7 +22,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.RobotSide;
 import frc.robot.Constants.TurretConstants;
 import frc.robot.subsystems.drive.Drive;
-import org.littletonrobotics.junction.Logger;
 
 public class Turret extends SubsystemBase {
 
@@ -50,13 +54,25 @@ public class Turret extends SubsystemBase {
                     .withKD(TurretConstants.kD)
                     .withKS(TurretConstants.kS)
                     .withKV(TurretConstants.kV)
-                    .withKA(TurretConstants.kA));
+                    .withKA(TurretConstants.kA))
+            .withMotionMagic(
+                new MotionMagicConfigs()
+                    .withMotionMagicCruiseVelocity(RotationsPerSecond.of(0.25))
+                    .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(5))
+                    .withMotionMagicJerk(RotationsPerSecondPerSecond.per(Second).of(100)));
 
     cfg.Commutation.MotorArrangement = MotorArrangementValue.Minion_JST;
 
     turretMotor.getConfigurator().apply(cfg);
 
     turretMotor.getConfigurator().setPosition(TurretConstants.kInitialTurretPosition);
+  }
+
+  public Command setStartingPos() {
+    return runOnce(
+        () -> {
+          turretMotor.getConfigurator().setPosition(TurretConstants.kInitialTurretPosition);
+        });
   }
 
   /** Encoder range [0, 10] corresponds to one full turret revolution [0, 2π] rad. */
@@ -72,20 +88,32 @@ public class Turret extends SubsystemBase {
     turretMotor.setControl(turretRequest.withPosition(angleToEncoder(mod(angleRad))));
   }
 
+  public Command runEncoder(double encoder) {
+    return run(() -> turretMotor.setControl(turretRequest.withPosition(encoder)));
+  }
+
+  public Command runDutyCycle(double power) {
+    return run(
+        () -> {
+          turretMotor.setControl(new DutyCycleOut(power));
+        });
+  }
+
   @Override
   public void periodic() {
-    double encoderPos = turretMotor.getPosition().getValueAsDouble();
-    Logger.recordOutput("Turret Encoder Counts", encoderPos);
+    // double encoderPos = turretMotor.getPosition().getValueAsDouble();
+    // Logger.recordOutput("Turret Encoder Counts", encoderPos);
 
-    shotCalc.updateState();
-    Pose2d pose = drive.getPose();
-    double currentTurretRad = encoderToAngleRad(encoderPos);
-    double targetYaw = shotCalc.getYaw(pose);
-    double targetForTurret = (robotSide == RobotSide.RIGHT) ? shotCalc.mod(-targetYaw) : targetYaw;
-    double setpointRad = shotCalc.getYawEquivalentClosestTo(targetForTurret, currentTurretRad);
-    Logger.recordOutput("targetYaw", targetYaw);
-    Logger.recordOutput("Turret/SetpointRad", setpointRad);
-    this.run(setpointRad);
+    // shotCalc.updateState();
+    // Pose2d pose = drive.getPose();
+    // double currentTurretRad = encoderToAngleRad(encoderPos);
+    // double targetYaw = shotCalc.getYaw(pose);
+    // double targetForTurret = (robotSide == RobotSide.RIGHT) ? shotCalc.mod(-targetYaw) :
+    // targetYaw;
+    // double setpointRad = shotCalc.getYawEquivalentClosestTo(targetForTurret, currentTurretRad);
+    // Logger.recordOutput("targetYaw", targetYaw);
+    // Logger.recordOutput("Turret/SetpointRad", setpointRad);
+    // this.run(setpointRad);
   }
 
   /** Converts angle in radians [0, 2π) to encoder position [0, ENCODER_RANGE]. */
@@ -126,7 +154,7 @@ public class Turret extends SubsystemBase {
               (robotSide == RobotSide.RIGHT) ? shotCalc.mod(-targetYaw) : targetYaw;
           double setpointRad =
               shotCalc.getYawEquivalentClosestTo(targetForTurret, currentTurretRad);
-          this.run(setpointRad);
+          this.run(0);
         });
   }
 
