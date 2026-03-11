@@ -421,30 +421,14 @@ public class Drive extends SubsystemBase {
   }
 
   public boolean shouldFlip() {
-    return !Robot.IsRedAlliance.getAsBoolean();
+    return Robot.IsRedAlliance.getAsBoolean();
   }
 
   public Command driveToStartingPose1() {
     return Commands.defer(
         () -> {
           return driveToPose(
-              new Pose2d(applyX(3.5), applyY(6.5), apply(new Rotation2d(120 / 180 * Math.PI))));
-        },
-        Set.of(this));
-  }
-
-  public Command driveToStartingPose2() {
-    return Commands.defer(
-        () -> {
-          return driveToPose(new Pose2d(applyX(3.5), applyY(4), apply(new Rotation2d(0))));
-        },
-        Set.of(this));
-  }
-
-  public Command driveToStartingPose3() {
-    return Commands.defer(
-        () -> {
-          return driveToPose(new Pose2d(applyX(3.5), applyY(1.5), apply(new Rotation2d(0))));
+              new Pose2d(applyX(3.53), applyY(7.4), apply(new Rotation2d(Math.PI / 2))));
         },
         Set.of(this));
   }

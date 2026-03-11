@@ -50,13 +50,12 @@ public class AutoRoutines {
 
   public Command depotSideAuto() {
     return Commands.sequence(
-        singleAuto(),
-        drive.driveToStartingPose1(),
-        Commands.parallel(
-                superStruc.weirdMasterCommand(),
-                drive.followPPPathCommand("DepotSideStartToSource"))
-            .withTimeout(4),
-        drive.alignToHub(),
+        Commands.race(drive.driveToStartingPose1(), superStruc.deployPivot()),
+        Commands.deadline(
+            drive.followPPPathCommand("DST-MB"),
+            Commands.sequence(
+                superStruc.deployPivot().withTimeout(1), superStruc.weirdMasterCommand())),
+        Commands.deadline(drive.followPPPathCommand("MB-DST"), superStruc.weirdMasterCommand()),
         superStruc.masterCommand());
   }
 
@@ -66,28 +65,5 @@ public class AutoRoutines {
         superStruc.deployPivot().withTimeout(1),
         drive.alignToHub(),
         superStruc.startupMasterCommand().withTimeout(6));
-  }
-
-  public Command middleAuto() {
-    return Commands.sequence(
-        singleAuto(),
-        drive.driveToStartingPose2(),
-        Commands.parallel(
-                superStruc.weirdMasterCommand(), drive.followPPPathCommand("MiddleStartToSource"))
-            .withTimeout(4),
-        drive.alignToHub(),
-        superStruc.masterCommand());
-  }
-
-  public Command sourceSideAuto() {
-    return Commands.sequence(
-        singleAuto(),
-        drive.driveToStartingPose3(),
-        Commands.parallel(
-                superStruc.weirdMasterCommand(),
-                drive.followPPPathCommand("SourceSideStartToSource"))
-            .withTimeout(4),
-        drive.alignToHub(),
-        superStruc.masterCommand());
   }
 }
