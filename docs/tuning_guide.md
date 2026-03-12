@@ -1,6 +1,6 @@
 # Mechanism Tuning Guide
 
-This guide covers tuning all position- and velocity-controlled mechanisms on the robot so they respond correctly, avoid oscillation or “screaming,” and meet performance goals. It applies to **Hood**, **Turret**, **Shooter**, **Intake Pivot**, and similar subsystems using CTRE Phoenix 6 (TalonFX / TalonFXS) or Spark Flex.
+This guide covers tuning all position- and velocity-controlled mechanisms on the robot so they respond correctly, avoid oscillation or “screaming,” and meet performance goals. It applies to **Hood**, **Turret**, **Shooter**, **Intake Pivot**, and similar subsystems using CTRE Phoenix 6 (TalonFX / TalonFXS) or REV controllers such as Spark MAX / Spark Flex.
 
 ---
 
@@ -178,6 +178,64 @@ Motion Magic (Phoenix) or similar **motion profiling** limits **velocity** and *
 5. **Add or increase kV** — so P doesn’t have to do all the work; often quiets the system.
 6. **Reduce Motion Magic cruise/accel** — less aggressive move can reduce vibration and noise.
 
+### D. Practical calibration order
+
+Use this order during bring-up so geometry, zeroing, and shot math are correct before you spend
+time tuning gains.
+
+1. **Verify hardware direction and inversion**
+   - Confirm the turret rotates in the expected direction for a positive setpoint.
+   - Confirm each hood moves toward a larger physical angle when commanded to a larger setpoint.
+   - Fix inversion first if anything moves backwards.
+
+2. **Set target geometry**
+   - Set `TargetConstants.hub` to the correct field coordinates.
+   - Set `TargetConstants.yf` to target height minus shooter exit height.
+
+3. **Measure robot-relative shooter geometry**
+   - Update the left/right `Transform3d(...)` values passed to `ShotCalc` so the turret/shooter
+     location on the robot matches reality.
+   - For mirrored mechanisms, verify left/right offsets are mirrored correctly.
+
+4. **Zero the turret**
+   - Put the turret at the intended physical “zero” direction.
+   - Set `TurretConstants.kInitialTurretPosition` so encoder zero matches that reference.
+
+5. **Zero both hoods independently**
+   - Put the left hood at its known reference angle and record the motor encoder position into
+     `HoodConstants.kLeftEncoderOffsetRotations`.
+   - Repeat for the right hood using `HoodConstants.kRightEncoderOffsetRotations`.
+
+6. **Set hood scaling and limits**
+   - Set `HoodConstants.kHoodGearRatio`.
+   - Verify `HoodConstants.kEncoderToHoodRadiansPerRotation` matches the real mechanism reduction.
+   - Set `HoodConstants.kHoodMinAngleRad` and `HoodConstants.kHoodMaxAngleRad` to safe mechanical
+     limits.
+
+7. **Match shooter RPM to launch speed**
+   - Set `ShooterConstants.kFixedShooterRPM` to the fixed flywheel speed you want to use.
+   - Tune `ShooterConstants.kFixedLaunchVelocityMetersPerSecond` so the hood angle solution matches
+     the real shot.
+
+8. **Tune hood motion profiling**
+   - Start with conservative `HoodConstants.kMotionMagicCruiseVelocity`.
+   - Start with conservative `HoodConstants.kMotionMagicAcceleration`.
+   - Increase only after the hood moves smoothly without buzzing or slamming.
+
+9. **Tune turret gains**
+   - Tune turret closed-loop gains only after zeroing and geometry are correct.
+
+10. **Tune hood gains**
+   - Tune hood closed-loop gains only after offsets, gear ratio, and limits are correct.
+
+11. **Validate turret and hood together**
+   - Test at several distances and robot headings.
+   - Confirm the turret points at the target and both hoods land on the same physical angle for the
+     same shot.
+
+12. **Only then move to advanced tests**
+   - Once stationary shots are consistent, move on to autos or shooting on the move.
+
 ---
 
 ## 6. Troubleshooting
@@ -202,10 +260,10 @@ Use this as a quick reference: **symptom → likely cause → action**.
 
 ## 7. Mechanism-specific notes
 
-### Hood (TalonFXS + Minion, encoder from controller)
+### Hood (Spark MAX + NEO 550, internal encoder)
 
-- **Constants:** `HoodConstants` — kP, kI, kD, kS, kV, kA; Motion Magic cruise/accel; min/max angle; `kEncoderOffsetRotations`, `kEncoderToHoodRadiansPerRotation`, `kHoodGearRatio`.
-- **Feedback:** Rotor sensor (no CANcoder). `SensorToMechanismRatio` = motor rotations per hood rotation.
+- **Constants:** `HoodConstants` — kP, kI, kD, kS, kV; MAXMotion cruise/accel; min/max angle; `kLeftEncoderOffsetRotations`, `kRightEncoderOffsetRotations`, `kEncoderToHoodRadiansPerRotation`, `kHoodGearRatio`.
+- **Feedback:** Internal NEO relative encoder through Spark MAX. Since it is relative, place the hood at a known reference angle before enabling and seed the encoder from the left/right offset.
 - **Tuning:** Position control + Motion Magic. Follow [Section 5A](#a-position-mechanism-eg-hood-or-turret-from-scratch) and [Section 4](#4-motion-magic). If it screams, lower kP and/or Motion Magic aggressiveness.
 
 ### Turret (TalonFXS + Minion)

@@ -7,69 +7,61 @@
 
 package frc.robot.subsystems.Shooters;
 
-import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
-import static edu.wpi.first.units.Units.Second;
 import static frc.robot.Constants.HoodConstants.*;
 
-import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
-import com.ctre.phoenix6.configs.MotionMagicConfigs;
-import com.ctre.phoenix6.configs.MotorOutputConfigs;
-import com.ctre.phoenix6.configs.Slot0Configs;
-import com.ctre.phoenix6.configs.TalonFXSConfiguration;
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
-import com.ctre.phoenix6.hardware.TalonFXS;
-import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.MotorArrangementValue;
-import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.revrobotics.PersistMode;
+import com.revrobotics.ResetMode;
+import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.RobotSide;
 import org.littletonrobotics.junction.Logger;
 
 /**
- * Hood subsystem using a CTRE Minion motor with a Phoenix (TalonFXS) controller. Encoder feedback
- * comes from the controller (rotor/integrated); no external CANcoder.
+ * Hood subsystem using a REV Spark MAX + NEO 550. Each hood uses its own internal relative encoder
+ * and supports a side-specific zero offset.
  */
 public class Hood extends SubsystemBase {
-  private final TalonFXS motor;
-  private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0);
+  private final SparkMax motor;
+  private final SparkClosedLoopController closedLoopController;
   private final ShotCalc shotCalc;
   private final String logPrefix;
+  private final double encoderOffsetRotations;
   private double lastSetpointRad = 0;
 
   public Hood(int motorID, RobotSide side, ShotCalc shotCalc) {
     this.shotCalc = shotCalc;
     this.logPrefix = "Hood/" + (side == RobotSide.LEFT ? "Left" : "Right");
+    this.encoderOffsetRotations =
+        side == RobotSide.LEFT ? kLeftEncoderOffsetRotations : kRightEncoderOffsetRotations;
 
-    motor = new TalonFXS(motorID);
+    motor = new SparkMax(motorID, MotorType.kBrushless);
+    closedLoopController = motor.getClosedLoopController();
 
-    var motorConfig = new TalonFXSConfiguration();
-    motorConfig.MotorOutput =
-        new MotorOutputConfigs()
-            .withInverted(InvertedValue.CounterClockwise_Positive)
-            .withNeutralMode(NeutralModeValue.Brake);
-    motorConfig.CurrentLimits =
-        new CurrentLimitsConfigs()
-            .withStatorCurrentLimit(Amps.of(40))
-            .withStatorCurrentLimitEnable(true);
-    // TalonFXS uses integrated rotor (Minion encoder) by default; we scale in code via
-    // kEncoderToHoodRadiansPerRotation and kEncoderOffsetRotations.
-    motorConfig.MotionMagic =
-        new MotionMagicConfigs()
-            .withMotionMagicCruiseVelocity(RotationsPerSecond.of(kMotionMagicCruiseVelocity))
-            .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(kMotionMagicAcceleration))
-            .withMotionMagicJerk(RotationsPerSecondPerSecond.per(Second).of(100));
-    motorConfig.Slot0 =
-        new Slot0Configs().withKP(kP).withKI(kI).withKD(kD).withKS(kS).withKV(kV).withKA(kA);
+    SparkMaxConfig motorConfig = new SparkMaxConfig();
+    motorConfig.idleMode(IdleMode.kBrake);
+    motorConfig.smartCurrentLimit(kCurrentLimitAmps);
 
-    motorConfig.Commutation.MotorArrangement = MotorArrangementValue.Minion_JST;
+    // Keep position in raw motor rotations, but expose velocity as rotations/sec so these constants
+    // remain in the same units as the old hood tuning.
+    motorConfig.encoder.positionConversionFactor(1.0).velocityConversionFactor(1.0 / 60.0);
+    motorConfig.closedLoop.p(kP).i(kI).d(kD);
+    motorConfig.closedLoop.feedForward.kS(kS).kV(kV);
+    motorConfig.closedLoop.maxMotion.cruiseVelocity(kMotionMagicCruiseVelocity);
+    motorConfig.closedLoop.maxMotion.maxAcceleration(kMotionMagicAcceleration);
+    motorConfig.closedLoop.maxMotion.allowedProfileError(
+        Math.toRadians(1.0) / kEncoderToHoodRadiansPerRotation);
 
-    motor.getConfigurator().apply(motorConfig);
+    motor.configure(motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-    // Optional: set position to 0 at boot so offset matches mechanism zero
-    motor.getConfigurator().setPosition(kEncoderOffsetRotations);
+    // Manual-zero workflow: place the hood at its known reference angle before enabling, then seed
+    // the relative encoder to that side's offset so angle math starts from the correct reference.
+    motor.getEncoder().setPosition(encoderOffsetRotations);
   }
 
   /** Sets the hood angle setpoint in radians. Clamped to [kHoodMinAngleRad, kHoodMaxAngleRad]. */
@@ -77,8 +69,8 @@ public class Hood extends SubsystemBase {
     double clamped = Math.max(kHoodMinAngleRad, Math.min(kHoodMaxAngleRad, angleRad));
     lastSetpointRad = clamped;
     double setpointRotations =
-        clamped / kEncoderToHoodRadiansPerRotation + kEncoderOffsetRotations;
-    motor.setControl(positionRequest.withPosition(setpointRotations));
+        clamped / kEncoderToHoodRadiansPerRotation + encoderOffsetRotations;
+    closedLoopController.setSetpoint(setpointRotations, ControlType.kMAXMotionPositionControl);
   }
 
   /** Sets the hood angle setpoint in degrees. */
@@ -88,8 +80,8 @@ public class Hood extends SubsystemBase {
 
   /** Returns the current hood angle in radians (from controller encoder). */
   public double getAngleRad() {
-    double positionRotations = motor.getPosition().getValueAsDouble();
-    return (positionRotations - kEncoderOffsetRotations) * kEncoderToHoodRadiansPerRotation;
+    double positionRotations = motor.getEncoder().getPosition();
+    return (positionRotations - encoderOffsetRotations) * kEncoderToHoodRadiansPerRotation;
   }
 
   /** Returns true if current angle is within tolerance of the last setpoint. */
@@ -122,10 +114,12 @@ public class Hood extends SubsystemBase {
   @Override
   public void periodic() {
     double angleRad = getAngleRad();
+    double rawEncoderRotations = motor.getEncoder().getPosition();
     Logger.recordOutput(logPrefix + "/AngleRad", angleRad);
     Logger.recordOutput(logPrefix + "/AngleDeg", Math.toDegrees(angleRad));
     Logger.recordOutput(logPrefix + "/SetpointRad", lastSetpointRad);
-    Logger.recordOutput(logPrefix + "/CurrentAmps", motor.getStatorCurrent().getValueAsDouble());
-    Logger.recordOutput(logPrefix + "/Voltage", motor.getMotorVoltage().getValueAsDouble());
+    Logger.recordOutput(logPrefix + "/EncoderRotations", rawEncoderRotations);
+    Logger.recordOutput(logPrefix + "/CurrentAmps", motor.getOutputCurrent());
+    Logger.recordOutput(logPrefix + "/Voltage", motor.getAppliedOutput() * motor.getBusVoltage());
   }
 }

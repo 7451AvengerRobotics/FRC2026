@@ -104,12 +104,15 @@ public final class Constants {
   public static final class HoodConstants {
     public static final int kLeftHoodMotorID = 30;
     public static final int kRightHoodMotorID = 31;
-    /** Sensor (rotor) to mechanism ratio: motor rotations per one hood rotation. */
+    /** Motor rotations per one hood rotation. */
     public static final double kHoodGearRatio = 1.0;
-    /** Encoder position (rotations) when hood is at zero angle. Set at boot or calibrate. */
-    public static final double kEncoderOffsetRotations = 0.0;
-    /** Hood angle (radians) per encoder rotation (e.g. 2π for 1:1). */
-    public static final double kEncoderToHoodRadiansPerRotation = 2 * Math.PI;
+    /** Internal NEO encoder position (motor rotations) when the left hood is at zero angle. */
+    public static final double kLeftEncoderOffsetRotations = 0.0;
+    /** Internal NEO encoder position (motor rotations) when the right hood is at zero angle. */
+    public static final double kRightEncoderOffsetRotations = 0.0;
+    /** Hood angle (radians) per motor rotation. */
+    public static final double kEncoderToHoodRadiansPerRotation = (2 * Math.PI) / kHoodGearRatio;
+    public static final int kCurrentLimitAmps = 20;
 
     public static final double kHoodMinAngleRad = 0.0;
     public static final double kHoodMaxAngleRad = Math.toRadians(60);
