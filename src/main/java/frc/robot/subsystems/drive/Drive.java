@@ -427,8 +427,7 @@ public class Drive extends SubsystemBase {
   public Command driveToStartingPose1() {
     return Commands.defer(
         () -> {
-          return driveToPose(
-              new Pose2d(applyX(3.53), applyY(7.4), apply(new Rotation2d(Math.PI / 2))));
+          return driveToPose(new Pose2d(applyX(3.53), applyY(7.4), apply(new Rotation2d())));
         },
         Set.of(this));
   }

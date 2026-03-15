@@ -56,6 +56,8 @@ public class AutoRoutines {
             Commands.sequence(
                 superStruc.deployPivot().withTimeout(1), superStruc.weirdMasterCommand())),
         Commands.deadline(drive.followPPPathCommand("MB-DST"), superStruc.weirdMasterCommand()),
+        drive.alignToHub().withTimeout(0.5),
+        drive.alignToHub().withTimeout(3),
         superStruc.masterCommand());
   }
 

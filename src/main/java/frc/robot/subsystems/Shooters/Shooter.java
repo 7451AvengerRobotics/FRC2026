@@ -182,7 +182,7 @@ public class Shooter extends SubsystemBase {
           flywheelVel = MathUtil.clamp(flywheelVel, 0, 5000);
 
           // Command the motor
-          setVel(flywheelVel * velOffset * 0.95);
+          setVel(flywheelVel * velOffset);
         });
   }
 
