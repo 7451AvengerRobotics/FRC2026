@@ -421,7 +421,7 @@ public class Drive extends SubsystemBase {
   }
 
   public boolean shouldFlip() {
-    return !Robot.IsRedAlliance.getAsBoolean();
+    return Robot.IsRedAlliance.getAsBoolean();
   }
 
   public Command driveToStartingPose1() {
@@ -447,10 +447,6 @@ public class Drive extends SubsystemBase {
           return driveToPose(new Pose2d(applyX(3.5), applyY(1.5), apply(new Rotation2d(0))));
         },
         Set.of(this));
-  }
-
-  public boolean isRedAlliance() {
-    return AutoBuilder.shouldFlip();
   }
 
   public Command driveToPose(Pose2d pose) {
@@ -527,11 +523,7 @@ public class Drive extends SubsystemBase {
 
     return Commands.defer(
         () -> {
-          double deltax =
-              (
-                  // 16.54 -
-                  11.915)
-                  - getPose().getX();
+          double deltax = applyX(16.54 - 11.915) - getPose().getX();
           double deltay = 4.035 - getPose().getY();
 
           double initTheta = Math.atan2(deltay, deltax);
