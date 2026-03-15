@@ -44,6 +44,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
+import frc.robot.Robot;
 import frc.robot.Constants.Mode;
 import frc.robot.Constants.Side;
 import frc.robot.generated.TunerConstants;
@@ -143,7 +144,7 @@ public class Drive extends SubsystemBase {
         new PPHolonomicDriveController(
             new PIDConstants(5.0, 0.0, 0.0), new PIDConstants(5.0, 0.0, 0.0)),
         PP_CONFIG,
-        () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
+        () -> Robot.IsRedAlliance.getAsBoolean(),
         this);
     Pathfinding.setPathfinder(new LocalADStarAK());
     PathPlannerLogging.setLogActivePathCallback(
