@@ -81,7 +81,7 @@ public class IntakePivot extends SubsystemBase {
 
   public boolean nearSetpoint(double rotations) {
     double diff = intakePivot.getPosition().getValueAsDouble() - rotations;
-    return Math.abs(diff) <= 0.05;
+    return Math.abs(diff) <= 0.1;
   }
 
   // public boolean atStow() {
@@ -114,7 +114,7 @@ public class IntakePivot extends SubsystemBase {
 
   public enum PivotPosition {
     STOW(0),
-    DEPLOYED(0.27);
+    DEPLOYED(1.7);
 
     public final double rotations;
 

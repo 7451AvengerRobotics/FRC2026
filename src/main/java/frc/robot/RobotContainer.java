@@ -228,9 +228,9 @@ public class RobotContainer {
 
     // .toggleOnFalse(superStructure.stopIntake());
 
-    controller.triangle().onTrue(superStructure.weirdMasterCommand());
+    // controller.triangle().onTrue(superStructure.weirdMasterCommand());
     controller.circle().onTrue(superStructure.stopMasterCommand());
-    controller.cross().toggleOnTrue(superStructure.masterCommand());
+    controller.cross().toggleOnTrue(superStructure.intakelessMasterCommand());
 
     controller.square().onTrue(superStructure.deployPivot());
 
