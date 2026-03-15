@@ -64,12 +64,12 @@ public class Hood extends SubsystemBase {
     motor.getEncoder().setPosition(encoderOffsetRotations);
   }
 
-  /** Sets the hood angle setpoint in radians. Clamped to [kHoodMinAngleRad, kHoodMaxAngleRad]. */
+  /** Sets the hood angle setpoint in radians (0 = up, π/2 = horizontal, π = down). Clamped to [kHoodMinAngleRad, kHoodMaxAngleRad]. */
   public void setAngleRad(double angleRad) {
     double clamped = Math.max(kHoodMinAngleRad, Math.min(kHoodMaxAngleRad, angleRad));
     lastSetpointRad = clamped;
     double setpointRotations =
-        clamped / kEncoderToHoodRadiansPerRotation + encoderOffsetRotations;
+        (clamped - kHoodReferenceAngleRad) / kEncoderToHoodRadiansPerRotation + encoderOffsetRotations;
     closedLoopController.setSetpoint(setpointRotations, ControlType.kMAXMotionPositionControl);
   }
 
@@ -78,10 +78,11 @@ public class Hood extends SubsystemBase {
     setAngleRad(Math.toRadians(angleDeg));
   }
 
-  /** Returns the current hood angle in radians (from controller encoder). */
+  /** Returns the current hood angle in radians (0 = up, π/2 = horizontal, π = down). */
   public double getAngleRad() {
     double positionRotations = motor.getEncoder().getPosition();
-    return (positionRotations - encoderOffsetRotations) * kEncoderToHoodRadiansPerRotation;
+    return (positionRotations - encoderOffsetRotations) * kEncoderToHoodRadiansPerRotation
+        + kHoodReferenceAngleRad;
   }
 
   /** Returns true if current angle is within tolerance of the last setpoint. */
@@ -97,12 +98,16 @@ public class Hood extends SubsystemBase {
     return run(() -> setAngleDegrees(angleDeg));
   }
 
-  /** Continuously updates setpoint from ShotCalc for hub tracking. Use as default command. */
+  /**
+   * Continuously updates setpoint from ShotCalc for hub tracking. Converts launch angle (0 = horizontal,
+   * π/2 = up) to hood angle (0 = up, π/2 = horizontal, π = down): hoodAngle = π/2 - launchPitch.
+   */
   public Command trackHub() {
     return run(
         () -> {
           shotCalc.updateState();
-          setAngleRad(shotCalc.getPitchForDistance(shotCalc.getXf()));
+          double launchPitchRad = shotCalc.getPitchForDistance(shotCalc.getXf());
+          setAngleRad(Math.PI / 2 - launchPitchRad);
         });
   }
 
@@ -111,8 +116,24 @@ public class Hood extends SubsystemBase {
     return run(() -> setAngleRad(getAngleRad()));
   }
 
+  /**
+   * Logs the current raw encoder position (motor rotations) for offset calibration. Place this hood
+   * at straight up (0° in hood convention), run this command once, then set {@code
+   * HoodConstants.kLeftEncoderOffsetRotations} or {@code kRightEncoderOffsetRotations} to the
+   * logged value {@code Hood/Left/CalibrationEncoderPosition} or {@code Hood/Right/...}.
+   */
+  public Command logEncoderPositionForOffsetCalibration() {
+    return runOnce(
+            () -> {
+              double pos = motor.getEncoder().getPosition();
+              Logger.recordOutput(logPrefix + "/CalibrationEncoderPosition", pos);
+            })
+        .withName("HoodCalibrateOffset");
+  }
+
   @Override
   public void periodic() {
+    shotCalc.updateState();
     double angleRad = getAngleRad();
     double rawEncoderRotations = motor.getEncoder().getPosition();
     Logger.recordOutput(logPrefix + "/AngleRad", angleRad);
@@ -121,5 +142,6 @@ public class Hood extends SubsystemBase {
     Logger.recordOutput(logPrefix + "/EncoderRotations", rawEncoderRotations);
     Logger.recordOutput(logPrefix + "/CurrentAmps", motor.getOutputCurrent());
     Logger.recordOutput(logPrefix + "/Voltage", motor.getAppliedOutput() * motor.getBusVoltage());
+    // Hood only moves when a command runs (e.g. trackHub() via L2)
   }
 }

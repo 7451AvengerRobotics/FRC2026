@@ -20,6 +20,7 @@ import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -46,6 +47,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.Constants.Side;
+import frc.robot.Constants.TargetConstants;
 import frc.robot.generated.TunerConstants;
 import frc.robot.util.LocalADStarAK;
 import java.util.Set;
@@ -330,6 +332,20 @@ public class Drive extends SubsystemBase {
     return output;
   }
 
+  /**
+   * Returns the hub position in field coordinates for the current alliance. Red uses {@link
+   * TargetConstants#hub}; Blue uses the position mirrored across the field (same Y, X mirrored by
+   * field length).
+   */
+  public Translation2d getHubPositionForCurrentAlliance() {
+    Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
+    if (alliance == Alliance.Red) {
+      return TargetConstants.hub;
+    }
+    return new Translation2d(
+        TargetConstants.fieldLengthX - TargetConstants.hub.getX(), TargetConstants.hub.getY());
+  }
+
   /** Returns the current odometry pose. */
   @AutoLogOutput(key = "Odometry/Robot")
   public Pose2d getPose() {
@@ -414,6 +430,41 @@ public class Drive extends SubsystemBase {
                 .until(holonomicDriveWithPIDController::atReference),
             runOnce(this::stop))
         .finallyDo(() -> holonomicControllerActive = false);
+  }
+
+  /** Rotation tolerance (rad) for {@link #alignRotationToHubCommand()}. */
+  private static final double ALIGN_TO_HUB_ROTATION_TOLERANCE_RAD = Math.toRadians(2);
+
+  /**
+   * Command that rotates the chassis to point at the hub (rotation only, no translation). Uses the
+   * hub position for the current alliance so it works on both red and blue. Runs until rotation is
+   * within tolerance, then stops.
+   */
+  public Command alignRotationToHubCommand() {
+    PIDController alignPid = new PIDController(4.0, 0.0, 0.0);
+    alignPid.enableContinuousInput(-Math.PI, Math.PI);
+    alignPid.setTolerance(ALIGN_TO_HUB_ROTATION_TOLERANCE_RAD);
+    double maxOmega = getMaxAngularSpeedRadPerSec();
+    return run(
+            () -> {
+              Pose2d pose = getPose();
+              Translation2d hub = getHubPositionForCurrentAlliance();
+              double desiredRad =
+                  Math.atan2(
+                      hub.getY() - pose.getY(),
+                      hub.getX() - pose.getX());
+              double omega =
+                  MathUtil.clamp(
+                      alignPid.calculate(pose.getRotation().getRadians(), desiredRad),
+                      -maxOmega,
+                      maxOmega);
+              runVelocity(
+                  ChassisSpeeds.fromFieldRelativeSpeeds(0, 0, omega, pose.getRotation()));
+            })
+        .beforeStarting(alignPid::reset)
+        .until(alignPid::atSetpoint)
+        .finallyDo(this::stop)
+        .withName("AlignRotationToHub");
   }
 
   public ChassisSpeeds getRobotRelativeSpeeds() {

@@ -2,7 +2,6 @@ package frc.robot.subsystems.Shooters;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -41,7 +40,6 @@ public class ShotCalc {
   /** Fixed pitch (rad) used by {@link #getVelocity(double)} when not using distance-based pitch. */
   private double pitch = Math.toRadians(60);
 
-  private final Transform3d turretOffset = new Transform3d(-0.17, -0.15, 0.39, new Rotation3d());
   private final Transform2d turretOffsetTransform2d;
   private Pose2d turretPositionPose2d;
   private final Drive drive;
@@ -98,6 +96,7 @@ public class ShotCalc {
 
   /** Updates turret position, field-relative chassis speeds, and horizontal range to target. */
   public void updateState() {
+    setTarget(drive.getHubPositionForCurrentAlliance());
     turretPositionPose2d = drive.getPose().plus(turretOffsetTransform2d);
     vr =
         ChassisSpeeds.fromRobotRelativeSpeeds(
@@ -128,9 +127,7 @@ public class ShotCalc {
    * the shooter points at the hub.
    */
   public double getYaw(Pose2d robotPose) {
-    Transform2d offset2d =
-        new Transform2d(turretOffset.getX(), turretOffset.getY(), new Rotation2d());
-    Pose2d turretPose2d = robotPose.plus(offset2d);
+    Pose2d turretPose2d = robotPose.plus(turretOffsetTransform2d);
 
     double deltax = target.getX() - turretPose2d.getX();
     double deltay = target.getY() - turretPose2d.getY();
