@@ -84,9 +84,17 @@ public final class Constants {
   }
 
   public static final class TurretConstants {
-    public static final int kTurretIDLeft = 21;
-    public static final int kTurretIDRight = 20;
-    public static final double kInitialTurretPosition = 2.5;
+    public static final int kTurretIDLeft = 20;
+    public static final int kTurretIDRight = 21;
+    public static final int kInitialTurretPosition = 0;
+    /**
+     * Offset (rad) from turret physical 0° to robot forward. Left turret 0° = +Y (left), so forward
+     * = −π/2 (applied as targetYaw − offset). Right turret 0° = −Y (right), so forward = +π/2
+     * (applied as −targetYaw + offset).
+     */
+    public static final double kTurretZeroOffsetRad = Math.PI / 2;
+    /** Encoder position units per one full turret revolution [0, 2π] rad. Calibrate with Turret.calibrateEncoderRangeCommand(). */
+    public static final double kEncoderUnitsPerRevolution = 10.0;
     public static final double kTurretGearRatio = 1.0;
     public static final double kP = 0.0;
     public static final double kI = 0.0;
@@ -98,22 +106,31 @@ public final class Constants {
   }
 
   public static final class TargetConstants {
+    /** Hub position in field coordinates (e.g. red alliance side). Used with {@link #fieldLengthX} for blue mirror. */
     public static final Translation2d hub = new Translation2d(11.915, 4.035);
     public static final double yf = 1.32;
+    /** Field length (m) along X for alliance mirror. Blue hub = (fieldLengthX - hub.x, hub.y). */
+    public static final double fieldLengthX = 16.54;
   }
 
   public static final class HoodConstants {
     public static final int kLeftHoodMotorID = 30;
     public static final int kRightHoodMotorID = 31;
-    /** Sensor (rotor) to mechanism ratio: motor rotations per one hood rotation. */
+    /** Motor rotations per one hood rotation. Sets scale: radians per encoder rotation = 2π/kHoodGearRatio. */
     public static final double kHoodGearRatio = 1.0;
-    /** Encoder position (rotations) when hood is at zero angle. Set at boot or calibrate. */
-    public static final double kEncoderOffsetRotations = 0.0;
-    /** Hood angle (radians) per encoder rotation (e.g. 2π for 1:1). */
-    public static final double kEncoderToHoodRadiansPerRotation = 2 * Math.PI;
+    /** Encoder position (motor rotations) when the left hood is at the reference angle (e.g. facing up). */
+    public static final double kLeftEncoderOffsetRotations = 0.0;
+    /** Encoder position (motor rotations) when the right hood is at the reference angle (e.g. facing up). */
+    public static final double kRightEncoderOffsetRotations = 0.0;
+    /** Hood angle (radians) per motor rotation. Derived from gear ratio; one encoder rotation = this many rad. */
+    public static final double kEncoderToHoodRadiansPerRotation = (2 * Math.PI) / kHoodGearRatio;
+    /** Angle (rad) when the hood is at its reference position. 0 = straight up; angle increases to π (180°) at straight down. */
+    public static final double kHoodReferenceAngleRad = 0.0;
+    public static final int kCurrentLimitAmps = 20;
 
+    /** Hood angle (rad): 0 = up, π/2 = horizontal, π = down. */
     public static final double kHoodMinAngleRad = 0.0;
-    public static final double kHoodMaxAngleRad = Math.toRadians(60);
+    public static final double kHoodMaxAngleRad = Math.PI;
     public static final double kP = 2.0;
     public static final double kI = 0.0;
     public static final double kD = 0.0;

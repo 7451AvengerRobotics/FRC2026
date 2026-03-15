@@ -5,6 +5,8 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Second;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
@@ -80,6 +82,8 @@ public class Turret extends SubsystemBase {
 
   private static final double ANGLE_RANGE_RAD = 2 * Math.PI;
 
+  private double encoderRangeCalibrationStart;
+
   /**
    * Commands the turret to the given angle in radians (robot-relative yaw). Use [0, 2π). The
    * controller will move to the corresponding encoder setpoint.
@@ -101,29 +105,54 @@ public class Turret extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // double encoderPos = turretMotor.getPosition().getValueAsDouble();
-    // Logger.recordOutput("Turret Encoder Counts", encoderPos);
-
-    // shotCalc.updateState();
-    // Pose2d pose = drive.getPose();
-    // double currentTurretRad = encoderToAngleRad(encoderPos);
-    // double targetYaw = shotCalc.getYaw(pose);
-    // double targetForTurret = (robotSide == RobotSide.RIGHT) ? shotCalc.mod(-targetYaw) :
-    // targetYaw;
-    // double setpointRad = shotCalc.getYawEquivalentClosestTo(targetForTurret, currentTurretRad);
-    // Logger.recordOutput("targetYaw", targetYaw);
-    // Logger.recordOutput("Turret/SetpointRad", setpointRad);
-    // this.run(setpointRad);
+    shotCalc.updateState();
+    double encoderPos = turretMotor.getPosition().getValueAsDouble();
+    Logger.recordOutput("Turret Encoder Counts", encoderPos);
+    Logger.recordOutput(
+        "Turret/AngleRad", encoderToAngleRad(encoderPos));
+    // Turret only moves when a command runs (e.g. trackHubCommand() via L2 or R3)
   }
 
-  /** Converts angle in radians [0, 2π) to encoder position [0, ENCODER_RANGE]. */
+  /** Converts angle in radians [0, 2π) to encoder position (units per revolution from TurretConstants). */
   public double angleToEncoder(double angleRad) {
-    return (mod(angleRad) / ANGLE_RANGE_RAD) * ENCODER_RANGE;
+    return (mod(angleRad) / ANGLE_RANGE_RAD) * TurretConstants.kEncoderUnitsPerRevolution;
   }
 
   /** Converts encoder position to angle in radians. */
   private double encoderToAngleRad(double encoderPosition) {
-    return (encoderPosition % ENCODER_RANGE) * (ANGLE_RANGE_RAD / ENCODER_RANGE);
+    double range = TurretConstants.kEncoderUnitsPerRevolution;
+    return (encoderPosition % range) * (ANGLE_RANGE_RAD / range);
+  }
+
+  /**
+   * Calibrate encoder range: run this command, rotate the turret exactly one full revolution in one
+   * direction, then cancel the command. Check logs for "Turret/CalibrationDeltaOneRevolution" and
+   * set TurretConstants.kEncoderUnitsPerRevolution to that value (use absolute value if negative).
+   */
+  public Command calibrateEncoderRangeCommand() {
+    return new Command() {
+      {
+        addRequirements(Turret.this);
+      }
+
+      @Override
+      public void initialize() {
+        encoderRangeCalibrationStart = turretMotor.getPosition().getValueAsDouble();
+        Logger.recordOutput("Turret/CalibrationStartPosition", encoderRangeCalibrationStart);
+      }
+
+      @Override
+      public void end(boolean interrupted) {
+        double endPos = turretMotor.getPosition().getValueAsDouble();
+        double delta = endPos - encoderRangeCalibrationStart;
+        Logger.recordOutput("Turret/CalibrationDeltaOneRevolution", delta);
+      }
+
+      @Override
+      public boolean isFinished() {
+        return false;
+      }
+    }.withName("CalibrateTurretEncoderRange");
   }
 
   // public Command followHub() {
@@ -151,7 +180,9 @@ public class Turret extends SubsystemBase {
           double currentTurretRad = encoderToAngleRad(encoderPos);
           double targetYaw = shotCalc.getYaw(pose);
           double targetForTurret =
-              (robotSide == RobotSide.RIGHT) ? shotCalc.mod(-targetYaw) : targetYaw;
+              (robotSide == RobotSide.RIGHT)
+                  ? shotCalc.mod(-targetYaw + TurretConstants.kTurretZeroOffsetRad)
+                  : shotCalc.mod(targetYaw - TurretConstants.kTurretZeroOffsetRad);
           double setpointRad =
               shotCalc.getYawEquivalentClosestTo(targetForTurret, currentTurretRad);
           this.run(0);

@@ -223,7 +223,7 @@ Commented out in code: X (drive stop-with-X), L2 (start intake), L1/R1 as turret
 | **SuperStructure** | Composes intake, index, feeder, shooters, turrets, pivot into single-command APIs. |
 | **Shooter** | SparkFlex flywheel; velocity or duty cycle; optional ShotCalc-based RPM. |
 | **Turret** | TalonFXS yaw; MotionMagic; uses ShotCalc + Drive; shortest-path in periodic. |
-| **Hood** | TalonFX + CANcoder (pitch); trackHub() default; uses ShotCalc.getPitchForDistance(xf). |
+| **Hood** | Spark MAX + NEO 550 (pitch); internal relative encoder with side-specific offsets; trackHub() default; uses ShotCalc.getPitchForDistance(xf). |
 | **TurretSim** | Sim turret: ShotCalc, FuelSim projectiles, shootBallCommand. |
 | **ShotCalc** | Target-relative ballistics: xf, velocity, yaw (and shortest-path), pitch; uses target pose. |
 | **Intake / IntakePivot / Index / Feeder** | TalonFX (and pivot MotionMagic); duty-cycle run/stop and pivot positions. |

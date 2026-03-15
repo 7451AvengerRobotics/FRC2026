@@ -254,8 +254,20 @@ public class RobotContainer {
     controller.PS().onTrue(superStructure.stopShooters());
 
     // Test: hold L2 to lock both turrets and both hoods onto the hub
-    controller.L1().whileTrue(rightTurret.runDutyCycle(0.8));
-    controller.R1().whileTrue(rightTurret.runDutyCycle(0));
+    controller.L2().whileTrue(lockOntoHubCommand());
+
+    // Test: L3 = align chassis rotation to hub (works for both alliances)
+    controller.L3().onTrue(drive.alignRotationToHubCommand());
+
+    // Test: R3 = left turret track hub (hold to test; works for both alliances)
+    controller.R3().whileTrue(leftTurret.trackHubCommand());
+
+    // Turret encoder calibration: start command, rotate turret one full revolution, cancel. See docs/tuning_guide.md §8.
+    // controller.L3().whileTrue(leftTurret.calibrateEncoderRangeCommand());
+
+    // Hood offset calibration: put hood at straight up (0°), press once. Set kLeftEncoderOffsetRotations / kRightEncoderOffsetRotations from log. See docs/tuning_guide.md §8.
+    // controller.R3().onTrue(leftHood.logEncoderPositionForOffsetCalibration());
+    // controller.R3().onTrue(rightHood.logEncoderPositionForOffsetCalibration());
   }
 
   /**

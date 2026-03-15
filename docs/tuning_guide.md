@@ -1,6 +1,6 @@
 # Mechanism Tuning Guide
 
-This guide covers tuning all position- and velocity-controlled mechanisms on the robot so they respond correctly, avoid oscillation or “screaming,” and meet performance goals. It applies to **Hood**, **Turret**, **Shooter**, **Intake Pivot**, and similar subsystems using CTRE Phoenix 6 (TalonFX / TalonFXS) or Spark Flex.
+This guide covers tuning all position- and velocity-controlled mechanisms on the robot so they respond correctly, avoid oscillation or “screaming,” and meet performance goals. It applies to **Hood**, **Turret**, **Shooter**, **Intake Pivot**, and similar subsystems using CTRE Phoenix 6 (TalonFX / TalonFXS) or REV controllers such as Spark MAX / Spark Flex.
 
 ---
 
@@ -13,6 +13,8 @@ This guide covers tuning all position- and velocity-controlled mechanisms on the
 5. [Step-by-step tuning procedures](#5-step-by-step-tuning-procedures)
 6. [Troubleshooting](#6-troubleshooting)
 7. [Mechanism-specific notes](#7-mechanism-specific-notes)
+8. [Encoder and gear standardization](#8-encoder-and-gear-standardization)
+9. [Prerequisites for turret/hood tracking](#9-prerequisites-for-turrethood-tracking)
 
 ---
 
@@ -178,6 +180,67 @@ Motion Magic (Phoenix) or similar **motion profiling** limits **velocity** and *
 5. **Add or increase kV** — so P doesn’t have to do all the work; often quiets the system.
 6. **Reduce Motion Magic cruise/accel** — less aggressive move can reduce vibration and noise.
 
+### D. Practical calibration order
+
+Use this order during bring-up so geometry, zeroing, and shot math are correct before you spend
+time tuning gains. See also [Section 9](#9-prerequisites-for-turrethood-tracking).
+
+1. **Calibrate turret encoder range** (so units are standardized)
+   - Run `leftTurret.calibrateEncoderRangeCommand()` (and right if different): start command, rotate turret one full revolution, cancel command.
+   - In logs, read `Turret/CalibrationDeltaOneRevolution` and set `TurretConstants.kEncoderUnitsPerRevolution` to that value (use absolute value if negative).
+   - Repeat for the other turret if it has different gearing/controller.
+
+2. **Verify hardware direction and inversion**
+   - Confirm the turret rotates in the expected direction for a positive setpoint.
+   - Confirm each hood moves toward a larger physical angle when commanded to a larger setpoint.
+   - Fix inversion first if anything moves backwards.
+
+3. **Set target geometry**
+   - Set `TargetConstants.hub` to the correct field coordinates.
+   - Set `TargetConstants.yf` to target height minus shooter exit height.
+
+4. **Measure robot-relative shooter geometry**
+   - Update the left/right `Transform3d(...)` values passed to `ShotCalc` so the turret/shooter
+     location on the robot matches reality.
+   - For mirrored mechanisms, verify left/right offsets are mirrored correctly.
+
+5. **Zero the turret**
+   - Put the turret at the intended physical “zero” direction.
+   - Set `TurretConstants.kInitialTurretPosition` so encoder zero matches that reference.
+
+6. **Zero both hoods independently** (see [Hood encoder offset calibration](#hood-encoder-offset-calibration))
+   - Put each hood at straight up (0° in hood convention). Run `leftHood.logEncoderPositionForOffsetCalibration()` and `rightHood.logEncoderPositionForOffsetCalibration()` (e.g. bound to buttons) and read the logged values.
+   - Set `HoodConstants.kLeftEncoderOffsetRotations` and `kRightEncoderOffsetRotations` to those values. Hood angle is 0 = up, 90° = horizontal, 180° = down; reference is already 0 in code.
+
+7. **Set hood scaling and limits**
+   - Set `HoodConstants.kHoodGearRatio` to match the mechanism (motor rotations per one hood revolution). Radians per encoder rotation are then `(2π) / kHoodGearRatio` and are already defined as `kEncoderToHoodRadiansPerRotation` in code.
+   - Set `HoodConstants.kHoodMinAngleRad` and `HoodConstants.kHoodMaxAngleRad` to safe mechanical
+     limits.
+
+8. **Match shooter RPM to launch speed**
+   - Set `ShooterConstants.kFixedShooterRPM` to the fixed flywheel speed you want to use.
+   - Tune `ShooterConstants.kFixedLaunchVelocityMetersPerSecond` so the hood angle solution matches
+     the real shot.
+
+9. **Tune hood motion profiling**
+   - Start with conservative `HoodConstants.kMotionMagicCruiseVelocity`.
+   - Start with conservative `HoodConstants.kMotionMagicAcceleration`.
+   - Increase only after the hood moves smoothly without buzzing or slamming.
+
+10. **Tune turret gains**
+   - Tune turret closed-loop gains only after zeroing and geometry are correct.
+
+11. **Tune hood gains**
+   - Tune hood closed-loop gains only after offsets, gear ratio, and limits are correct.
+
+12. **Validate turret and hood together**
+   - Test at several distances and robot headings.
+   - Confirm the turret points at the target and both hoods land on the same physical angle for the
+     same shot.
+
+13. **Only then move to advanced tests**
+   - Once stationary shots are consistent, move on to autos or shooting on the move.
+
 ---
 
 ## 6. Troubleshooting
@@ -202,16 +265,16 @@ Use this as a quick reference: **symptom → likely cause → action**.
 
 ## 7. Mechanism-specific notes
 
-### Hood (TalonFXS + Minion, encoder from controller)
+### Hood (Spark MAX + NEO 550, internal encoder)
 
-- **Constants:** `HoodConstants` — kP, kI, kD, kS, kV, kA; Motion Magic cruise/accel; min/max angle; `kEncoderOffsetRotations`, `kEncoderToHoodRadiansPerRotation`, `kHoodGearRatio`.
-- **Feedback:** Rotor sensor (no CANcoder). `SensorToMechanismRatio` = motor rotations per hood rotation.
+- **Constants:** `HoodConstants` — kP, kI, kD, kS, kV; MAXMotion cruise/accel; min/max angle; `kLeftEncoderOffsetRotations`, `kRightEncoderOffsetRotations`, `kHoodReferenceAngleRad` (0 = up), `kEncoderToHoodRadiansPerRotation`, `kHoodGearRatio`.
+- **Feedback:** Internal NEO relative encoder through Spark MAX. Hood angle: 0 = up, π/2 = horizontal, π = down. Calibrate offset with `logEncoderPositionForOffsetCalibration()` (Section 8). Place the hood at straight up (0°), run the command, set the offset constants. ShotCalc launch angle is converted to hood angle in `trackHub()` (hood = π/2 − launch).
 - **Tuning:** Position control + Motion Magic. Follow [Section 5A](#a-position-mechanism-eg-hood-or-turret-from-scratch) and [Section 4](#4-motion-magic). If it screams, lower kP and/or Motion Magic aggressiveness.
 
 ### Turret (TalonFXS + Minion)
 
-- **Constants:** `TurretConstants` — kP, kI, kD, kS, kV, kA. Encoder range [0, 10] = one revolution in code.
-- **Tuning:** Position control. Same as Hood: start with kP and kV; add kD only if needed and keep small to avoid noise.
+- **Constants:** `TurretConstants` — kP, kI, kD, kS, kV, kA; `kEncoderUnitsPerRevolution` (encoder units per one full revolution — calibrate with `calibrateEncoderRangeCommand()`).
+- **Tuning:** Position control. Same as Hood: start with kP and kV; add kD only if needed and keep small to avoid noise. Calibrate encoder range first (Section 8).
 
 ### Shooter (Spark Flex)
 
@@ -228,6 +291,88 @@ Use this as a quick reference: **symptom → likely cause → action**.
 - **Current limits:** Set in config to protect motors and mechanism; don’t rely on tuning to limit current.
 - **Neutral mode:** Brake for position mechanisms (hood, pivot) so they hold when disabled; coast for turret/shooter if desired.
 - **Logging:** Use AdvantageScope or similar to log setpoint, position/velocity, and output. Essential for diagnosing oscillation and windup.
+
+---
+
+## 8. Encoder and gear standardization
+
+All position-based control (turret yaw, hood pitch) depends on **encoder units** and **gear ratios** matching the real mechanism. If these are wrong, setpoints will be in the wrong units and tracking will fail even with perfect PID.
+
+### Why it matters
+
+- **Turret:** The code converts between **angle (radians)** and **encoder position**. One full revolution must equal exactly the encoder delta you configured (`TurretConstants.kEncoderUnitsPerRevolution`). If this is wrong, the turret will point in the wrong direction for a given yaw.
+- **Hood:** Hood angle is 0 = up, π/2 = horizontal, π = down. The code converts between **angle (radians)** and **motor rotations** using `kEncoderToHoodRadiansPerRotation` (= 2π / kHoodGearRatio) and `kHoodReferenceAngleRad` (0). Offsets define the encoder position when the hood is straight up. ShotCalc returns launch angle (0 = horizontal); `trackHub()` converts to hood angle (hood = π/2 − launch). If offsets or gear ratio are wrong, the hood will move to the wrong angle for a given pitch.
+
+### Standardizing units
+
+- **Turret:** Use one constant for "encoder units per revolution" (`TurretConstants.kEncoderUnitsPerRevolution`). All turret angle ↔ encoder math uses this. Calibrate it (see below) so it matches your hardware.
+- **Hood:** Use consistent units: motor rotations, and "radians per motor rotation" (or equivalent via gear ratio). Left and right can have different **offsets** but the same **scale** (or per-side scale if you add it).
+- **Everywhere:** Prefer defining scale and offset in `Constants` so one place defines "one revolution = X units." Avoid magic numbers in subsystem code.
+
+### Turret encoder range calibration
+
+To measure the actual encoder range for one turret revolution:
+
+1. Bind **`turret.calibrateEncoderRangeCommand()`** to a button (e.g. in `RobotContainer`).
+2. **Start** the command (press the button once). The turret records the current encoder position.
+3. **Rotate the turret exactly one full revolution** in one direction (use a mark on the mechanism if needed).
+4. **Cancel** the command (press the button again or cancel the command).
+5. In your log (e.g. AdvantageScope), read **`Turret/CalibrationDeltaOneRevolution`**. That value is the encoder delta for one revolution.
+6. Set **`TurretConstants.kEncoderUnitsPerRevolution`** to that value (use the absolute value if the delta is negative, depending on rotation direction).
+7. Re-deploy and verify: command the turret to move one full revolution and confirm it moves exactly 360° physically.
+
+Run this for **each turret** (left and right) if they use different controllers or gearing; use the same constant if they are identical.
+
+### Hood encoder offset calibration
+
+The hood uses a **relative** encoder (NEO 550 internal). Hood angle convention: **0° = straight up**, angle increases through 90° (horizontal) to **180° = straight down**. You must define which encoder position corresponds to straight up. The code then reports angle as `(encoder - offset) * scale + kHoodReferenceAngleRad` (reference is 0).
+
+1. **Place the hood** at **straight up** (0°). Use a physical stop or protractor so it is repeatable.
+2. Bind **`hood.logEncoderPositionForOffsetCalibration()`** to a button (e.g. in `RobotContainer`). Use a different button or run separately for left vs right.
+3. **Press the button once** so the command runs. It logs the current raw encoder position (motor rotations).
+4. In your log (e.g. AdvantageScope), read **`Hood/Left/CalibrationEncoderPosition`** or **`Hood/Right/CalibrationEncoderPosition`**.
+5. Set **`HoodConstants.kLeftEncoderOffsetRotations`** or **`kRightEncoderOffsetRotations`** to that value.
+6. Re-deploy. On the next boot, the hood will report that encoder position as 0° (straight up). Optionally run the calibration again to confirm the logged value is stable.
+
+Do this for **each hood** (left and right); they often have different offsets.
+
+### Hood scale (gear ratio) verification
+
+**Radians per encoder (motor) rotation** is already defined in code: **`kEncoderToHoodRadiansPerRotation`** = `(2π) / kHoodGearRatio`. You only need to set **`HoodConstants.kHoodGearRatio`** to match the mechanism (motor rotations per one hood revolution). Pitch ↔ encoder scale is then fixed. To verify:
+
+1. Command the hood to a known angle (e.g. 0° then 30°) and measure the **physical** angle with a protractor or level.
+2. If the physical angle does not match the commanded angle, adjust **`kHoodGearRatio`** (and ensure **`kEncoderToHoodRadiansPerRotation`** remains `(2π) / kHoodGearRatio`). For example, if you command 30° but the hood moves 15°, the mechanism is 2:1 so double the effective gear ratio (more motor rotation per hood revolution).
+
+---
+
+## 9. Prerequisites for turret/hood tracking
+
+**Tracking will not work correctly until these mechanical and geometric constants are right.** The aim math (ShotCalc) assumes correct pose, target position, and mechanism scaling. Tuning PID before fixing these will only make the mechanism move smoothly to the wrong setpoints.
+
+### Checklist: get these right first
+
+| What | Where | Why |
+|------|--------|-----|
+| **Turret encoder units per revolution** | `TurretConstants.kEncoderUnitsPerRevolution` | Converts yaw (rad) ↔ encoder; wrong value → turret points wrong direction. |
+| **Turret zero (initial position)** | `TurretConstants.kInitialTurretPosition` | Defines which encoder value corresponds to "forward." |
+| **Turret/shooter pose on robot (left)** | `Transform3d` passed to left `ShotCalc` in RobotContainer | Used for range (xf) and yaw; wrong → wrong aim. |
+| **Turret/shooter pose on robot (right)** | `Transform3d` passed to right `ShotCalc` in RobotContainer | Same for right side; mirror left/right if needed. |
+| **Target position (hub)** | `TargetConstants.hub` | Field coordinates of the target; wrong → wrong yaw and range. |
+| **Target height vs shooter** | `TargetConstants.yf` | Vertical distance to target; wrong → wrong pitch. |
+| **Hood encoder offsets (left/right)** | `HoodConstants.kLeftEncoderOffsetRotations`, `kRightEncoderOffsetRotations` | Encoder position when hood is straight up (0°). |
+| **Hood angle convention** | 0 = up, π/2 = horizontal, π = down | `kHoodReferenceAngleRad` = 0; launch angle from ShotCalc converted in trackHub (hood = π/2 − launch). |
+| **Hood scale (gear ratio)** | `HoodConstants.kHoodGearRatio`, `kEncoderToHoodRadiansPerRotation` | Radians per encoder rotation = 2π/kHoodGearRatio; set gear ratio only. |
+| **Hood soft limits** | `HoodConstants.kHoodMinAngleRad`, `kHoodMaxAngleRad` | Prevents commanding past mechanical range. |
+| **Fixed launch speed** | `ShooterConstants.kFixedLaunchVelocityMetersPerSecond` | Must match real ball speed so pitch solution is correct. |
+
+### Order of operations
+
+1. **Calibrate turret encoder range** (Section 8) and set `kEncoderUnitsPerRevolution`.
+2. Set **target geometry** (`hub`, `yf`) and **robot-relative turret positions** (left/right `Transform3d`).
+3. **Zero** turret and both hoods (initial position and encoder offsets).
+4. Set **hood** gear ratio and limits.
+5. Match **shooter** fixed speed to real launch velocity.
+6. **Then** tune PID and motion profiling (Section 5, including [Practical calibration order](#d-practical-calibration-order)).
 
 ---
 
