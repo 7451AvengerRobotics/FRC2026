@@ -41,7 +41,7 @@ public class ShotCalc {
   /** Fixed pitch (rad) used by {@link #getVelocity(double)} when not using distance-based pitch. */
   private double pitch = Math.toRadians(60);
 
-  private final Transform3d turretOffset = new Transform3d(-0.17, -0.15, 0.39, new Rotation3d());
+  private final Transform3d turretOffset = new Transform3d(-0.17, 0.15, 0.39, new Rotation3d());
   private final Transform2d turretOffsetTransform2d;
   private Pose2d turretPositionPose2d;
   private final Drive drive;
@@ -53,6 +53,8 @@ public class ShotCalc {
     this.yf = TargetConstants.yf;
     this.turretOffsetTransform2d =
         new Transform2d(turretOffset.getX(), turretOffset.getY(), new Rotation2d());
+
+    turretPositionPose2d = drive.getPose().plus(turretOffsetTransform2d);
   }
 
   /** Sets the target position in field coordinates (e.g. hub). Affects xf and getYaw. */
@@ -128,12 +130,8 @@ public class ShotCalc {
    * the shooter points at the hub.
    */
   public double getYaw(Pose2d robotPose) {
-    Transform2d offset2d =
-        new Transform2d(turretOffset.getX(), turretOffset.getY(), new Rotation2d());
-    Pose2d turretPose2d = robotPose.plus(offset2d);
-
-    double deltax = target.getX() - turretPose2d.getX();
-    double deltay = target.getY() - turretPose2d.getY();
+    double deltax = target.getX() - turretPositionPose2d.getX();
+    double deltay = target.getY() - turretPositionPose2d.getY();
 
     double initTheta = Math.PI - Math.atan2(deltay, -deltax);
     double theta = (initTheta - robotPose.getRotation().getRadians());

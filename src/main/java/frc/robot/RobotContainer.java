@@ -161,7 +161,7 @@ public class RobotContainer {
     //     new TurretSim(drive, new Transform3d(-0.17, 0.15, 0.39, new Rotation3d()), "Right");
 
     simTurret = new TurretSim(drive, new Transform3d(), "Left");
-    leftShotCalc = new ShotCalc(drive, new Transform3d(-0.17, -0.15, 0.39, new Rotation3d()));
+    leftShotCalc = new ShotCalc(drive, new Transform3d(-0.17, 0.15, 0.39, new Rotation3d()));
     rightShotCalc = new ShotCalc(drive, new Transform3d(-0.17, -0.15, 0.39, new Rotation3d()));
     simTurretLeft =
         new TurretSim(drive, new Transform3d(-0.17, 0.15, 0.39, new Rotation3d()), "Left");
