@@ -133,7 +133,7 @@ public class SuperStructure {
 
   public Command masterCommand() {
     return Commands.parallel( // These run immediately
-        intake.runIntake(-0.5),
+        intake.runIntake(-0.8),
         runShooters(),
         feeder.runFeeder(-0.9),
 
@@ -155,7 +155,7 @@ public class SuperStructure {
     return Commands.sequence(
         setPassing(false),
         Commands.parallel(
-            intake.runIntake(-0.5), index.runIndex(0.6), feeder.runFeeder(0.6), runShooters()));
+            intake.runIntake(-0.8), index.runIndex(0.6), feeder.runFeeder(0.6), runShooters()));
   }
 
   public Command shooterlessMasterCommand() {
