@@ -183,7 +183,11 @@ public class SuperStructure {
   }
 
   public Command jiggle() {
-    return Commands.sequence(stowPivot().withTimeout(2), deployPivot());
+    return pivot.jiggle();
+  }
+
+  public Command stopJiggle() {
+    return deployPivot();
   }
 
   public Command stowPivot() {
