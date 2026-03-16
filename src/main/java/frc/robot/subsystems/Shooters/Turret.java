@@ -89,7 +89,7 @@ public class Turret extends SubsystemBase {
 
   public void run(double rotations) {
     turretMotor.setControl(
-        turretRequest.withPosition(angleToEncoder(turretSignage(mod(rotations)))));
+        turretRequest.withPosition(angleToEncoder(rotations)));
   }
 
   public Command runCommand(double rotations) {
@@ -147,19 +147,14 @@ public class Turret extends SubsystemBase {
     double encoderRange = maxEncoderCount - minEncoderCount;
     double angleRange = 2 * Math.PI;
 
-    return ((angle * encoderRange) / angleRange) + minEncoderCount;
+    return turretSignage(mod(((angle * encoderRange) / angleRange) + minEncoderCount));
   }
-
-  // public Command followHub() {
-  //   double targetYaw = shotCalc.getYaw(drive.getPose());
-  //   double currentYaw = turretMotor.getPosition().getValueAsDouble();
-  // }
 
   public Command setTurretPos(double angle) {
     return run(() -> {
           this.run(angle);
         })
-        .until(() -> nearSetpoint(angleToEncoder(-mod(angle))))
+        .until(() -> nearSetpoint(angleToEncoder(turretSignage(mod(angle)))))
         .andThen(stopTurret());
   }
 
@@ -167,19 +162,6 @@ public class Turret extends SubsystemBase {
     return run(
         () -> {
           turretMotor.set(0);
-        });
-  }
-
-  public Command goToFive() {
-    return runCommand(turretSignage(7.5))
-        .until(() -> nearSetpoint(turretSignage(7.5)))
-        .andThen(stopTurret());
-  }
-
-  public Command goToTwoFive() {
-    return runOnce(
-        () -> {
-          runEncoder(turretSignage(2.5));
         });
   }
 
