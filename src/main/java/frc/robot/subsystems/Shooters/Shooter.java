@@ -21,7 +21,6 @@ import org.littletonrobotics.junction.Logger;
 public class Shooter extends SubsystemBase {
 
   private final SparkFlex shooterLeader;
-  private final SparkFlex shooterFollower;
   private final SparkClosedLoopController closedLoopController;
   private final ShotCalc shotCalc;
   private final String name;
@@ -31,10 +30,9 @@ public class Shooter extends SubsystemBase {
 
   private double ballRequiredVel;
 
-  public Shooter(int leaderID, int followerID, String name, TurretSim simTurret, Drive drive) {
+  public Shooter(int leaderID, String name, TurretSim simTurret, Drive drive) {
 
     shooterLeader = new SparkFlex(leaderID, MotorType.kBrushless);
-    shooterFollower = new SparkFlex(followerID, MotorType.kBrushless);
     this.name = name;
     this.simTurret = simTurret;
     this.drive = drive;
@@ -63,7 +61,6 @@ public class Shooter extends SubsystemBase {
 
     SparkFlexConfig globalCfg = new SparkFlexConfig();
     SparkFlexConfig leaderCfg = new SparkFlexConfig();
-    SparkFlexConfig followerCfg = new SparkFlexConfig();
 
     globalCfg.idleMode(IdleMode.kCoast);
 
@@ -86,12 +83,9 @@ public class Shooter extends SubsystemBase {
         .allowedProfileError(1);
 
     leaderCfg.apply(globalCfg).disableFollowerMode();
-    followerCfg.apply(globalCfg).follow(shooterLeader, true);
 
     shooterLeader.configure(
         leaderCfg, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    shooterFollower.configure(
-        followerCfg, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
 
   public void setVelOffset(double offset) {

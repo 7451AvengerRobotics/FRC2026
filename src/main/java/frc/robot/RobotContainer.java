@@ -157,14 +157,12 @@ public class RobotContainer {
     leftShooter =
         new Shooter(
             ShooterConstants.LeftShooterLeaderID,
-            ShooterConstants.LeftShooterFollowerID,
             "left",
             simTurretLeft,
             drive);
     rightShooter =
         new Shooter(
             ShooterConstants.RightShooterLeaderID,
-            ShooterConstants.RightShooterFollowerID,
             "right",
             simTurretRight,
             drive);
