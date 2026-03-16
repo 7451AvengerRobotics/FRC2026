@@ -114,7 +114,7 @@ public class IntakePivot extends SubsystemBase {
 
   public enum PivotPosition {
     STOW(0),
-    DEPLOYED(0.27);
+    DEPLOYED(1.7);
 
     public final double rotations;
 

@@ -432,10 +432,6 @@ public class Drive extends SubsystemBase {
         Set.of(this));
   }
 
-  public boolean isRedAlliance() {
-    return AutoBuilder.shouldFlip();
-  }
-
   public Command driveToPose(Pose2d pose) {
     return Commands.sequence(
             runOnce(
@@ -511,10 +507,7 @@ public class Drive extends SubsystemBase {
     return Commands.defer(
         () -> {
           double deltax =
-              (
-                  // 16.54 -
-                  11.915)
-                  - getPose().getX();
+              applyX(16.54 -11.915) - getPose().getX();
           double deltay = 4.035 - getPose().getY();
 
           double initTheta = Math.atan2(deltay, deltax);

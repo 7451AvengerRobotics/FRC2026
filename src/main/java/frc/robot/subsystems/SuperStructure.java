@@ -71,7 +71,7 @@ public class SuperStructure {
   }
 
   public Command soleIntake() {
-    return intake.runIntake(-0.5);
+    return intake.runIntake(-0.8);
   }
 
   public Command soleIndex() {
@@ -133,7 +133,7 @@ public class SuperStructure {
 
   public Command masterCommand() {
     return Commands.parallel( // These run immediately
-        intake.runIntake(-0.5),
+        soleIntake(),
         runShooters(),
         feeder.runFeeder(-0.9),
 
@@ -143,7 +143,7 @@ public class SuperStructure {
 
   public Command startupMasterCommand() {
     return Commands.parallel( // These run immediately
-        intake.runIntake(-0.5),
+        soleIntake(),
         runShooters(),
 
         // This branch waits, then starts feeder/index
@@ -155,12 +155,12 @@ public class SuperStructure {
     return Commands.sequence(
         setPassing(false),
         Commands.parallel(
-            intake.runIntake(-0.5), index.runIndex(0.6), feeder.runFeeder(0.6), runShooters()));
+            soleIntake(), index.runIndex(0.6), feeder.runFeeder(0.6), runShooters()));
   }
 
   public Command shooterlessMasterCommand() {
     return Commands.parallel(
-        intake.runIntake(-0.75), index.runIndex(-0.9), feeder.runFeeder(-0.9), runShooters());
+        soleIntake(), index.runIndex(-0.9), feeder.runFeeder(-0.9), runShooters());
   }
 
   public Command intakelessMasterCommand() {
