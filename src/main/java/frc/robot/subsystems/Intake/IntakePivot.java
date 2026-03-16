@@ -101,10 +101,10 @@ public class IntakePivot extends SubsystemBase {
   }
 
   public Command jiggle() {
-    return
-      Commands.sequence(
-      toPosition(PivotPosition.DEPLOYED.rotations * 0.4),
-      toPosition(PivotPosition.DEPLOYED.rotations * 0.8)).repeatedly();
+    return Commands.sequence(
+            toPosition(PivotPosition.DEPLOYED.rotations * 0.4),
+            toPosition(PivotPosition.DEPLOYED.rotations * 0.8))
+        .repeatedly();
   }
 
   public Command toPosition(double rotations) {

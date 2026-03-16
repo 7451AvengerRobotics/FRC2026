@@ -43,11 +43,11 @@ public class FuelSim {
   }
 
   public double getX() {
-    return initialPos.getX() + velocity * Math.cos(pitch) * Math.cos(yaw) * time;
+    return initialPos.getX() + velocity * Math.cos(pitch) * Math.cos(yaw) * time + vxr * time;
   }
 
   public double getY() {
-    return initialPos.getY() + velocity * Math.cos(pitch) * Math.sin(yaw) * time;
+    return initialPos.getY() + velocity * Math.cos(pitch) * Math.sin(yaw) * time + vyr * time;
   }
 
   public double getZ() {

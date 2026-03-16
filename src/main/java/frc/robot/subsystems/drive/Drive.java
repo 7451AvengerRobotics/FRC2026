@@ -506,8 +506,7 @@ public class Drive extends SubsystemBase {
 
     return Commands.defer(
         () -> {
-          double deltax =
-              applyX(16.54 -11.915) - getPose().getX();
+          double deltax = applyX(16.54 - 11.915) - getPose().getX();
           double deltay = 4.035 - getPose().getY();
 
           double initTheta = Math.atan2(deltay, deltax);

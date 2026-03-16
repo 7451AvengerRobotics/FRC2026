@@ -7,11 +7,8 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.TargetConstants;
 import frc.robot.Constants.TurretConstants;
@@ -60,13 +57,6 @@ public class TurretSim extends SubsystemBase {
     this.target = newTarget;
   }
 
-  public Command setTargetCommand(Translation2d newTarget) {
-    return Commands.run(
-        () -> {
-          this.setTarget(newTarget);
-        });
-  }
-
   public Translation2d getTarget() {
     return this.target;
   }
@@ -83,28 +73,12 @@ public class TurretSim extends SubsystemBase {
     vxr = Math.abs(Vr.vxMetersPerSecond) < 0.01 ? 0 : Vr.vxMetersPerSecond;
     vyr = Math.abs(Vr.vyMetersPerSecond) < 0.01 ? 0 : Vr.vyMetersPerSecond;
 
-    xf =
-        Math.sqrt(
-            Math.pow(
-                    (target.getX() - turretPositionPose2d.getX()) + vxr * TurretConstants.latency,
-                    2)
-                + Math.pow(
-                    (target.getY() - turretPositionPose2d.getY()) + vyr * TurretConstants.latency,
-                    2));
+    xf = this.getXf(0, 0);
 
     Logger.recordOutput("ZeroedComponentPoses_" + name, new Pose3d[] {new Pose3d()});
     Logger.recordOutput(
         "FinalPoses_" + name,
         new Pose3d[] {new Pose3d(turretOffset.getTranslation(), new Rotation3d(0, 0, calcYaw()))});
-    Logger.recordOutput("Target", targetPose3d());
-
-    Logger.recordOutput(
-        "Stationary Vel_" + name,
-        new Pose3d[] {
-          new Pose3d(
-              new Translation3d(),
-              new Rotation3d(0, 0, velocityYaw() - drive.getPose().getRotation().getRadians()))
-        });
 
     activeFuel.removeIf(
         fuel -> {
@@ -116,13 +90,21 @@ public class TurretSim extends SubsystemBase {
         "GamePieces/Fuel_" + name,
         activeFuel.stream().map(FuelSim::getPose).toArray(Pose3d[]::new));
 
-    Logger.recordOutput("Shooter Velocity", shotCalc.getVelocity(xf));
-    Logger.recordOutput("Shooter Pitch", shotCalc.pitch * 180 / Math.PI);
-    Logger.recordOutput("Shooter Yaw", shotCalc.getYaw(drive.getPose()) * 180 / Math.PI);
+    double v0 = shotCalc.getVelocity8();
+    double pitch0 = shotCalc.getPitch(v0, xf);
+    double yaw0 = shotCalc.getYaw(drive.getPose());
 
-    SmartDashboard.putNumber("Yaw", calcYaw());
+    double time = calcShotTime(xf, v0, pitch0);
+    double adjustedXf = getXf(-vxr * time, -vyr * time);
 
-    // SmartDashboard.putData("Mechanism", new Mechanism2d(3, 3));
+    double vf = shotCalc.getVelocity8();
+    double pitchf = shotCalc.getPitch(vf, adjustedXf);
+    double yawf = shotCalc.getYaw(drive.getPose(), -vxr * time, -vyr * time);
+
+    Logger.recordOutput("vf_" + name, vf);
+    Logger.recordOutput("pitchf_" + name, pitchf * 180 / Math.PI);
+    Logger.recordOutput("yawf_" + name, yawf * 180 / Math.PI);
+    
   }
 
   public double calcYaw() {
@@ -169,65 +151,30 @@ public class TurretSim extends SubsystemBase {
     return vel;
   }
 
-  public double calcPitch(double v, double xf) {
-    double A = a * Math.pow(xf, 2) / (2 * Math.pow(v, 2));
-    double B = xf;
-    double C = A - yf;
-
-    double theta = Math.atan((-B - Math.sqrt(Math.pow(B, 2) - 4 * A * C)) / (2 * A));
-
-    return theta;
-  }
-
   public double calcShotTime(double xf, double v, double pitch) {
     return xf / (v * Math.cos(pitch));
   }
 
   public void shootBall() {
-    double v0 = calcVelocity(xf);
-    double pitch0 = calcPitch(v0, xf);
-    double yaw0 = calcYawForSimBall(calcYaw());
+    double v0 = shotCalc.getVelocity8();
+    double pitch0 = shotCalc.getPitch(v0, xf);
+    double yaw0 = shotCalc.getYaw(drive.getPose());
 
     double time = calcShotTime(xf, v0, pitch0);
+    double adjustedXf = getXf(-vxr * time, -vyr * time);
 
-    // double xfadapted =
-    //     Math.sqrt(
-    //         Math.pow(
-    //                 (target.getX() - turretPositionPose2d.getX()) + vxr *
-    // TurretConstants.latency,
-    //                 2)
-    //             + Math.pow(
-    //                 (target.getY() - turretPositionPose2d.getY()) + vyr *
-    // TurretConstants.latency,
-    //                 2));
-
-    // double vf = calcVelocity(xfadapted);
-    // double pitchf = calcPitch(vf, xfadapted);
-    // double yawf =
-    //     calcYawForSimBall(
-    //         calcYaw(
-    //             target.getX() - turretPositionPose2d.getX() + vxr * TurretConstants.latency,
-    //             target.getY() - turretPositionPose2d.getY() + vyr * TurretConstants.latency));
+    double vf = shotCalc.getVelocity8();
+    double pitchf = shotCalc.getPitch(vf, adjustedXf);
+    double yawf = shotCalc.getYaw(drive.getPose(), -vxr * time, -vyr * time);
 
     activeFuel.add(
         new FuelSim(
-            shotCalc.getMovingVelocity(xf, Vr, drive.getPose()),
-            shotCalc.pitch,
-            shotCalc.getMovingYaw(xf, Vr, drive.getPose())
-                + drive.getPose().getRotation().getRadians(),
+            vf,
+            pitchf,
+            yawf + drive.getPose().getRotation().getRadians(),
             turretPositionPose2d,
             Vr.vxMetersPerSecond,
             Vr.vyMetersPerSecond));
-  }
-
-  public Pose3d targetPose3d() {
-    double time = calcShotTime(xf, calcVelocity(xf), calcPitch(calcVelocity(xf), xf));
-
-    return new Pose3d(
-        target.getX() + vxr * TurretConstants.latency,
-        target.getY() + vyr * TurretConstants.latency,
-        yf,
-        new Rotation3d());
   }
 
   public Command shootBallCommand() {
@@ -239,6 +186,15 @@ public class TurretSim extends SubsystemBase {
 
   public double getRequiredVelocity() {
     return shotCalc.getVelocity(xf);
+  }
+
+  public double getXf(double xOffset, double yOffset) {
+    xf =
+        Math.sqrt(
+            Math.pow((target.getX() - turretPositionPose2d.getX() + xOffset), 2)
+                + Math.pow((target.getY() - turretPositionPose2d.getY() + yOffset), 2));
+
+    return xf;
   }
 
   // Helper Function:

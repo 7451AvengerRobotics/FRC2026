@@ -22,9 +22,20 @@ public class ShotCalc {
     double denom1 = -yf + xf * Math.tan(pitch);
     double denom2 = 2 * Math.pow(Math.cos(pitch), 2);
     return Math.sqrt(numerator / (denom1 * denom2));
-    // return Math.sqrt(
-    //     (-g * Math.pow(xf, 2)) / (2 * Math.pow(Math.cos(pitch), 2) * (yf - Math.tan(pitch) *
-    // xf)));
+  }
+
+  public double getVelocity8() {
+    return 12;
+  }
+
+  public double getPitch(double v, double xf) {
+    double A = -g * Math.pow(xf, 2) / (2 * Math.pow(v, 2));
+    double B = xf;
+    double C = A - yf;
+
+    double theta = Math.atan((-B - Math.sqrt(Math.pow(B, 2) - 4 * A * C)) / (2 * A));
+
+    return theta;
   }
 
   public double getYaw(Pose2d robotPose) {
@@ -42,6 +53,21 @@ public class ShotCalc {
     return mod(theta);
   }
 
+  public double getYaw(Pose2d robotPose, double xOffset, double yOffset) {
+    Transform2d turretOffsetTransform2d =
+        new Transform2d(turretOffset.getX(), turretOffset.getY(), new Rotation2d());
+    Pose2d turretPositionPose2d = robotPose.plus(turretOffsetTransform2d);
+
+    double deltax = Constants.TargetConstants.hub.getX() - turretPositionPose2d.getX() + xOffset;
+    double deltay = Constants.TargetConstants.hub.getY() - turretPositionPose2d.getY() + yOffset;
+
+    double initTheta = Math.PI - Math.atan2(deltay, -deltax);
+
+    double theta = (initTheta - robotPose.getRotation().getRadians());
+
+    return mod(theta);
+  }
+
   public double getRobotRelativeYaw(Pose2d robotPose) {
     return getYaw(robotPose) + 2 * robotPose.getRotation().getRadians();
   }
@@ -51,41 +77,11 @@ public class ShotCalc {
   }
 
   public double getMovingVelocity(double xf, ChassisSpeeds Vr, Pose2d robotPose) {
-    double vxri = Vr.vxMetersPerSecond;
-    double vyri = Vr.vyMetersPerSecond;
-
-    double robotVelocityMag = Math.sqrt(Math.pow(vxri, 2) + Math.pow(vyri, 2));
-
-    double robotVelocityAngle = Math.atan2(vyri, vxri);
-
-    double transformedVelocityAngle = robotVelocityAngle - getYaw(robotPose) + Math.PI / 2;
-
-    double vrxf = Math.cos(transformedVelocityAngle) * robotVelocityMag;
-
-    double vrxHorizontalDisplacement = -vrxf * getTime(xf);
-
-    double newxf = Math.sqrt(Math.pow(xf, 2) + Math.pow(vrxHorizontalDisplacement, 2));
-
-    return getVelocity(newxf);
+    return 1;
   }
 
   public double getMovingYaw(double xf, ChassisSpeeds Vr, Pose2d robotPose) {
-    double vxri = Vr.vxMetersPerSecond;
-    double vyri = Vr.vyMetersPerSecond;
-
-    double robotVelocityMag = Math.sqrt(Math.pow(vxri, 2) + Math.pow(vyri, 2));
-
-    double robotVelocityAngle = Math.atan2(vyri, vxri);
-
-    double transformedVelocityAngle = robotVelocityAngle - getYaw(robotPose) + Math.PI / 2;
-
-    double vrxf = Math.cos(transformedVelocityAngle) * robotVelocityMag;
-
-    double vrxHorizontalDisplacement = -vrxf * getTime(xf);
-
-    double yawAdj = Math.atan2(vrxHorizontalDisplacement, xf);
-
-    return mod(getYaw(robotPose) + yawAdj);
+    return 1;
   }
 
   public double mod(double angle) {
