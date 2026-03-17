@@ -154,18 +154,9 @@ public class RobotContainer {
 
     // simTurret = new TurretSim(drive, new Transform3d(), "Left");
 
-    leftShooter =
-        new Shooter(
-            ShooterConstants.LeftShooterLeaderID,
-            "left",
-            simTurretLeft,
-            drive);
+    leftShooter = new Shooter(ShooterConstants.LeftShooterLeaderID, "left", simTurretLeft, drive);
     rightShooter =
-        new Shooter(
-            ShooterConstants.RightShooterLeaderID,
-            "right",
-            simTurretRight,
-            drive);
+        new Shooter(ShooterConstants.RightShooterLeaderID, "right", simTurretRight, drive);
 
     leftTurret =
         new Turret(
@@ -240,7 +231,7 @@ public class RobotContainer {
     // controller.R1().onTrue(superStructure.stopMasterCommand());
 
     // controller.L1().onTrue(simTurretLeft.shootBallCommand());
-    controller.L1().onTrue(Commands.parallel(drive.alignToHub().withTimeout(3)));
+    controller.L1().onTrue(Commands.parallel(simTurretLeft.shootBallCommand()));
     controller.R1().onTrue(superStructure.runShooters5000());
 
     // controller
@@ -274,8 +265,8 @@ public class RobotContainer {
 
     // manip.povLeft().onTrue(superStructure.offsetTurrets(-5 * Math.PI / 180));
     // manip.povRight().onTrue(superStructure.offsetTurrets(5 * Math.PI / 180));
-    manip.L1().whileTrue(pivot.runPivot(-0.18)).onFalse(pivot.runPivot(0.1));
-    manip.R1().onTrue(superStructure.deployPivot());
+    manip.L1().whileTrue(superStructure.jiggle()).onFalse(superStructure.stopJiggle());
+    // manip.R1().onTrue(superStructure.deployPivot());
     // manip.R1().onTrue(superStructure.offsetShooters(0.025));
 
     // controller.PS().onTrue(superStructure.stopShooters());

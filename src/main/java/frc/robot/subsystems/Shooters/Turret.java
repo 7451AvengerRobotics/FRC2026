@@ -88,8 +88,7 @@ public class Turret extends SubsystemBase {
   }
 
   public void run(double rotations) {
-    turretMotor.setControl(
-        turretRequest.withPosition(angleToEncoder(rotations)));
+    turretMotor.setControl(turretRequest.withPosition(angleToEncoder(rotations)));
   }
 
   public Command runCommand(double rotations) {
