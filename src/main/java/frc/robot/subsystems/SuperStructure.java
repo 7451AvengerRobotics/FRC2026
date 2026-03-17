@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.Intake.IntakePivot;
+import frc.robot.subsystems.Intake.IntakePivot.PivotPosition;
 import frc.robot.subsystems.Shooters.Shooter;
 import frc.robot.subsystems.Shooters.Turret;
 
@@ -111,12 +112,7 @@ public class SuperStructure {
   }
 
   public Command playThrough() {
-    return Commands.sequence(
-        leftTurret.followHub()
-        // ,
-        // leftTurret.goToFive().withTimeout(1.5),
-        // leftTurret.stopTurret()
-        );
+    return rightTurret.setTurretPosEncoder(0);
   }
 
   public Command runShooters() {
@@ -178,7 +174,7 @@ public class SuperStructure {
   }
 
   public Command deployPivot() {
-    return pivot.toPosition(2.8);
+    return pivot.toPosition(PivotPosition.DEPLOYED.rotations);
   }
 
   public Command jiggle() {

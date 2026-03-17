@@ -54,8 +54,8 @@ public class IntakePivot extends SubsystemBase {
                     .withStatorCurrentLimitEnable(true))
             .withMotionMagic(
                 new MotionMagicConfigs()
-                    .withMotionMagicCruiseVelocity(RotationsPerSecond.of(1.5))
-                    .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(7))
+                    .withMotionMagicCruiseVelocity(RotationsPerSecond.of(10))
+                    .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(10))
                     .withMotionMagicJerk(RotationsPerSecondPerSecond.per(Second).of(100)))
             .withSlot0(
                 new Slot0Configs()
@@ -82,7 +82,7 @@ public class IntakePivot extends SubsystemBase {
 
   public boolean nearSetpoint(double rotations) {
     double diff = intakePivot.getPosition().getValueAsDouble() - rotations;
-    return Math.abs(diff) <= 0.05;
+    return Math.abs(diff) <= 0.1;
   }
 
   // public boolean atStow() {
@@ -122,7 +122,7 @@ public class IntakePivot extends SubsystemBase {
 
   public enum PivotPosition {
     STOW(0),
-    DEPLOYED(1.7);
+    DEPLOYED(4.12);
 
     public final double rotations;
 

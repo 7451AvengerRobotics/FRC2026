@@ -69,7 +69,7 @@ public final class Constants {
 
   public static final class ShooterConstants {
     public static final int LeftShooterLeaderID = 50;
-    public static final int RightShooterLeaderID = 52;
+    public static final int RightShooterLeaderID = 51;
     public static final double kShooterGearRatio = 1.0;
     public static final double kS = 0;
     public static final double kP = 0.0075 / 100 * 0.05;
@@ -84,14 +84,27 @@ public final class Constants {
     public static final int kRightTurretID = 21;
     public static final double kInitialTurretPosition = 2.5;
     public static final double kTurretGearRatio = 1.0;
-    public static final double kP = 15;
+    public static final double kP = 5;
     public static final double kI = 0;
     public static final double kD = 0.0;
-    public static final double kS = 0;
+    public static final double kS = 0.72;
     public static final double kV = 0;
     public static final double kA = 0.0;
-    public static final double kG = -1;
+    public static final double kG = 0;
     public static final double latency = 0.02;
+  }
+
+  public static final class HoodConstants {
+    public static final int kLeftHoodID = 29;
+    public static final int kRightHoodID = 28;
+    public static final double kHoodGearRatio = 1.0;
+    public static final double kP = 0.5;
+    public static final double kI = 0.0;
+    public static final double kD = 0.0;
+    public static final double kS = 0.0;
+    public static final double kV = 0.0;
+    public static final double kA = 0.0;
+    public static final double kG = -1.0;
   }
 
   public static final class TargetConstants {

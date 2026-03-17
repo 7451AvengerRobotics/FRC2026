@@ -33,6 +33,7 @@ public class Turret extends SubsystemBase {
   private final Drive drive;
   private final Transform3d turretOffset;
   private double yawOffset;
+  private double targetYaw;
 
   public Turret(int leaderID, RobotSide robotSide, Drive drive, Transform3d turretOffset) {
 
@@ -50,12 +51,12 @@ public class Turret extends SubsystemBase {
                     .withNeutralMode(NeutralModeValue.Brake))
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
-                    .withStatorCurrentLimit(Amps.of(40))
+                    .withStatorCurrentLimit(Amps.of(80))
                     .withStatorCurrentLimitEnable(true))
             .withMotionMagic(
                 new MotionMagicConfigs()
                     .withMotionMagicCruiseVelocity(RotationsPerSecond.of(5))
-                    .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(10))
+                    .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(100))
                     .withMotionMagicJerk(RotationsPerSecondPerSecond.per(Second).of(100)))
             .withSlot0(
                 new Slot0Configs()
@@ -112,7 +113,13 @@ public class Turret extends SubsystemBase {
         "Turret Encoder Counts" + (robotSide == RobotSide.LEFT ? " Left" : " Right"),
         turretMotor.getPosition().getValueAsDouble());
 
-    double targetYaw = shotCalc.getRobotRelativeYaw(this.drive.getPose()) - Math.PI / 2;
+    Logger.recordOutput("Turret Voltage", turretMotor.getSupplyVoltage().getValueAsDouble());
+    Logger.recordOutput(
+        "Turret Supply Amperage", turretMotor.getSupplyCurrent().getValueAsDouble());
+    Logger.recordOutput(
+        "Turret Stator Amperage", turretMotor.getStatorCurrent().getValueAsDouble());
+
+    targetYaw = shotCalc.getRobotRelativeYaw(this.drive.getPose()) - Math.PI / 2;
     if (this.robotSide == RobotSide.RIGHT) {
       targetYaw = targetYaw - Math.PI;
     }
@@ -146,7 +153,7 @@ public class Turret extends SubsystemBase {
     double encoderRange = maxEncoderCount - minEncoderCount;
     double angleRange = 2 * Math.PI;
 
-    return turretSignage(mod(((angle * encoderRange) / angleRange) + minEncoderCount));
+    return ((angle * encoderRange) / angleRange) + minEncoderCount;
   }
 
   public Command setTurretPos(double angle) {
@@ -155,6 +162,17 @@ public class Turret extends SubsystemBase {
         })
         .until(() -> nearSetpoint(angleToEncoder(turretSignage(mod(angle)))))
         .andThen(stopTurret());
+  }
+
+  public Command setTurretPosEncoder(double encoder) {
+    return Commands.run(
+        () -> {
+          targetYaw = shotCalc.getRobotRelativeYaw(drive.getPose());
+          if (this.robotSide == RobotSide.RIGHT) {
+            targetYaw = targetYaw - Math.PI;
+          }
+          this.runEncoder(angleToEncoder(mod(targetYaw)));
+        });
   }
 
   public Command stopTurret() {

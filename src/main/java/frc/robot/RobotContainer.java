@@ -223,7 +223,7 @@ public class RobotContainer {
 
     controller.square().onTrue(superStructure.deployPivot());
 
-    controller.povUp().toggleOnTrue(superStructure.startupMasterCommand());
+    controller.povUp().toggleOnTrue(superStructure.playThrough());
 
     controller.touchpad().toggleOnTrue(superStructure.runShooters());
 
