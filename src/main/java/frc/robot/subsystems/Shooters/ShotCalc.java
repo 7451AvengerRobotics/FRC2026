@@ -10,6 +10,7 @@ import frc.robot.Constants;
 public class ShotCalc {
   double g = 9.81;
   double yf = Constants.TargetConstants.yf;
+  double H = 2.5;
   public double pitch = Math.toRadians(60);
   Transform3d turretOffset = new Transform3d();
 
@@ -24,8 +25,22 @@ public class ShotCalc {
     return Math.sqrt(numerator / (denom1 * denom2));
   }
 
-  public double getVelocity8() {
-    return 12;
+  public double newGetVelocity(double xf) {
+    double voy = Math.sqrt(2 * g * H);
+    double vx = g * xf / (voy + Math.sqrt(Math.pow(voy, 2) - 2 * g * yf));
+    return Math.sqrt(Math.pow(vx, 2) + Math.pow(voy, 2));
+  }
+
+  public double newGetPitch(double xf) {
+    double voy = Math.sqrt(2 * g * H);
+    double vx = g * xf / (voy + Math.sqrt(Math.pow(voy, 2) - 2 * g * yf));
+    return Math.atan(voy / vx);
+  }
+
+  public double getVelocity8(ChassisSpeeds vr, double xf) {
+    double a = 0.1;
+    double b = 0;
+    return getVelocity(xf);
   }
 
   public double getPitch(double v, double xf) {
