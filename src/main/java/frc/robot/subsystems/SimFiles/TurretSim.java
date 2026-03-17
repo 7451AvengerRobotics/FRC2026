@@ -176,6 +176,29 @@ public class TurretSim extends SubsystemBase {
             Vr.vyMetersPerSecond));
   }
 
+  public double getRequiredYaw() {
+    double v0 = shotCalc.newGetVelocity(xf);
+    double pitch0 = shotCalc.newGetPitch(xf);
+
+    double time = calcShotTime(xf, v0, pitch0);
+
+    double yawf = shotCalc.getYaw(drive.getPose(), -vxr * time, -vyr * time);
+
+    return yawf;
+  }
+
+  public double getRequiredPitch() {
+    double v0 = shotCalc.newGetVelocity(xf);
+    double pitch0 = shotCalc.newGetPitch(xf);
+
+    double time = calcShotTime(xf, v0, pitch0);
+    double adjustedXf = getXf(-vxr * time, -vyr * time);
+
+    double pitchf = shotCalc.newGetPitch(adjustedXf);
+
+    return pitchf;
+  }
+
   public Command shootBallCommand() {
     return runOnce(
         () -> {
@@ -184,7 +207,15 @@ public class TurretSim extends SubsystemBase {
   }
 
   public double getRequiredVelocity() {
-    return shotCalc.getVelocity(xf);
+    double v0 = shotCalc.newGetVelocity(xf);
+    double pitch0 = shotCalc.newGetPitch(xf);
+
+    double time = calcShotTime(xf, v0, pitch0);
+    double adjustedXf = getXf(-vxr * time, -vyr * time);
+
+    double vf = shotCalc.newGetVelocity(adjustedXf);
+    
+    return vf;
   }
 
   public double getXf(double xOffset, double yOffset) {

@@ -5,8 +5,10 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.Intake.IntakePivot;
+import frc.robot.subsystems.Shooters.Hood;
 import frc.robot.subsystems.Shooters.Shooter;
 import frc.robot.subsystems.Shooters.Turret;
+import frc.robot.subsystems.SimFiles.FuelSim;
 
 public class SuperStructure {
   private final IntakePivot intakePivot;
@@ -17,6 +19,8 @@ public class SuperStructure {
   private final Shooter rightShooter;
   private final Turret leftTurret;
   private final Turret rightTurret;
+  private final Hood leftHood;
+  private final Hood rightHood;
   private final IntakePivot pivot;
 
   private boolean passing = false;
@@ -30,6 +34,8 @@ public class SuperStructure {
       Shooter rightShooter,
       Turret leftTurret,
       Turret rightTurret,
+      Hood leftHood,
+      Hood rightHood,
       IntakePivot pivot) {
     this.intakePivot = intakePivot;
     this.intake = intake;
@@ -39,6 +45,8 @@ public class SuperStructure {
     this.rightShooter = rightShooter;
     this.leftTurret = leftTurret;
     this.rightTurret = rightTurret;
+    this.leftHood = leftHood;
+    this.rightHood = rightHood;
     this.pivot = pivot;
   }
 
@@ -123,6 +131,15 @@ public class SuperStructure {
     return Commands.parallel(leftShooter.runShooter(), rightShooter.runShooter());
   }
 
+  public Command trackTurrets() {
+    return Commands.parallel(leftTurret.followHub(), rightTurret.followHub());
+  }
+
+  public Command setHoods() {
+    return Commands.parallel(leftHood.trackHub(), rightHood.trackHub());
+  }
+
+
   public Command runShooters5000() {
     return Commands.parallel(leftShooter.runShooter5000(), rightShooter.runShooter5000());
   }
@@ -195,5 +212,9 @@ public class SuperStructure {
 
   public Command resetShooters() {
     return Commands.parallel(leftTurret.setTurretPos(2 * Math.PI / 3));
+  }
+
+  public Command shootOnMove() {
+    return Commands.parallel(trackTurrets(), setHoods(), runShooters());
   }
 }

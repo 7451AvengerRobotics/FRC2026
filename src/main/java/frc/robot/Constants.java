@@ -79,6 +79,34 @@ public final class Constants {
     public static final double kA = 0;
   }
 
+  public static final class HoodConstants {
+    public static final int kLeftHoodMotorID = 28;
+    public static final int kRightHoodMotorID = 29;
+    /** Motor rotations per one hood rotation. Sets scale: radians per encoder rotation = 2π/kHoodGearRatio. */
+    public static final double kHoodGearRatio = 1.0;
+    /** Encoder position (motor rotations) when the left hood is at the reference angle (e.g. facing up). */
+    public static final double kLeftEncoderOffsetRotations = 0.0;
+    /** Encoder position (motor rotations) when the right hood is at the reference angle (e.g. facing up). */
+    public static final double kRightEncoderOffsetRotations = 0.0;
+    /** Hood angle (radians) per motor rotation. Derived from gear ratio; one encoder rotation = this many rad. */
+    public static final double kEncoderToHoodRadiansPerRotation = (2 * Math.PI) / kHoodGearRatio;
+    /** Angle (rad) when the hood is at its reference position. 0 = straight up; angle increases to π (180°) at straight down. */
+    public static final double kHoodReferenceAngleRad = 0.0;
+    public static final int kCurrentLimitAmps = 20;
+
+    /** Hood angle (rad): 0 = up, π/2 = horizontal, π = down. */
+    public static final double kHoodMinAngleRad = 0.0;
+    public static final double kHoodMaxAngleRad = Math.PI;
+    public static final double kP = 2.0;
+    public static final double kI = 0.0;
+    public static final double kD = 0.0;
+    public static final double kS = 0.0;
+    public static final double kV = 0.8;
+    public static final double kA = 0.0;
+    public static final double kMotionMagicCruiseVelocity = 1.5;
+    public static final double kMotionMagicAcceleration = 15.0;
+  }
+
   public static final class TurretConstants {
     public static final int kLeftTurretID = 20;
     public static final int kRightTurretID = 21;

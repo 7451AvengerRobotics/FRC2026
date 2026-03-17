@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.RobotSide;
 import frc.robot.Constants.TurretConstants;
+import frc.robot.subsystems.SimFiles.TurretSim;
 import frc.robot.subsystems.drive.Drive;
 import org.littletonrobotics.junction.Logger;
 
@@ -33,14 +34,16 @@ public class Turret extends SubsystemBase {
   private final Drive drive;
   private final Transform3d turretOffset;
   private double yawOffset;
+  private final TurretSim simTurret;
 
-  public Turret(int leaderID, RobotSide robotSide, Drive drive, Transform3d turretOffset) {
+  public Turret(int leaderID, RobotSide robotSide, Drive drive, Transform3d turretOffset, TurretSim simTurret) {
 
     turretMotor = new TalonFXS(leaderID);
     shotCalc = new ShotCalc(turretOffset);
     this.drive = drive;
     this.turretOffset = turretOffset;
     this.robotSide = robotSide;
+    this.simTurret = simTurret;
 
     TalonFXSConfiguration cfg =
         new TalonFXSConfiguration()
@@ -132,11 +135,12 @@ public class Turret extends SubsystemBase {
   public Command followHub() {
     return run(
         () -> {
-          double targetYaw = shotCalc.getRobotRelativeYaw(this.drive.getPose()) - Math.PI / 2;
+          double fieldRelativeYaw = simTurret.getRequiredYaw();
+          double actualYaw = fieldRelativeYaw - drive.getPose().getRotation().getRadians();
           if (this.robotSide == RobotSide.RIGHT) {
-            targetYaw = targetYaw - Math.PI;
+            actualYaw = actualYaw - Math.PI;
           }
-          this.run(targetYaw + yawOffset);
+          this.run(actualYaw + yawOffset);
         });
   }
 
