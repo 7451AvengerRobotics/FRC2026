@@ -125,7 +125,8 @@ public class Shooter extends SubsystemBase {
   }
 
   public void setVel(double rpm) {
-    closedLoopController.setSetpoint(rpm, ControlType.kMAXMotionVelocityControl);
+    closedLoopController.setSetpoint(
+        this.name == "left" ? -rpm : rpm, ControlType.kMAXMotionVelocityControl);
   }
 
   public Command setVelCommand(double rpm) {
@@ -165,7 +166,7 @@ public class Shooter extends SubsystemBase {
           //         * 60
           //         / (2 * Math.PI * 4 * 0.0254);
 
-          double a2 = 4.7665;
+          double a2 = 4.4763;
           double flywheelVel = (a2) * velocityRequired * 60 / (2 * Math.PI * 4 * 0.0254);
 
           double battery = RobotController.getBatteryVoltage();
@@ -176,7 +177,7 @@ public class Shooter extends SubsystemBase {
           flywheelVel = MathUtil.clamp(flywheelVel, 0, 5000);
 
           // Command the motor
-          setVel(flywheelVel * velOffset);
+          setVel(flywheelVel * drive.getVelOffset());
         });
   }
 

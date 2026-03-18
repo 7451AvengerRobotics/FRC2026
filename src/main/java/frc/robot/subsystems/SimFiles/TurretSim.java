@@ -90,15 +90,15 @@ public class TurretSim extends SubsystemBase {
         "GamePieces/Fuel_" + name,
         activeFuel.stream().map(FuelSim::getPose).toArray(Pose3d[]::new));
 
-    double v0 = shotCalc.getVelocity8(Vr, xf);
-    double pitch0 = shotCalc.getPitch(v0, xf);
+    double v0 = shotCalc.newGetVelocity(xf);
+    double pitch0 = shotCalc.newGetPitch(xf);
     double yaw0 = shotCalc.getYaw(drive.getPose());
 
     double time = calcShotTime(xf, v0, pitch0);
     double adjustedXf = getXf(-vxr * time, -vyr * time);
 
-    double vf = shotCalc.getVelocity8(Vr, xf);
-    double pitchf = shotCalc.getPitch(vf, adjustedXf);
+    double vf = shotCalc.newGetVelocity(adjustedXf);
+    double pitchf = shotCalc.newGetPitch(adjustedXf);
     double yawf = shotCalc.getYaw(drive.getPose(), -vxr * time, -vyr * time);
 
     Logger.recordOutput("vf_" + name, vf);
@@ -214,7 +214,7 @@ public class TurretSim extends SubsystemBase {
     double adjustedXf = getXf(-vxr * time, -vyr * time);
 
     double vf = shotCalc.newGetVelocity(adjustedXf);
-    
+
     return vf;
   }
 
