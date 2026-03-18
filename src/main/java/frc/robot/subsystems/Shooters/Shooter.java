@@ -176,14 +176,14 @@ public class Shooter extends SubsystemBase {
           flywheelVel = MathUtil.clamp(flywheelVel, 0, 5000);
 
           // Command the motor
-          setVel(flywheelVel * velOffset);
+          setVel(-flywheelVel * velOffset);
         });
   }
 
   public Command runShooter5000() {
     return run(
         () -> {
-          setVel(4500);
+          setVel(2500);
         });
   }
 

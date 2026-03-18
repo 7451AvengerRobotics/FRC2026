@@ -130,7 +130,7 @@ public class SuperStructure {
   public Command masterCommand() {
     return Commands.parallel( // These run immediately
         soleIntake(),
-        runShooters(),
+        runShooters5000(),
         feeder.runFeeder(-0.9),
 
         // This branch waits, then starts feeder/index

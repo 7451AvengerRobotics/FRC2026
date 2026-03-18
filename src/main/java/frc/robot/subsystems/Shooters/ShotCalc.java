@@ -84,7 +84,7 @@ public class ShotCalc {
   }
 
   public double getRobotRelativeYaw(Pose2d robotPose) {
-    return getYaw(robotPose) + 2 * robotPose.getRotation().getRadians();
+    return getYaw(robotPose) + 0 * robotPose.getRotation().getRadians();
   }
 
   public double getTime(double xf) {

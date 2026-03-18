@@ -223,7 +223,7 @@ public class RobotContainer {
 
     controller.square().onTrue(superStructure.deployPivot());
 
-    controller.povUp().toggleOnTrue(superStructure.playThrough());
+    controller.povUp().toggleOnTrue(superStructure.startupMasterCommand());
 
     controller.touchpad().toggleOnTrue(superStructure.runShooters());
 
@@ -231,7 +231,7 @@ public class RobotContainer {
     // controller.R1().onTrue(superStructure.stopMasterCommand());
 
     // controller.L1().onTrue(simTurretLeft.shootBallCommand());
-    controller.L1().onTrue(Commands.parallel(simTurretLeft.shootBallCommand()));
+    controller.L1().onTrue(Commands.parallel(simTurretLeft.shootBallCommand(), drive.alignToHub()));
     controller.R1().onTrue(superStructure.runShooters5000());
 
     // controller
