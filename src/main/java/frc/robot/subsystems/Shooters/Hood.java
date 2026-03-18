@@ -18,6 +18,7 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.RobotSide;
 import frc.robot.subsystems.SimFiles.TurretSim;
@@ -65,6 +66,12 @@ public class Hood extends SubsystemBase {
     // Manual-zero workflow: place the hood at its known reference angle before enabling, then seed
     // the relative encoder to that side's offset so angle math starts from the correct reference.
     motor.getEncoder().setPosition(encoderOffsetRotations);
+  }
+
+  public Command resetEncoderCount() {
+    return Commands.run(() -> {
+        motor.getEncoder().setPosition(encoderOffsetRotations);
+    });
   }
 
   /** Sets the hood angle setpoint in radians (0 = up, π/2 = horizontal, π = down). Clamped to [kHoodMinAngleRad, kHoodMaxAngleRad]. */
