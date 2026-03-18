@@ -16,6 +16,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.Constants.HoodConstants;
+import frc.robot.Constants.RobotSide;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.TurretConstants;
 import frc.robot.commands.AutoRoutines;
@@ -25,7 +27,9 @@ import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Index;
 import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.Intake.IntakePivot;
+import frc.robot.subsystems.Shooters.Hood;
 import frc.robot.subsystems.Shooters.Shooter;
+import frc.robot.subsystems.Shooters.ShotCalc;
 import frc.robot.subsystems.Shooters.Turret;
 import frc.robot.subsystems.SimFiles.TurretSim;
 import frc.robot.subsystems.SuperStructure;
@@ -59,6 +63,8 @@ public class RobotContainer {
   private final IntakePivot pivot = new IntakePivot();
   private final Shooter leftShooter;
   private final Shooter rightShooter;
+  private final Hood leftHood;
+  private final Hood rightHood;
   private final SuperStructure superStructure;
 
   // Controller
@@ -163,13 +169,18 @@ public class RobotContainer {
             TurretConstants.kLeftTurretID,
             Constants.RobotSide.LEFT,
             drive,
-            new Transform3d(-0.17, 0.15, 0.39, new Rotation3d()));
+            new Transform3d(-0.17, 0.15, 0.39, new Rotation3d()),
+            simTurretLeft);
     rightTurret =
         new Turret(
             TurretConstants.kRightTurretID,
             Constants.RobotSide.RIGHT,
             drive,
-            new Transform3d(-0.17, -0.15, 0.39, new Rotation3d()));
+            new Transform3d(-0.17, -0.15, 0.39, new Rotation3d()),
+            simTurretRight);
+
+    leftHood = new Hood(HoodConstants.kLeftHoodMotorID, RobotSide.LEFT, simTurretLeft);
+    rightHood = new Hood(HoodConstants.kRightHoodMotorID, RobotSide.RIGHT, simTurretLeft);
     superStructure =
         new SuperStructure(
             index,
@@ -180,6 +191,8 @@ public class RobotContainer {
             rightShooter,
             leftTurret,
             rightTurret,
+            leftHood,
+            rightHood,
             pivot);
 
     // Set up auto routines
@@ -225,7 +238,7 @@ public class RobotContainer {
 
     controller.povUp().toggleOnTrue(superStructure.startupMasterCommand());
 
-    controller.touchpad().toggleOnTrue(superStructure.runShooters());
+    controller.touchpad().toggleOnTrue(superStructure.shootOnMove());
 
     // controller.L1().onTrue(superStructure.masterCommand());
     // controller.R1().onTrue(superStructure.stopMasterCommand());
