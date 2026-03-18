@@ -214,7 +214,7 @@ public class TurretSim extends SubsystemBase {
     double adjustedXf = getXf(-vxr * time, -vyr * time);
 
     double vf = shotCalc.newGetVelocity(adjustedXf);
-    
+
     return vf;
   }
 

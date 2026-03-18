@@ -21,7 +21,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.RobotSide;
 import frc.robot.subsystems.SimFiles.TurretSim;
-
 import org.littletonrobotics.junction.Logger;
 
 /**
@@ -67,12 +66,16 @@ public class Hood extends SubsystemBase {
     motor.getEncoder().setPosition(encoderOffsetRotations);
   }
 
-  /** Sets the hood angle setpoint in radians (0 = up, π/2 = horizontal, π = down). Clamped to [kHoodMinAngleRad, kHoodMaxAngleRad]. */
+  /**
+   * Sets the hood angle setpoint in radians (0 = up, π/2 = horizontal, π = down). Clamped to
+   * [kHoodMinAngleRad, kHoodMaxAngleRad].
+   */
   public void setAngleRad(double angleRad) {
     double clamped = Math.max(kHoodMinAngleRad, Math.min(kHoodMaxAngleRad, angleRad));
     lastSetpointRad = clamped;
     double setpointRotations =
-        (clamped - kHoodReferenceAngleRad) / kEncoderToHoodRadiansPerRotation + encoderOffsetRotations;
+        (clamped - kHoodReferenceAngleRad) / kEncoderToHoodRadiansPerRotation
+            + encoderOffsetRotations;
     closedLoopController.setSetpoint(setpointRotations, ControlType.kMAXMotionPositionControl);
   }
 
@@ -102,8 +105,9 @@ public class Hood extends SubsystemBase {
   }
 
   /**
-   * Continuously updates setpoint from ShotCalc for hub tracking. Converts launch angle (0 = horizontal,
-   * π/2 = up) to hood angle (0 = up, π/2 = horizontal, π = down): hoodAngle = π/2 - launchPitch.
+   * Continuously updates setpoint from ShotCalc for hub tracking. Converts launch angle (0 =
+   * horizontal, π/2 = up) to hood angle (0 = up, π/2 = horizontal, π = down): hoodAngle = π/2 -
+   * launchPitch.
    */
   public Command trackHub() {
     return run(

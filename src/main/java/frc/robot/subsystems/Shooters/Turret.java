@@ -37,7 +37,12 @@ public class Turret extends SubsystemBase {
   private double targetYaw;
   private final TurretSim simTurret;
 
-  public Turret(int leaderID, RobotSide robotSide, Drive drive, Transform3d turretOffset, TurretSim simTurret) {
+  public Turret(
+      int leaderID,
+      RobotSide robotSide,
+      Drive drive,
+      Transform3d turretOffset,
+      TurretSim simTurret) {
 
     turretMotor = new TalonFXS(leaderID);
     shotCalc = new ShotCalc(turretOffset);

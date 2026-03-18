@@ -89,6 +89,8 @@ public class Drive extends SubsystemBase {
   public static double fieldWidth = Units.feetToMeters(26.0) + Units.inchesToMeters(5.7);
   public static double fieldLength = Units.feetToMeters(54.0) + Units.inchesToMeters(3.2);
 
+  public double velOffset = 1;
+
   private final PIDController headingController = new PIDController(4, 0.0, 0.0);
   private boolean holonomicControllerActive = false;
   private Pose2d holonomicPoseTarget = new Pose2d();
@@ -533,6 +535,14 @@ public class Drive extends SubsystemBase {
               });
         },
         Set.of(this));
+  }
+
+  public Command boostShooters() {
+    return runOnce(() -> this.velOffset = this.velOffset + 0.025);
+  }
+
+  public double getVelOffset() {
+    return this.velOffset;
   }
 
   public double mod(double angle) {

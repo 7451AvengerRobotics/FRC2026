@@ -9,7 +9,6 @@ import frc.robot.subsystems.Intake.IntakePivot.PivotPosition;
 import frc.robot.subsystems.Shooters.Hood;
 import frc.robot.subsystems.Shooters.Shooter;
 import frc.robot.subsystems.Shooters.Turret;
-import frc.robot.subsystems.SimFiles.FuelSim;
 
 public class SuperStructure {
   private final IntakePivot intakePivot;
@@ -135,7 +134,6 @@ public class SuperStructure {
     return Commands.parallel(leftHood.trackHub(), rightHood.trackHub());
   }
 
-
   public Command runShooters5000() {
     return Commands.parallel(leftShooter.runShooter5000(), rightShooter.runShooter5000());
   }
@@ -147,7 +145,7 @@ public class SuperStructure {
   public Command masterCommand() {
     return Commands.parallel( // These run immediately
         soleIntake(),
-        runShooters5000(),
+        runShooters(),
         feeder.runFeeder(-0.9),
 
         // This branch waits, then starts feeder/index

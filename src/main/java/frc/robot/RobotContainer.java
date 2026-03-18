@@ -29,7 +29,6 @@ import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.Intake.IntakePivot;
 import frc.robot.subsystems.Shooters.Hood;
 import frc.robot.subsystems.Shooters.Shooter;
-import frc.robot.subsystems.Shooters.ShotCalc;
 import frc.robot.subsystems.Shooters.Turret;
 import frc.robot.subsystems.SimFiles.TurretSim;
 import frc.robot.subsystems.SuperStructure;
@@ -245,7 +244,7 @@ public class RobotContainer {
 
     // controller.L1().onTrue(simTurretLeft.shootBallCommand());
     controller.L1().onTrue(Commands.parallel(simTurretLeft.shootBallCommand(), drive.alignToHub()));
-    controller.R1().onTrue(superStructure.runShooters5000());
+    controller.R1().onTrue(drive.boostShooters());
 
     // controller
     //     .square()
