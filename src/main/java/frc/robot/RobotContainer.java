@@ -229,7 +229,7 @@ public class RobotContainer {
 
     // .toggleOnFalse(superStructure.stopIntake());
 
-    controller.triangle().onTrue(superStructure.weirdMasterCommand());
+    controller.triangle().onTrue(superStructure.shooterlessWeirdMasterCommand());
     controller.circle().onTrue(superStructure.stopMasterCommand());
     controller.cross().toggleOnTrue(superStructure.masterCommand());
 
@@ -237,13 +237,17 @@ public class RobotContainer {
 
     controller.povUp().toggleOnTrue(superStructure.startupMasterCommand());
 
-    controller.touchpad().toggleOnTrue(superStructure.shootOnMove());
+    controller.touchpad().toggleOnTrue(superStructure.runShooters5000());
 
     // controller.L1().onTrue(superStructure.masterCommand());
     // controller.R1().onTrue(superStructure.stopMasterCommand());
 
     // controller.L1().onTrue(simTurretLeft.shootBallCommand());
-    controller.L1().onTrue(Commands.parallel(simTurretLeft.shootBallCommand(), drive.alignToHub()));
+    controller
+        .L1()
+        .onTrue(
+            Commands.parallel(
+                simTurretLeft.shootBallCommand(), drive.alignToHub().withTimeout(1.5)));
     controller.R1().onTrue(drive.boostShooters());
 
     // controller
@@ -277,7 +281,11 @@ public class RobotContainer {
 
     // manip.povLeft().onTrue(superStructure.offsetTurrets(-5 * Math.PI / 180));
     // manip.povRight().onTrue(superStructure.offsetTurrets(5 * Math.PI / 180));
-    manip.L1().whileTrue(superStructure.jiggle()).onFalse(superStructure.stopJiggle());
+
+    // manip.L1().whileTrue(superStructure.jiggle()).onFalse(superStructure.stopJiggle());
+    manip.L1().onTrue(superStructure.increaseSpeed()).toggleOnTrue(superStructure.runShooters(1.1));
+    manip.R1().onTrue(superStructure.decreaseSpeed()).toggleOnTrue(superStructure.runShooters(0.9));
+
     // manip.R1().onTrue(superStructure.deployPivot());
     // manip.R1().onTrue(superStructure.offsetShooters(0.025));
 

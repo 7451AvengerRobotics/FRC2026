@@ -11,7 +11,6 @@ import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.subsystems.SimFiles.TurretSim;
@@ -96,14 +95,6 @@ public class Shooter extends SubsystemBase {
     return this.velOffset;
   }
 
-  public Command offsetVel(double offset) {
-    return Commands.runOnce(
-        () -> {
-          this.setVelOffset(this.velOffset + offset);
-          this.runShooter();
-        });
-  }
-
   public double getRPM() {
     return shooterLeader.getEncoder().getVelocity();
   }
@@ -136,7 +127,7 @@ public class Shooter extends SubsystemBase {
         });
   }
 
-  public Command runShooter() {
+  public Command runShooter(double velOffset) {
     return run(
         () -> {
           //   double target = Constants.TargetConstants.hub;
@@ -159,15 +150,19 @@ public class Shooter extends SubsystemBase {
           // Compute flywheel target
           double velocityRequired = ballRequiredVel;
 
-          // double a = -0.12001;
-          // double b = 5.97629;
+          double a = 0.451112;
+          double b = 0.58888;
           // double flywheelVel =
           //     (a * Math.pow(velocityRequired, 2) + b * velocityRequired)
           //         * 60
           //         / (2 * Math.PI * 4 * 0.0254);
 
           double a2 = 4.4763;
-          double flywheelVel = (a2) * velocityRequired * 60 / (2 * Math.PI * 4 * 0.0254);
+          a2 = 4;
+          double flywheelVel =
+              ((a) * Math.pow(velocityRequired, 2) + b * velocityRequired)
+                  * 60
+                  / (2 * Math.PI * 4 * 0.0254);
 
           double battery = RobotController.getBatteryVoltage();
           double factor = -0.1333 * battery + 2.3663;
@@ -177,14 +172,14 @@ public class Shooter extends SubsystemBase {
           flywheelVel = MathUtil.clamp(flywheelVel, 0, 5000);
 
           // Command the motor
-          setVel(flywheelVel * drive.getVelOffset());
+          setVel(flywheelVel * velOffset);
         });
   }
 
   public Command runShooter5000() {
     return run(
         () -> {
-          setVel(4500);
+          setVel(5000);
         });
   }
 

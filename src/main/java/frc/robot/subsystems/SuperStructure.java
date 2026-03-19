@@ -22,6 +22,7 @@ public class SuperStructure {
   private final Hood leftHood;
   private final Hood rightHood;
   private final IntakePivot pivot;
+  private double shooterOffset = 1;
 
   private boolean passing = false;
 
@@ -55,14 +56,6 @@ public class SuperStructure {
         () -> {
           leftTurret.offsetYaw(offset);
           rightTurret.offsetYaw(-offset);
-        });
-  }
-
-  public Command offsetShooters(double offset) {
-    return Commands.run(
-        () -> {
-          leftShooter.offsetVel(offset);
-          rightShooter.offsetVel(offset);
         });
   }
 
@@ -111,19 +104,33 @@ public class SuperStructure {
   }
 
   public Command leftShoot() {
-    return leftShooter.runShooter();
+    return leftShooter.runShooter(shooterOffset);
   }
 
   public Command rightShoot() {
-    return rightShooter.runShooter();
+    return rightShooter.runShooter(shooterOffset);
   }
 
   public Command playThrough() {
     return rightTurret.setTurretPosEncoder(0);
   }
 
+  public Command increaseSpeed() {
+    return Commands.runOnce(() -> shooterOffset += 0.025);
+  }
+
+  public Command decreaseSpeed() {
+    return Commands.runOnce(() -> shooterOffset -= 0.025);
+  }
+
   public Command runShooters() {
-    return Commands.parallel(leftShooter.runShooter(), rightShooter.runShooter());
+    return Commands.parallel(
+        leftShooter.runShooter(shooterOffset), rightShooter.runShooter(shooterOffset));
+  }
+
+  public Command runShooters(double shooterOffset) {
+    return Commands.parallel(
+        leftShooter.runShooter(shooterOffset), rightShooter.runShooter(shooterOffset));
   }
 
   public Command trackTurrets() {
@@ -169,8 +176,7 @@ public class SuperStructure {
   }
 
   public Command shooterlessMasterCommand() {
-    return Commands.parallel(
-        soleIntake(), index.runIndex(-0.9), feeder.runFeeder(-0.9), runShooters());
+    return Commands.parallel(soleIntake(), index.runIndex(-0.9), feeder.runFeeder(-0.9));
   }
 
   public Command intakelessMasterCommand() {
@@ -179,8 +185,7 @@ public class SuperStructure {
   }
 
   public Command shooterlessWeirdMasterCommand() {
-    return Commands.parallel(
-        intake.runIntake(-0.75), index.runIndex(0.6), feeder.runFeeder(-0.9), runShooters());
+    return Commands.parallel(soleIntake(), index.runIndex(0.6), feeder.runFeeder(-0.6));
   }
 
   public Command stopMasterCommand() {

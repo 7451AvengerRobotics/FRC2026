@@ -91,7 +91,7 @@ public class Drive extends SubsystemBase {
 
   public double velOffset = 1;
 
-  private final PIDController headingController = new PIDController(4, 0.0, 0.0);
+  private final PIDController headingController = new PIDController(2.5, 0.0, 0.0);
   private boolean holonomicControllerActive = false;
   private Pose2d holonomicPoseTarget = new Pose2d();
   private Rotation2d rotation2d = new Rotation2d();
