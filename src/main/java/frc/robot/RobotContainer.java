@@ -333,7 +333,10 @@ public class RobotContainer {
         "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
     autoChooser.addOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-    autoChooser.addOption("Depot Side Auto", autos.depotSideAuto());
+    autoChooser.addOption("DepotDepot", autos.depotDepot());
+    autoChooser.addOption("DepotSource", autos.depotSource());
+    autoChooser.addOption("SourceDepot", autos.sourceDepot());
+    autoChooser.addOption("SourceSource", autos.sourceSource());
     autoChooser.addOption("Single Auto", autos.singleAuto());
   }
 

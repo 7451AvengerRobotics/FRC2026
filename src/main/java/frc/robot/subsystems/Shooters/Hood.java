@@ -68,12 +68,16 @@ public class Hood extends SubsystemBase {
   }
 
   public Command resetEncoderCount() {
-    return Commands.run(() -> {
-        motor.getEncoder().setPosition(encoderOffsetRotations);
-    });
+    return Commands.run(
+        () -> {
+          motor.getEncoder().setPosition(encoderOffsetRotations);
+        });
   }
 
-  /** Sets the hood angle setpoint in radians (0 = up, π/2 = horizontal, π = down). Clamped to [kHoodMinAngleRad, kHoodMaxAngleRad]. */
+  /**
+   * Sets the hood angle setpoint in radians (0 = up, π/2 = horizontal, π = down). Clamped to
+   * [kHoodMinAngleRad, kHoodMaxAngleRad].
+   */
   public void setAngleRad(double angleRad) {
     double clamped = Math.max(kHoodMinAngleRad, Math.min(kHoodMaxAngleRad, angleRad));
     lastSetpointRad = clamped;

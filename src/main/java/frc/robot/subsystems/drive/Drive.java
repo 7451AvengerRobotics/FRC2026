@@ -426,10 +426,46 @@ public class Drive extends SubsystemBase {
     return Robot.IsRedAlliance.getAsBoolean();
   }
 
-  public Command driveToStartingPose1() {
+  public Command driveToStartDT() {
     return Commands.defer(
         () -> {
-          return driveToPose(new Pose2d(applyX(3.53), applyY(7.4), apply(new Rotation2d())));
+          return driveToPose(new Pose2d(applyX(3.53), applyY(7.4), apply(new Rotation2d(Math.PI))));
+        },
+        Set.of(this));
+  }
+
+  public Command driveToStartSB() {
+    return Commands.defer(
+        () -> {
+          return driveToPose(
+              new Pose2d(applyX(3.558), applyY(2.472), apply(new Rotation2d(Math.PI))));
+        },
+        Set.of(this));
+  }
+
+  public Command driveToStartDB() {
+    return Commands.defer(
+        () -> {
+          return driveToPose(
+              new Pose2d(applyX(3.558), applyY(5.528), apply(new Rotation2d(Math.PI))));
+        },
+        Set.of(this));
+  }
+
+  public Command driveToDSReturn() {
+    return Commands.defer(
+        () -> {
+          return driveToPose(
+              new Pose2d(applyX(7.845), applyY(4.445), apply(new Rotation2d(3 * Math.PI / 4))));
+        },
+        Set.of(this));
+  }
+
+  public Command driveToSSReturn() {
+    return Commands.defer(
+        () -> {
+          return driveToPose(
+              new Pose2d(applyX(7.845), applyY(3.555), apply(new Rotation2d(3 * Math.PI / 4))));
         },
         Set.of(this));
   }
