@@ -104,7 +104,6 @@ public class Shooter extends SubsystemBase {
     Logger.recordOutput("Velocity in RPM_" + name, shooterLeader.getEncoder().getVelocity());
     Logger.recordOutput("Voltage in Volts_" + name, shooterLeader.getAppliedOutput());
     Logger.recordOutput("Current in Amps_" + name, shooterLeader.getOutputCurrent());
-    Logger.recordOutput("Flywheel" + name, this.flywheelVel());
 
     ballRequiredVel = simTurret.getRequiredVelocity();
     Logger.recordOutput("Required Velocity" + name, ballRequiredVel);
@@ -150,8 +149,9 @@ public class Shooter extends SubsystemBase {
           // Compute flywheel target
           double velocityRequired = ballRequiredVel;
 
-          double a = 0.451112;
-          double b = 0.58888;
+          double a = 0.368653;
+          double b = 2.13185;
+          double c = -0.526856;
           // double flywheelVel =
           //     (a * Math.pow(velocityRequired, 2) + b * velocityRequired)
           //         * 60
@@ -160,7 +160,9 @@ public class Shooter extends SubsystemBase {
           double a2 = 4.4763;
           a2 = 4;
           double flywheelVel =
-              ((a) * Math.pow(velocityRequired, 2) + b * velocityRequired)
+              ((a) * Math.pow(velocityRequired, 2)
+                      + b * velocityRequired
+                      + c * RobotController.getBatteryVoltage())
                   * 60
                   / (2 * Math.PI * 4 * 0.0254);
 
@@ -172,27 +174,27 @@ public class Shooter extends SubsystemBase {
           flywheelVel = MathUtil.clamp(flywheelVel, 0, 5000);
 
           // Command the motor
-          setVel(flywheelVel * velOffset);
+          setVel(flywheelVel * velOffset * 0.9);
         });
   }
 
   public Command runShooter5000() {
     return run(
         () -> {
-          setVel(5000);
+          setVel(4000);
         });
   }
 
-  public double flywheelVel() {
-    double velocityRequired = ballRequiredVel;
-    double a = -0.123001;
-    double b = 5.95629;
-    double flywheelVel =
-        (a * Math.pow(velocityRequired, 2) + b * velocityRequired)
-            * 60
-            / (2 * Math.PI * 4 * 0.0254);
-    return flywheelVel * 1.2;
-  }
+  // public double flywheelVel() {
+  //   double velocityRequired = ballRequiredVel;
+  //   double a = -0.123001;
+  //   double b = 5.95629;
+  //   double flywheelVel =
+  //       (a * Math.pow(velocityRequired, 2) + b * velocityRequired)
+  //           * 60
+  //           / (2 * Math.PI * 4 * 0.0254);
+  //   return flywheelVel * 1.2;
+  // }
 
   public Command stopShooter() {
     return run(

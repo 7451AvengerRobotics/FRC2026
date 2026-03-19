@@ -156,7 +156,7 @@ public class SuperStructure {
         feeder.runFeeder(-0.9),
 
         // This branch waits, then starts feeder/index
-        Commands.sequence(new WaitCommand(0), Commands.parallel(index.runIndex(-0.9))));
+        Commands.sequence(new WaitCommand(0), Commands.parallel(index.runIndex(-0.6))));
   }
 
   public Command startupMasterCommand() {
@@ -172,7 +172,7 @@ public class SuperStructure {
   public Command weirdMasterCommand() {
     return Commands.sequence(
         setPassing(false),
-        Commands.parallel(soleIntake(), index.runIndex(0.6), feeder.runFeeder(0.6), runShooters()));
+        Commands.parallel(soleIntake(), index.runIndex(0.6), feeder.runFeeder(0.2), runShooters()));
   }
 
   public Command shooterlessMasterCommand() {
