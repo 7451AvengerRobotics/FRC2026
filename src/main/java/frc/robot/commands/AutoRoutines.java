@@ -49,14 +49,58 @@ public class AutoRoutines {
     return Robot.IsRedAlliance.getAsBoolean();
   }
 
-  public Command depotSideAuto() {
+  public Command depotDepot() {
     return Commands.sequence(
-        Commands.race(drive.driveToStartingPose1(), superStruc.deployPivot()),
+        Commands.race(drive.driveToStartDB(), superStruc.deployPivot()),
         Commands.deadline(
-            drive.followPPPathCommand("DST-MB"),
+            drive.followPPPathCommand("DB-DNZ"),
             Commands.sequence(
                 superStruc.deployPivot().withTimeout(1), superStruc.weirdMasterCommand())),
-        Commands.deadline(drive.followPPPathCommand("MB-DST"), superStruc.weirdMasterCommand()),
+        Commands.deadline(
+            Commands.deadline(drive.driveToDSReturn()), superStruc.weirdMasterCommand()),
+        Commands.deadline(drive.followPPPathCommand("DNZ-DB"), superStruc.weirdMasterCommand()),
+        score());
+  }
+
+  public Command depotSource() {
+    return Commands.sequence(
+        Commands.race(drive.driveToStartDB(), superStruc.deployPivot()),
+        Commands.deadline(
+            drive.followPPPathCommand("DB-DNZ"),
+            Commands.sequence(
+                superStruc.deployPivot().withTimeout(1), superStruc.weirdMasterCommand())),
+        Commands.deadline(drive.driveToDSReturn(), superStruc.weirdMasterCommand()),
+        Commands.deadline(drive.followPPPathCommand("DNZ-SB"), superStruc.weirdMasterCommand()),
+        score());
+  }
+
+  public Command sourceSource() {
+    return Commands.sequence(
+        Commands.race(drive.driveToStartSB(), superStruc.deployPivot()),
+        Commands.deadline(
+            drive.followPPPathCommand("SB-SNZ"),
+            Commands.sequence(
+                superStruc.deployPivot().withTimeout(1), superStruc.weirdMasterCommand())),
+        Commands.deadline(
+            Commands.deadline(drive.driveToSSReturn()), superStruc.weirdMasterCommand()),
+        Commands.deadline(drive.followPPPathCommand("SNZ-SB"), superStruc.weirdMasterCommand()),
+        score());
+  }
+
+  public Command sourceDepot() {
+    return Commands.sequence(
+        Commands.race(drive.driveToStartSB(), superStruc.deployPivot()),
+        Commands.deadline(
+            drive.followPPPathCommand("SB-SNZ"),
+            Commands.sequence(
+                superStruc.deployPivot().withTimeout(1), superStruc.weirdMasterCommand())),
+        Commands.deadline(drive.driveToSSReturn(), superStruc.weirdMasterCommand()),
+        Commands.deadline(drive.followPPPathCommand("SNZDB"), superStruc.weirdMasterCommand()),
+        score());
+  }
+
+  public Command score() {
+    return Commands.sequence(
         drive.alignToHub().withTimeout(0.5),
         drive.alignToHub().withTimeout(3),
         superStruc.masterCommand());
