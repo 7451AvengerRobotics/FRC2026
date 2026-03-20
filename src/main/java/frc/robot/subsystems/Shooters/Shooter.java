@@ -144,7 +144,7 @@ public class Shooter extends SubsystemBase {
           // double denom1 = -yf + xf * Math.tan(pitch);
           // double denom2 = 2 * Math.pow(Math.cos(pitch), 2);
           //  Math.sqrt(numerator / (denom1 * denom2));
-          ballRequiredVel = simTurret.getRequiredVelocity();
+          ballRequiredVel = simTurret.getColumbusVelocity();
 
           // Compute flywheel target
           double velocityRequired = ballRequiredVel;

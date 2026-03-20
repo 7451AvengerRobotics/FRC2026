@@ -51,14 +51,14 @@ public class AutoRoutines {
 
   public Command depotDepot() {
     return Commands.sequence(
-        Commands.race(drive.driveToStartDB(), superStruc.deployPivot()),
+        Commands.parallel(drive.driveToStartDB(), superStruc.deployPivot()).withTimeout(2),
         Commands.deadline(
-            drive.followPPPathCommand("DB-DNZ"),
+            drive.followPPPathCommand("DB-DNZ").withTimeout(5),
             Commands.sequence(
-                superStruc.deployPivot().withTimeout(1), superStruc.weirdMasterCommand())),
+                superStruc.stopPivot().withTimeout(1), superStruc.weirdMasterCommand())),
+        Commands.deadline(drive.driveToDSReturn().withTimeout(2), superStruc.weirdMasterCommand()),
         Commands.deadline(
-            Commands.deadline(drive.driveToDSReturn()), superStruc.weirdMasterCommand()),
-        Commands.deadline(drive.followPPPathCommand("DNZ-DB"), superStruc.weirdMasterCommand()),
+            drive.followPPPathCommand("DNZ-DB").withTimeout(4), superStruc.weirdMasterCommand()),
         score());
   }
 
@@ -101,9 +101,8 @@ public class AutoRoutines {
 
   public Command score() {
     return Commands.sequence(
-        drive.alignToHub().withTimeout(0.5),
-        drive.alignToHub().withTimeout(3),
-        superStruc.masterCommand());
+        drive.alignToHub().withTimeout(2),
+        Commands.parallel(drive.alignToHub(), superStruc.masterCommand()));
   }
 
   public Command singleAuto() {

@@ -166,7 +166,7 @@ public class SuperStructure {
 
         // This branch waits, then starts feeder/index
         Commands.sequence(
-            new WaitCommand(1.5), Commands.parallel(index.runIndex(-1), feeder.runFeeder(-1))));
+            new WaitCommand(1.5), Commands.parallel(index.runIndex(-0.6), feeder.runFeeder(-0.9))));
   }
 
   public Command weirdMasterCommand() {
@@ -195,6 +195,10 @@ public class SuperStructure {
 
   public Command deployPivot() {
     return pivot.toPosition(PivotPosition.DEPLOYED.rotations);
+  }
+
+  public Command stopPivot() {
+    return pivot.stopPivot();
   }
 
   public Command jiggle() {

@@ -38,7 +38,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -151,7 +150,7 @@ public class Drive extends SubsystemBase {
         new PPHolonomicDriveController(
             new PIDConstants(5.0, 0.0, 0.0), new PIDConstants(5.0, 0.0, 0.0)),
         PP_CONFIG,
-        () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
+        () -> Robot.IsRedAlliance.getAsBoolean(),
         this);
     Pathfinding.setPathfinder(new LocalADStarAK());
     PathPlannerLogging.setLogActivePathCallback(
@@ -456,7 +455,7 @@ public class Drive extends SubsystemBase {
     return Commands.defer(
         () -> {
           return driveToPose(
-              new Pose2d(applyX(7.845), applyY(4.445), apply(new Rotation2d(3 * Math.PI / 4))));
+              new Pose2d(applyX(7.845), applyY(4.445), apply(new Rotation2d(-3 * Math.PI / 4))));
         },
         Set.of(this));
   }
@@ -552,6 +551,22 @@ public class Drive extends SubsystemBase {
           double theta = (initTheta);
 
           return driveToRotation(new Rotation2d(theta + Math.PI));
+        },
+        Set.of(this));
+  }
+
+  public Command alignToHub(double offsetDegrees) {
+
+    return Commands.defer(
+        () -> {
+          double deltax = applyX(16.54 - 11.915) - getPose().getX();
+          double deltay = 4.035 - getPose().getY();
+
+          double initTheta = Math.atan2(deltay, deltax);
+
+          double theta = (initTheta);
+
+          return driveToRotation(new Rotation2d(theta + Math.PI - Math.toRadians(offsetDegrees)));
         },
         Set.of(this));
   }

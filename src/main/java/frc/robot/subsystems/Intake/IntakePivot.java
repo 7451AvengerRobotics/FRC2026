@@ -19,7 +19,6 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.IntakePivotConstants;
 import org.littletonrobotics.junction.Logger;
@@ -101,10 +100,11 @@ public class IntakePivot extends SubsystemBase {
   }
 
   public Command jiggle() {
-    return Commands.sequence(
-            toPosition(PivotPosition.DEPLOYED.rotations * 0.4),
-            toPosition(PivotPosition.DEPLOYED.rotations * 0.8))
-        .repeatedly();
+    return runPivot(-0.15);
+  }
+
+  public Command stopPivot() {
+    return runPivot(0);
   }
 
   public Command toPosition(double rotations) {

@@ -218,6 +218,10 @@ public class TurretSim extends SubsystemBase {
     return vf;
   }
 
+  public double getColumbusVelocity() {
+    return shotCalc.getVelocity(xf);
+  }
+
   public double getXf(double xOffset, double yOffset) {
     xf =
         Math.sqrt(
