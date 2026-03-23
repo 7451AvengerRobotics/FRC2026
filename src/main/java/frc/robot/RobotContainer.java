@@ -276,7 +276,7 @@ public class RobotContainer {
 
     // controller.touchpad().onTrue(drive.driveOverBump());
 
-    controller.PS().onTrue(superStructure.stopShooters());
+    manip.PS().onTrue(superStructure.stopIntake());
 
     // manip.povLeft().onTrue(superStructure.offsetTurrets(-5 * Math.PI / 180));
     // manip.povRight().onTrue(superStructure.offsetTurrets(5 * Math.PI / 180));
@@ -284,7 +284,7 @@ public class RobotContainer {
     manip
         .L1()
         .whileTrue(Commands.parallel(superStructure.jiggle(), superStructure.stopIntake()))
-        .onFalse(Commands.parallel(superStructure.stopJiggle(), superStructure.soleIntake()));
+        .onFalse(Commands.parallel(superStructure.stopJiggle()));
     manip.R1().onTrue(superStructure.stopPivot());
     manip
         .povUp()
@@ -302,8 +302,11 @@ public class RobotContainer {
         .povRight()
         .onTrue(superStructure.decreaseSpeed())
         .toggleOnTrue(superStructure.runShooters(1.05));
-    manip.cross().onTrue(drive.alignToHub(-5));
-    manip.triangle().onTrue(drive.alignToHub(5));
+    manip.square().onTrue(drive.alignToHub(-5));
+    manip.circle().onTrue(drive.alignToHub(5));
+
+    manip.cross().onTrue(superStructure.stopMasterCommand());
+    // manip.triangle().whileTrue(superStructure.reverseIntake());
 
     // manip.R1().onTrue(superStructure.deployPivot());
     // manip.R1().onTrue(superStructure.offsetShooters(0.025));

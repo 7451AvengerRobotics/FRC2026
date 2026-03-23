@@ -3,6 +3,7 @@ package frc.robot.commands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -51,7 +52,7 @@ public class AutoRoutines {
 
   public Command depotDepot() {
     return Commands.sequence(
-        Commands.parallel(drive.driveToStartDB(), superStruc.deployPivot()).withTimeout(2),
+        Commands.parallel(superStruc.deployPivot()).withTimeout(2),
         Commands.deadline(
             drive.followPPPathCommand("DB-DNZ").withTimeout(5),
             Commands.sequence(
@@ -102,14 +103,16 @@ public class AutoRoutines {
   public Command score() {
     return Commands.sequence(
         drive.alignToHub().withTimeout(2),
-        Commands.parallel(drive.alignToHub(), superStruc.masterCommand()));
+        Commands.run(() -> drive.runVelocity(new ChassisSpeeds(0, 0, 0))).withTimeout(0.5),
+        Commands.parallel(superStruc.masterCommand()));
   }
 
   public Command singleAuto() {
     return Commands.sequence(
         // drive.jostle(),
         superStruc.deployPivot().withTimeout(1),
-        drive.alignToHub(),
+        drive.alignToHub().withTimeout(2),
+        Commands.run(() -> drive.runVelocity(new ChassisSpeeds(0, 0, 0))).withTimeout(0.5),
         superStruc.startupMasterCommand().withTimeout(6));
   }
 }

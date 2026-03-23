@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.RobotSide;
+import frc.robot.Constants.TargetConstants;
 import frc.robot.Constants.TurretConstants;
 import frc.robot.subsystems.SimFiles.TurretSim;
 import frc.robot.subsystems.drive.Drive;
@@ -127,7 +128,9 @@ public class Turret extends SubsystemBase {
     Logger.recordOutput(
         "Turret Stator Amperage", turretMotor.getStatorCurrent().getValueAsDouble());
 
-    targetYaw = shotCalc.getRobotRelativeYaw(drive.getPose()) + Math.PI / 2;
+    targetYaw =
+        shotCalc.getRobotRelativeYaw(drive.getPose(), drive.applyX(TargetConstants.hub.getX()))
+            + Math.PI / 2;
     // if (this.robotSide == RobotSide.RIGHT) {
     //   targetYaw = targetYaw - Math.PI;
     // }
@@ -147,7 +150,10 @@ public class Turret extends SubsystemBase {
   public Command followHub() {
     return run(
         () -> {
-          double targetYaw = shotCalc.getRobotRelativeYaw(this.drive.getPose()) - Math.PI / 2;
+          double targetYaw =
+              shotCalc.getRobotRelativeYaw(
+                      this.drive.getPose(), drive.applyX(TargetConstants.hub.getX()))
+                  - Math.PI / 2;
           if (this.robotSide == RobotSide.RIGHT) {
             targetYaw = targetYaw - Math.PI;
           }
@@ -175,7 +181,10 @@ public class Turret extends SubsystemBase {
   public Command setTurretPosEncoder(double encoder) {
     return Commands.run(
         () -> {
-          targetYaw = shotCalc.getRobotRelativeYaw(drive.getPose()) + Math.PI / 2;
+          targetYaw =
+              shotCalc.getRobotRelativeYaw(
+                      drive.getPose(), drive.applyX(TargetConstants.hub.getX()))
+                  + Math.PI / 2;
           // if (this.robotSide == RobotSide.RIGHT) {
           //   targetYaw = targetYaw - Math.PI;
           // }

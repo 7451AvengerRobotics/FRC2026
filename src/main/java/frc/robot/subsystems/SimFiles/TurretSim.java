@@ -50,7 +50,11 @@ public class TurretSim extends SubsystemBase {
 
     this.shotCalc = new ShotCalc(turretOffset);
 
-    target = TargetConstants.hub;
+    target =
+        new Translation2d(
+            // Commented is red code
+            // 16.54 -
+            drive.applyX(TargetConstants.hub.getX()), TargetConstants.hub.getY());
   }
 
   public void setTarget(Translation2d newTarget) {
@@ -92,7 +96,7 @@ public class TurretSim extends SubsystemBase {
 
     double v0 = shotCalc.newGetVelocity(xf);
     double pitch0 = shotCalc.newGetPitch(xf);
-    double yaw0 = shotCalc.getYaw(drive.getPose());
+    double yaw0 = shotCalc.getYaw(drive.getPose(), drive.applyX(TargetConstants.hub.getX()));
 
     double time = calcShotTime(xf, v0, pitch0);
     double adjustedXf = getXf(-vxr * time, -vyr * time);
@@ -157,7 +161,7 @@ public class TurretSim extends SubsystemBase {
   public void shootBall() {
     double v0 = shotCalc.newGetVelocity(xf);
     double pitch0 = shotCalc.newGetPitch(xf);
-    double yaw0 = shotCalc.getYaw(drive.getPose());
+    double yaw0 = shotCalc.getYaw(drive.getPose(), drive.applyX(TargetConstants.hub.getX()));
 
     double time = calcShotTime(xf, v0, pitch0);
     double adjustedXf = getXf(-vxr * time, -vyr * time);
@@ -166,11 +170,21 @@ public class TurretSim extends SubsystemBase {
     double pitchf = shotCalc.newGetPitch(adjustedXf);
     double yawf = shotCalc.getYaw(drive.getPose(), -vxr * time, -vyr * time);
 
+    // activeFuel.add(
+    //     new FuelSim(
+    //         vf,
+    //         pitchf,
+    //         yawf + drive.getPose().getRotation().getRadians(),
+    //         turretPositionPose2d,
+    //         Vr.vxMetersPerSecond,
+    //         Vr.vyMetersPerSecond));
+
     activeFuel.add(
         new FuelSim(
-            vf,
-            pitchf,
-            yawf + drive.getPose().getRotation().getRadians(),
+            shotCalc.getVelocity(xf),
+            Math.toRadians(60),
+            shotCalc.getYaw(drive.getPose(), drive.applyX(TargetConstants.hub.getX()))
+                + drive.getPose().getRotation().getRadians(),
             turretPositionPose2d,
             Vr.vxMetersPerSecond,
             Vr.vyMetersPerSecond));
@@ -225,7 +239,7 @@ public class TurretSim extends SubsystemBase {
   public double getXf(double xOffset, double yOffset) {
     xf =
         Math.sqrt(
-            Math.pow((target.getX() - turretPositionPose2d.getX() + xOffset), 2)
+            Math.pow((drive.applyX(target.getX()) - turretPositionPose2d.getX() + xOffset), 2)
                 + Math.pow((target.getY() - turretPositionPose2d.getY() + yOffset), 2));
 
     return xf;
