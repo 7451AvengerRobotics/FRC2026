@@ -29,9 +29,9 @@ public class Robot extends LoggedRobot {
   private Command autonomousCommand;
   private RobotContainer robotContainer;
 
-  public static final BooleanSupplier IsRedAlliance =
+  public static BooleanSupplier IsRedAlliance =
       () -> {
-        final Optional<DriverStation.Alliance> alliance = DriverStation.getAlliance();
+        Optional<DriverStation.Alliance> alliance = DriverStation.getAlliance();
         return alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red;
         // return true;
       };

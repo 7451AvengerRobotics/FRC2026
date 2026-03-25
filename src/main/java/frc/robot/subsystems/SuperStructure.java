@@ -72,7 +72,7 @@ public class SuperStructure {
   }
 
   public Command soleIntake() {
-    return intake.runIntake(-0.8);
+    return intake.runIntake(-1.0);
   }
 
   // public Command reverseIntake() {
