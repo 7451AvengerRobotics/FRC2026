@@ -96,7 +96,7 @@ public class TurretSim extends SubsystemBase {
 
     double v0 = shotCalc.newGetVelocity(xf);
     double pitch0 = shotCalc.newGetPitch(xf);
-    double yaw0 = shotCalc.getYaw(drive.getPose(), drive.applyX(TargetConstants.hub.getX()));
+    double yaw0 = shotCalc.getYaw(drive.getPose(), TargetConstants.hub.getX());
 
     double time = calcShotTime(xf, v0, pitch0);
     double adjustedXf = getXf(-vxr * time, -vyr * time);
@@ -181,10 +181,9 @@ public class TurretSim extends SubsystemBase {
 
     activeFuel.add(
         new FuelSim(
-            shotCalc.getVelocity(xf),
-            Math.toRadians(60),
-            shotCalc.getYaw(drive.getPose(), drive.applyX(TargetConstants.hub.getX()))
-                + drive.getPose().getRotation().getRadians(),
+            vf,
+            pitchf,
+            yawf + drive.getPose().getRotation().getRadians(),
             turretPositionPose2d,
             Vr.vxMetersPerSecond,
             Vr.vyMetersPerSecond));
