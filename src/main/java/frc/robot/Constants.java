@@ -83,6 +83,8 @@ public final class Constants {
     public static final double kInitialHoodPosition = 0.0;
     public static final int kLeftHoodMotorID = 28;
     public static final int kRightHoodMotorID = 29;
+    public static final int kLeftHoodEncoderID = 30;
+    public static final int kRightHoodEncoderID = 31;
     public static final double kP = 0.0;
     public static final double kI = 0.0;
     public static final double kD = 0.0;

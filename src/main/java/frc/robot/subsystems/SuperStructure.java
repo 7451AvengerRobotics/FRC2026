@@ -11,7 +11,6 @@ import frc.robot.subsystems.Shooters.Shooter;
 import frc.robot.subsystems.Shooters.Turret;
 
 public class SuperStructure {
-  private final IntakePivot intakePivot;
   private final Intake intake;
   private final Index index;
   private final Feeder feeder;
@@ -29,7 +28,6 @@ public class SuperStructure {
   public SuperStructure(
       Index index,
       Intake intake,
-      IntakePivot intakePivot,
       Feeder feeder,
       Shooter leftShooter,
       Shooter rightShooter,
@@ -38,7 +36,6 @@ public class SuperStructure {
       Hood leftHood,
       Hood rightHood,
       IntakePivot pivot) {
-    this.intakePivot = intakePivot;
     this.intake = intake;
     this.index = index;
     this.feeder = feeder;
@@ -58,18 +55,9 @@ public class SuperStructure {
         });
   }
 
-  public Command startIntake() {
-    return Commands.parallel(
-        intakePivot.toPosition(PivotPosition.DEPLOYED.rotations), intake.runIntake(-0.5), index.runIndex(-0.1));
-  }
-
   public Command soleIntake() {
     return intake.runIntake(-1.0);
   }
-
-  // public Command reverseIntake() {
-  //   return intake.runIntake(0.8);
-  // }
 
   public Command soleIndex() {
     return index.runIndex(-0.5);

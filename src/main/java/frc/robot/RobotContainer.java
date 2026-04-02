@@ -55,7 +55,6 @@ public class RobotContainer {
   private final Turret rightTurret;
   private final TurretSim simTurretLeft;
   private final TurretSim simTurretRight;
-  private final IntakePivot intakePivot = new IntakePivot();
   private final Index index = new Index();
   private final Intake intake = new Intake();
   private final Feeder feeder = new Feeder();
@@ -178,13 +177,12 @@ public class RobotContainer {
             new Transform3d(-0.17, -0.15, 0.39, new Rotation3d()),
             simTurretRight);
 
-    leftHood = new Hood(HoodConstants.kLeftHoodMotorID, RobotSide.LEFT, simTurretLeft);
-    rightHood = new Hood(HoodConstants.kRightHoodMotorID, RobotSide.RIGHT, simTurretLeft);
+    leftHood = new Hood(HoodConstants.kLeftHoodMotorID, HoodConstants.kLeftHoodEncoderID, RobotSide.LEFT, simTurretLeft);
+    rightHood = new Hood(HoodConstants.kRightHoodMotorID, HoodConstants.kRightHoodEncoderID, RobotSide.RIGHT, simTurretRight);
     superStructure =
         new SuperStructure(
             index,
             intake,
-            intakePivot,
             feeder,
             leftShooter,
             rightShooter,
