@@ -118,58 +118,26 @@ public class Turret extends SubsystemBase {
         "Turret Encoder Counts" + (robotSide == RobotSide.LEFT ? " Left" : " Right"),
         turretMotor.getPosition().getValueAsDouble());
 
-    Logger.recordOutput("Turret Voltage", turretMotor.getSupplyVoltage().getValueAsDouble());
-    Logger.recordOutput(
-        "Turret Supply Amperage", turretMotor.getSupplyCurrent().getValueAsDouble());
-    Logger.recordOutput(
-        "Turret Stator Amperage", turretMotor.getStatorCurrent().getValueAsDouble());
-
     targetYaw =
-        shotCalc.getRobotRelativeYaw(drive.getPose(), (TargetConstants.hub.getX())) + Math.PI / 2;
-
-    // if (this.robotSide == RobotSide.LEFT) {
-    //   targetYaw = Math.PI - targetYaw;
-    // }
+        shotCalc.getRobotRelativeYaw(drive.getPose(), (TargetConstants.hub.getX()));
 
     Logger.recordOutput(
-        "Suggested Encoder Count" + (robotSide == RobotSide.LEFT ? " Left" : " Right"),
-        this.robotSide == RobotSide.LEFT
-            ? angleToEncoder((mod(Math.PI - targetYaw)) - Math.PI)
-            : angleToEncoder((mod(-targetYaw))));
-
-    Logger.recordOutput(
-        "Turret Voltage" + (robotSide == RobotSide.LEFT ? " Left" : " Right"),
-        turretMotor.getMotorVoltage().getValueAsDouble());
-    Logger.recordOutput(
-        "Turret Current" + (robotSide == RobotSide.LEFT ? " Left" : " Right"),
-        turretMotor.getSupplyCurrent().getValueAsDouble());
+        "Suggested Encoder Count" + (robotSide == RobotSide.LEFT ? " Left" : " Right"), 
+        angleToEncoder(mod(targetYaw)));
   }
 
   public Command followHub() {
     return Commands.run(
         () -> {
-          targetYaw =
-              -(shotCalc.getRobotRelativeYaw(drive.getPose(), (TargetConstants.hub.getX()))
-                  + Math.PI / 2);
+          targetYaw = shotCalc.getRobotRelativeYaw(drive.getPose(), (TargetConstants.hub.getX()));
 
-          if (this.robotSide == RobotSide.LEFT) {
-            targetYaw += Math.PI;
-          }
-
-          double limitedTargetYaw = (mod(targetYaw));
-
-          double targetEnc =
-              this.robotSide == RobotSide.LEFT
-                  ? angleToEncoder(limitedTargetYaw - Math.PI)
-                  : angleToEncoder(limitedTargetYaw);
-
-          this.runEncoder(targetEnc);
+          this.runEncoder(angleToEncoder(mod(targetYaw)));
         });
   }
 
   public double angleToEncoder(double angle) {
-    double minEncoderCount = 0;
-    double maxEncoderCount = 10;
+    double minEncoderCount = -5;
+    double maxEncoderCount = 5;
     double encoderRange = maxEncoderCount - minEncoderCount;
     double angleRange = 2 * Math.PI;
 
@@ -184,13 +152,10 @@ public class Turret extends SubsystemBase {
   //       .andThen(stopTurret());
   // }
 
-  public Command setTurretPosEncoder() {
+  public Command setTurretPosEncoder(double encoder) {
     return Commands.run(
         () -> {
-          targetYaw =
-              shotCalc.getRobotRelativeYaw(drive.getPose(), (TargetConstants.hub.getX()))
-                  + Math.PI / 2;
-          this.runEncoder(angleToEncoder(mod(targetYaw)));
+          this.runEncoder(encoder);
         });
   }
 

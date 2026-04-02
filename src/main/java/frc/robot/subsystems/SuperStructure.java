@@ -107,10 +107,6 @@ public class SuperStructure {
     return rightShooter.runShooter(shooterOffset);
   }
 
-  public Command playThrough() {
-    return rightTurret.setTurretPosEncoder();
-  }
-
   public Command increaseSpeed() {
     return Commands.runOnce(() -> shooterOffset += 0.025);
   }
