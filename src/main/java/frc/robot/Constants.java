@@ -128,8 +128,8 @@ public final class Constants {
   public static final class TurretConstants {
     public static final int kLeftTurretID = 20;
     public static final int kRightTurretID = 21;
-    public static final double kInitialLeftTurretPosition = 2.5;
-    public static final double kInitialRightTurretPosition = 2.5;
+    public static final double kInitialLeftTurretPosition = 0;
+    public static final double kInitialRightTurretPosition = 0;
     public static final double kTurretGearRatio = 1.0;
     public static final double kP = 5;
     public static final double kI = 0;
