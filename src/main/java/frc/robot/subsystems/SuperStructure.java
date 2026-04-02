@@ -51,14 +51,6 @@ public class SuperStructure {
     this.pivot = pivot;
   }
 
-  public Command offsetTurrets(double offset) {
-    return Commands.run(
-        () -> {
-          leftTurret.offsetYaw(offset);
-          rightTurret.offsetYaw(-offset);
-        });
-  }
-
   public Command setPassing(boolean passing) {
     return Commands.runOnce(
         () -> {
@@ -68,7 +60,7 @@ public class SuperStructure {
 
   public Command startIntake() {
     return Commands.parallel(
-        intakePivot.toPosition(0.27), intake.runIntake(-0.5), index.runIndex(-0.1));
+        intakePivot.toPosition(PivotPosition.DEPLOYED.rotations), intake.runIntake(-0.5), index.runIndex(-0.1));
   }
 
   public Command soleIntake() {
@@ -116,7 +108,7 @@ public class SuperStructure {
   }
 
   public Command playThrough() {
-    return rightTurret.setTurretPosEncoder(0);
+    return rightTurret.setTurretPosEncoder();
   }
 
   public Command increaseSpeed() {
@@ -217,11 +209,11 @@ public class SuperStructure {
     return pivot.toPosition(0);
   }
 
-  public Command resetShooters() {
-    return Commands.parallel(leftTurret.setTurretPos(2 * Math.PI / 3));
-  }
-
   public Command shootOnMove() {
     return Commands.parallel(trackTurrets(), setHoods(), runShooters());
+  }
+
+  public Command outtake() {
+    return Commands.parallel(index.runIndex(0.9), intake.runIntake(1.0));
   }
 }
