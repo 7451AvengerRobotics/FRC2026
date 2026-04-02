@@ -50,6 +50,20 @@ public class AutoRoutines {
     return Robot.IsRedAlliance.getAsBoolean();
   }
 
+  public Command noBumpDepotDepot() {
+    return Commands.sequence(
+        Commands.parallel(superStruc.deployPivot()).withTimeout(2),
+        Commands.deadline(
+            drive.followPPPathCommand("NoBumpDB-DNZ").withTimeout(5),
+            Commands.sequence(
+                superStruc.stopPivot().withTimeout(1), superStruc.weirdMasterCommand())),
+        Commands.deadline(
+            drive.driveToNoBumpDSReturn().withTimeout(2), superStruc.weirdMasterCommand()),
+        Commands.deadline(
+            drive.followPPPathCommand("DNZ-DB").withTimeout(4), superStruc.weirdMasterCommand()),
+        score());
+  }
+
   public Command depotDepot() {
     return Commands.sequence(
         Commands.parallel(superStruc.deployPivot()).withTimeout(2),
