@@ -14,12 +14,17 @@ import static edu.wpi.first.units.Units.Second;
 import static frc.robot.Constants.HoodConstants.*;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.ExternalFeedbackConfigs;
+import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXSConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFXS;
+import com.ctre.phoenix6.signals.ExternalFeedbackSensorSourceValue;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorArrangementValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -37,21 +42,17 @@ import org.littletonrobotics.junction.Logger;
  * and supports a side-specific zero offset.
  */
 public class Hood extends SubsystemBase {
-  private final TalonFXS motor;
+  private TalonFXS hoodMotor;
+  private CANcoder hoodEncoder;
   private final MotionMagicVoltage hoodRequest = new MotionMagicVoltage(0);
-  private final String logPrefix;
-  private final double encoderOffsetRotations;
-  private double lastSetpointRad = 0;
   private final TurretSim simTurret;
 
-  public Hood(int motorID, RobotSide side, TurretSim simTurret) {
-    this.logPrefix = "Hood/" + (side == RobotSide.LEFT ? "Left" : "Right");
-    this.encoderOffsetRotations =
-        side == RobotSide.LEFT ? kLeftEncoderOffsetRotations : kRightEncoderOffsetRotations;
+  public Hood(int motorID, int encoderID, RobotSide side, TurretSim simTurret) {
 
     this.simTurret = simTurret;
 
-    motor = new TalonFXS(motorID);
+    hoodMotor = new TalonFXS(motorID);
+    hoodEncoder = new CANcoder(encoderID);
 
     TalonFXSConfiguration cfg =
         new TalonFXSConfiguration()
@@ -59,9 +60,15 @@ public class Hood extends SubsystemBase {
                 new MotorOutputConfigs()
                     .withInverted(InvertedValue.CounterClockwise_Positive)
                     .withNeutralMode(NeutralModeValue.Brake))
+            .withExternalFeedback(
+                new ExternalFeedbackConfigs()
+                    .withRotorToSensorRatio(1)
+                    .withSensorToMechanismRatio(1)
+                    .withFeedbackRemoteSensorID(encoderID)
+                    .withExternalFeedbackSensorSource(ExternalFeedbackSensorSourceValue.RemoteCANcoder))
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
-                    .withStatorCurrentLimit(Amps.of(80))
+                    .withStatorCurrentLimit(Amps.of(40))
                     .withStatorCurrentLimitEnable(true))
             .withMotionMagic(
                 new MotionMagicConfigs()
@@ -70,26 +77,19 @@ public class Hood extends SubsystemBase {
                     .withMotionMagicJerk(RotationsPerSecondPerSecond.per(Second).of(100)))
             .withSlot0(
                 new Slot0Configs()
-                    .withKP(TurretConstants.kP)
-                    .withKI(TurretConstants.kI)
-                    .withKD(TurretConstants.kD)
-                    .withKS(TurretConstants.kS)
-                    .withKV(TurretConstants.kV)
-                    .withKA(TurretConstants.kA)
-                    .withKG(TurretConstants.kG));
+                    .withKP(HoodConstants.kP)
+                    .withKI(HoodConstants.kI)
+                    .withKD(HoodConstants.kD)
+                    .withKS(HoodConstants.kS)
+                    .withKV(HoodConstants.kV)
+                    .withKA(HoodConstants.kA)
+                    .withKG(HoodConstants.kG));
 
     cfg.Commutation.MotorArrangement = MotorArrangementValue.Minion_JST;
 
-    motor.getConfigurator().apply(cfg);
+    hoodMotor.getConfigurator().apply(cfg);
 
-    motor.getConfigurator().setPosition(HoodConstants.kInitialHoodPosition);
-  }
-
-  public Command resetEncoderCount() {
-    return Commands.run(
-        () -> {
-          motor.getConfigurator().setPosition(encoderOffsetRotations);
-        });
+    hoodMotor.getConfigurator().setPosition(HoodConstants.kInitialHoodPosition);
   }
 
   /**
@@ -97,12 +97,8 @@ public class Hood extends SubsystemBase {
    * [kHoodMinAngleRad, kHoodMaxAngleRad].
    */
   public void setAngleRad(double angleRad) {
-    double clamped = Math.max(kHoodMinAngleRad, Math.min(kHoodMaxAngleRad, angleRad));
-    lastSetpointRad = clamped;
-    double setpointRotations =
-        (clamped - kHoodReferenceAngleRad) / kEncoderToHoodRadiansPerRotation
-            + encoderOffsetRotations;
-    motor.setControl(hoodRequest.withPosition(setpointRotations));
+    double setpointRotations = angleRad / (2 * Math.PI);
+    hoodMotor.setControl(hoodRequest.withPosition(setpointRotations));
   }
 
   /** Sets the hood angle setpoint in degrees. */
@@ -112,14 +108,7 @@ public class Hood extends SubsystemBase {
 
   /** Returns the current hood angle in radians (0 = up, π/2 = horizontal, π = down). */
   public double getAngleRad() {
-    double positionRotations = motor.getPosition().getValueAsDouble();
-    return (positionRotations - encoderOffsetRotations) * kEncoderToHoodRadiansPerRotation
-        + kHoodReferenceAngleRad;
-  }
-
-  /** Returns true if current angle is within tolerance of the last setpoint. */
-  public boolean atSetpoint(double toleranceRad) {
-    return Math.abs(getAngleRad() - lastSetpointRad) < toleranceRad;
+    return hoodMotor.getPosition().getValueAsDouble() * 2 * Math.PI;
   }
 
   public Command toAngleRad(double angleRad) {
@@ -143,38 +132,19 @@ public class Hood extends SubsystemBase {
         });
   }
 
-  /** Holds current position. */
+  /** Cuts power */
   public Command stopHood() {
-    return run(() -> setAngleRad(getAngleRad()));
-  }
-
-  /**
-   * Logs the current raw encoder position (motor rotations) for offset calibration. Place this hood
-   * at straight up (0° in hood convention), run this command once, then set {@code
-   * HoodConstants.kLeftEncoderOffsetRotations} or {@code kRightEncoderOffsetRotations} to the
-   * logged value {@code Hood/Left/CalibrationEncoderPosition} or {@code Hood/Right/...}.
-   */
-  public Command logEncoderPositionForOffsetCalibration() {
-    return runOnce(
-            () -> {
-              double pos = motor.getPosition().getValueAsDouble();
-              Logger.recordOutput(logPrefix + "/CalibrationEncoderPosition", pos);
-            })
-        .withName("HoodCalibrateOffset");
+    return run(() -> hoodMotor.set(0));
   }
 
   @Override
   public void periodic() {
     double angleRad = getAngleRad();
-    double rawEncoderRotations = motor.getPosition().getValueAsDouble();
-    Logger.recordOutput(logPrefix + "/AngleRad", angleRad);
-    Logger.recordOutput(logPrefix + "/AngleDeg", Math.toDegrees(angleRad));
-    Logger.recordOutput(logPrefix + "/SetpointRad", lastSetpointRad);
-    Logger.recordOutput(logPrefix + "/EncoderRotations", rawEncoderRotations);
-    Logger.recordOutput(logPrefix + "/CurrentAmps", motor.getStatorCurrent().getValueAsDouble());
-    Logger.recordOutput(
-        logPrefix + "/Voltage",
-        motor.getMotorVoltage().getValueAsDouble() * motor.getSupplyVoltage().getValueAsDouble());
-    // Hood only moves when a command runs (e.g. trackHub() via L2)
+    double rawEncoderRotations = hoodMotor.getPosition().getValueAsDouble();
+    Logger.recordOutput("Hood/AngleRad", angleRad);
+    Logger.recordOutput("Hood/AngleDeg", Math.toDegrees(angleRad));
+    Logger.recordOutput("Hood/EncoderRotations", rawEncoderRotations);
+    Logger.recordOutput("Hood/StatorCurrentAmps", hoodMotor.getStatorCurrent().getValueAsDouble());
+    Logger.recordOutput("Hood/Voltage", hoodMotor.getMotorVoltage().getValueAsDouble());
   }
 }
