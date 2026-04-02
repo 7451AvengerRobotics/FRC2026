@@ -80,6 +80,7 @@ public final class Constants {
   }
 
   public static final class HoodConstants {
+    public static final double kInitialHoodPosition = 0.0;
     public static final int kLeftHoodMotorID = 28;
     public static final int kRightHoodMotorID = 29;
     /**
@@ -127,18 +128,19 @@ public final class Constants {
   public static final class TurretConstants {
     public static final int kLeftTurretID = 20;
     public static final int kRightTurretID = 21;
-    public static final double kInitialTurretPosition = 2.5;
+    public static final double kInitialLeftTurretPosition = 2.5;
+    public static final double kInitialRightTurretPosition = 2.5;
     public static final double kTurretGearRatio = 1.0;
     public static final double kP = 5;
     public static final double kI = 0;
-    public static final double kD = 0.0;
-    public static final double kS = 0;
-    public static final double kV = 0;
+    public static final double kD = 0.2;
+    public static final double kS = 0.9;
+    public static final double kV = 0.9;
     public static final double kA = 0.0;
-    public static final double kG = 0;
+    public static final double kG = 0.4;
     public static final double latency = 0.02;
   }
-
+  // HI SRIRAMMMMM ;p
   public static final class TargetConstants {
     public static final Translation2d hub =
         new Translation2d(Robot.IsRedAlliance.getAsBoolean() ? 11.915 : 16.54 - 11.915, 4.035);
