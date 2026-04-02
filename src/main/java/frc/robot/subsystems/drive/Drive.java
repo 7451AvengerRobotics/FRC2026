@@ -455,7 +455,16 @@ public class Drive extends SubsystemBase {
     return Commands.defer(
         () -> {
           return driveToPose(
-              new Pose2d(applyX(8.319), applyY(4.445), apply(new Rotation2d(-3 * Math.PI / 4))));
+              new Pose2d(applyX(7.845), applyY(4.445), apply(new Rotation2d(-3 * Math.PI / 4))));
+        },
+        Set.of(this));
+  }
+
+  public Command driveToNoBumpDSReturn() {
+    return Commands.defer(
+        () -> {
+          return driveToPose(
+              new Pose2d(applyX(7.845), applyY(4.445), apply(new Rotation2d(-3 * Math.PI / 4))));
         },
         Set.of(this));
   }
