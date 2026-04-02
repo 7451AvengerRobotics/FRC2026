@@ -75,6 +75,6 @@ public class Intake extends SubsystemBase {
     intakeTable.getEntry("Stall").setBoolean(propIntake());
     intakeTable.getEntry("Velocity").setDouble(velocity);
     intakeTable.getEntry("Current").setDouble(current);
-    Logger.recordOutput("Battery Voltage", 1 / (10 - RobotController.getBatteryVoltage()) + 1);
+    Logger.recordOutput("Battery Voltage", RobotController.getBatteryVoltage());
   }
 }
