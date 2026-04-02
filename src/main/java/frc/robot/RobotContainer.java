@@ -247,7 +247,11 @@ public class RobotContainer {
         .L1()
         .onTrue(
             Commands.parallel(
-                simTurretLeft.shootBallCommand(), drive.alignToHub().withTimeout(1.5)));
+                simTurretLeft.shootBallCommand(), simTurretRight.shootBallCommand()
+                // drive.alignToHub().withTimeout(1.5)
+                ));
+
+    controller.R1().toggleOnTrue(superStructure.trackTurrets());
 
     // controller
     //     .square()
@@ -281,11 +285,11 @@ public class RobotContainer {
     // manip.povLeft().onTrue(superStructure.offsetTurrets(-5 * Math.PI / 180));
     // manip.povRight().onTrue(superStructure.offsetTurrets(5 * Math.PI / 180));
 
-    manip
-        .L1()
-        .whileTrue(Commands.parallel(superStructure.jiggle(), superStructure.stopIntake()))
-        .onFalse(Commands.parallel(superStructure.stopJiggle()));
-    manip.R1().onTrue(superStructure.stopPivot());
+    // manip
+    //    .L1()
+    //    .whileTrue(Commands.parallel(superStructure.jiggle(), superStructure.stopIntake()))
+    //    .onFalse(Commands.parallel(superStructure.stopJiggle()));
+    // manip.R1().onTrue(superStructure.stopPivot());
     manip
         .povUp()
         .onTrue(superStructure.increaseSpeed())
@@ -306,6 +310,9 @@ public class RobotContainer {
     manip.circle().onTrue(drive.alignToHub(5));
 
     manip.cross().onTrue(superStructure.stopMasterCommand());
+    // controller.L1().onTrue(rightTurret.disableTurret());
+    manip.L1().onTrue(superStructure.jiggle()).onFalse(superStructure.stopJiggle());
+
     // manip.triangle().whileTrue(superStructure.reverseIntake());
 
     // manip.R1().onTrue(superStructure.deployPivot());
@@ -368,6 +375,7 @@ public class RobotContainer {
     autoChooser.addOption("SourceDepot", autos.sourceDepot());
     autoChooser.addOption("SourceSource", autos.sourceSource());
     autoChooser.addOption("Single Auto", autos.singleAuto());
+    autoChooser.addOption("No Bump DepotDepot", autos.noBumpDepotDepot());
   }
 
   /**
