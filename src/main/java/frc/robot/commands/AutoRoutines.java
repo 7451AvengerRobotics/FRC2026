@@ -64,6 +64,28 @@ public class AutoRoutines {
         score());
   }
 
+  public Command DDT() {
+    return Commands.sequence(
+        Commands.parallel(superStruc.deployPivot()).withTimeout(2),
+        Commands.deadline(
+            drive.followPPPathCommand("DT-DNZ").withTimeout(5),
+            Commands.sequence(
+                superStruc.stopPivot().withTimeout(1), superStruc.weirdMasterCommand())),
+        // Commands.deadline(drive.driveToDepotReturn().withTimeout(2),
+        // superStruc.weirdMasterCommand()),
+        Commands.deadline(
+            drive.followPPPathCommand("DNZ-DT").withTimeout(4), superStruc.weirdMasterCommand()),
+        score());
+  }
+
+  public Command DDTX2() {
+    return Commands.sequence(
+        DDT().withTimeout(10),
+        Commands.deadline(
+            drive.followPPPathCommand("DT-DNZ-2").withTimeout(12), superStruc.weirdMasterCommand()),
+        score());
+  }
+
   public Command depotDepot() {
     return Commands.sequence(
         Commands.parallel(superStruc.deployPivot()).withTimeout(2),
@@ -71,7 +93,8 @@ public class AutoRoutines {
             drive.followPPPathCommand("DB-DNZ").withTimeout(5),
             Commands.sequence(
                 superStruc.stopPivot().withTimeout(1), superStruc.weirdMasterCommand())),
-        Commands.deadline(drive.driveToDSReturn().withTimeout(2), superStruc.weirdMasterCommand()),
+        Commands.deadline(
+            drive.driveToDepotReturn().withTimeout(2), superStruc.weirdMasterCommand()),
         Commands.deadline(
             drive.followPPPathCommand("DNZ-DB").withTimeout(4), superStruc.weirdMasterCommand()),
         score());
@@ -84,7 +107,7 @@ public class AutoRoutines {
             drive.followPPPathCommand("DB-DNZ"),
             Commands.sequence(
                 superStruc.deployPivot().withTimeout(1), superStruc.weirdMasterCommand())),
-        Commands.deadline(drive.driveToDSReturn(), superStruc.weirdMasterCommand()),
+        Commands.deadline(drive.driveToDepotReturn(), superStruc.weirdMasterCommand()),
         Commands.deadline(drive.followPPPathCommand("DNZ-SB"), superStruc.weirdMasterCommand()),
         score());
   }

@@ -62,6 +62,10 @@
   ],
   "rotationTargets": [
     {
+      "waypointRelativePos": 1.0,
+      "rotationDegrees": 180.0
+    },
+    {
       "waypointRelativePos": 1.8048128342245982,
       "rotationDegrees": -90.0
     }
@@ -99,7 +103,7 @@
   "folder": "DepotSide",
   "idealStartingState": {
     "velocity": 0.0,
-    "rotation": 0.0
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }

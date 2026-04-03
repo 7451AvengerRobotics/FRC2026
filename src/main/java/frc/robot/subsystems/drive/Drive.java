@@ -451,7 +451,7 @@ public class Drive extends SubsystemBase {
         Set.of(this));
   }
 
-  public Command driveToDSReturn() {
+  public Command driveToDepotReturn() {
     return Commands.defer(
         () -> {
           return driveToPose(
