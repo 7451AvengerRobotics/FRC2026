@@ -177,8 +177,18 @@ public class RobotContainer {
             new Transform3d(-0.17, -0.15, 0.39, new Rotation3d()),
             simTurretRight);
 
-    leftHood = new Hood(HoodConstants.kLeftHoodMotorID, HoodConstants.kLeftHoodEncoderID, RobotSide.LEFT, simTurretLeft);
-    rightHood = new Hood(HoodConstants.kRightHoodMotorID, HoodConstants.kRightHoodEncoderID, RobotSide.RIGHT, simTurretRight);
+    leftHood =
+        new Hood(
+            HoodConstants.kLeftHoodMotorID,
+            HoodConstants.kLeftHoodEncoderID,
+            RobotSide.LEFT,
+            simTurretLeft);
+    rightHood =
+        new Hood(
+            HoodConstants.kRightHoodMotorID,
+            HoodConstants.kRightHoodEncoderID,
+            RobotSide.RIGHT,
+            simTurretRight);
     superStructure =
         new SuperStructure(
             index,
@@ -369,6 +379,8 @@ public class RobotContainer {
     autoChooser.addOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
     autoChooser.addOption("DepotDepot", autos.depotDepot());
+    autoChooser.addOption("DDT", autos.DDT());
+    autoChooser.addOption("DDTX2", autos.DDTX2());
     autoChooser.addOption("DepotSource", autos.depotSource());
     autoChooser.addOption("SourceDepot", autos.sourceDepot());
     autoChooser.addOption("SourceSource", autos.sourceSource());

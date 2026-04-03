@@ -57,10 +57,11 @@ public class Hood extends SubsystemBase {
                     .withNeutralMode(NeutralModeValue.Brake))
             .withExternalFeedback(
                 new ExternalFeedbackConfigs()
-                    .withRotorToSensorRatio(1)
-                    .withSensorToMechanismRatio(1)
+                    .withRotorToSensorRatio(6.125)
+                    .withSensorToMechanismRatio(435 / 26)
                     .withFeedbackRemoteSensorID(encoderID)
-                    .withExternalFeedbackSensorSource(ExternalFeedbackSensorSourceValue.RemoteCANcoder))
+                    .withExternalFeedbackSensorSource(
+                        ExternalFeedbackSensorSourceValue.RemoteCANcoder))
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
                     .withStatorCurrentLimit(Amps.of(40))

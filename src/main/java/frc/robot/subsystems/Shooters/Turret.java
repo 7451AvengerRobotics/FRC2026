@@ -10,7 +10,6 @@ import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXSConfiguration;
-import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFXS;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -82,19 +81,17 @@ public class Turret extends SubsystemBase {
 
     turretMotor.getConfigurator().apply(cfg);
 
-    turretMotor
-        .getConfigurator()
-        .setPosition(getInitialPosition());
+    turretMotor.getConfigurator().setPosition(getInitialPosition());
   }
 
   public double getInitialPosition() {
-    return robotSide == RobotSide.LEFT ? 
-        TurretConstants.kInitialLeftTurretPosition : 
-        TurretConstants.kInitialRightTurretPosition;
+    return robotSide == RobotSide.LEFT
+        ? TurretConstants.kInitialLeftTurretPosition
+        : TurretConstants.kInitialRightTurretPosition;
   }
 
   public void runAngle(double rotations) {
-    turretMotor.setControl(turretRequest.withPosition(angleToEncoder(rotations)));
+    turretMotor.setControl(turretRequest.withPosition(angleToEncoder(mod(rotations))));
   }
 
   public Command runCommand(double rotations) {
@@ -118,11 +115,10 @@ public class Turret extends SubsystemBase {
         "Turret Encoder Counts" + (robotSide == RobotSide.LEFT ? " Left" : " Right"),
         turretMotor.getPosition().getValueAsDouble());
 
-    targetYaw =
-        shotCalc.getRobotRelativeYaw(drive.getPose(), (TargetConstants.hub.getX()));
+    targetYaw = shotCalc.getRobotRelativeYaw(drive.getPose(), (TargetConstants.hub.getX()));
 
     Logger.recordOutput(
-        "Suggested Encoder Count" + (robotSide == RobotSide.LEFT ? " Left" : " Right"), 
+        "Suggested Encoder Count" + (robotSide == RobotSide.LEFT ? " Left" : " Right"),
         angleToEncoder(mod(targetYaw)));
   }
 
@@ -136,12 +132,24 @@ public class Turret extends SubsystemBase {
   }
 
   public double angleToEncoder(double angle) {
-    double minEncoderCount = -5;
-    double maxEncoderCount = 5;
-    double encoderRange = maxEncoderCount - minEncoderCount;
-    double angleRange = 2 * Math.PI;
+    if (this.robotSide == RobotSide.LEFT) {
+      if (angle < Math.PI / 2) {
+        angle += 2 * Math.PI;
+      }
+    }
+    if (this.robotSide == RobotSide.RIGHT) {
+      if (angle > 3 * Math.PI / 2) {
+        angle -= 2 * Math.PI;
+      }
+    }
 
-    return ((angle * encoderRange) / angleRange) + minEncoderCount;
+    return (angle - Math.PI / 2) / 36;
+    // double minEncoderCount = -5;
+    // double maxEncoderCount = 5;
+    // double encoderRange = maxEncoderCount - minEncoderCount;
+    // double angleRange = 2 * Math.PI;
+
+    // return ((angle * encoderRange) / angleRange) + minEncoderCount;
   }
 
   // public Command setTurretPos(double angle) {
@@ -162,9 +170,7 @@ public class Turret extends SubsystemBase {
   public Command resetTurret() {
     return runOnce(
         () -> {
-          turretMotor
-              .getConfigurator()
-              .setPosition(getInitialPosition());
+          turretMotor.getConfigurator().setPosition(getInitialPosition());
         });
   }
 
