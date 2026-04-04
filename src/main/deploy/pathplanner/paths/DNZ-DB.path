@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.609524375619773,
-        "y": 6.152029509533297
+        "x": 7.008509026095797,
+        "y": 5.773572080855733
       },
       "isLocked": false,
       "linkedName": null
@@ -20,12 +20,12 @@
         "y": 5.5
       },
       "prevControl": {
-        "x": 5.955000997928307,
-        "y": 5.5
+        "x": 5.749998192385977,
+        "y": 5.499049314066614
       },
       "nextControl": {
-        "x": 4.58217336035317,
-        "y": 5.5
+        "x": 4.988150683429955,
+        "y": 5.501946445854798
       },
       "isLocked": false,
       "linkedName": null
@@ -36,8 +36,8 @@
         "y": 5.5
       },
       "prevControl": {
-        "x": 2.965234250952768,
-        "y": 5.5
+        "x": 2.767316576379267,
+        "y": 5.538100941920025
       },
       "nextControl": null,
       "isLocked": false,
@@ -59,7 +59,7 @@
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
-    "unlimited": false
+    "unlimited": true
   },
   "goalEndState": {
     "velocity": 0,

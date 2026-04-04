@@ -469,6 +469,14 @@ public class Drive extends SubsystemBase {
         Set.of(this));
   }
 
+  public Command driveToSecondPassStart() {
+    return Commands.defer(
+        () -> {
+          return driveToPose(new Pose2d(applyX(2.8), applyY(7.4), apply(new Rotation2d())));
+        },
+        Set.of(this));
+  }
+
   public Command driveToSSReturn() {
     return Commands.defer(
         () -> {

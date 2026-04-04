@@ -50,37 +50,44 @@ public class AutoRoutines {
     return Robot.IsRedAlliance.getAsBoolean();
   }
 
-  public Command noBumpDepotDepot() {
+  public Command DDBQ1() {
     return Commands.sequence(
-        Commands.parallel(superStruc.deployPivot()).withTimeout(2),
         Commands.deadline(
-            drive.followPPPathCommand("NoBumpDB-DNZ").withTimeout(5),
+            drive.followPPPathCommand("DT-DNZ-Q1").withTimeout(5),
             Commands.sequence(
-                superStruc.stopPivot().withTimeout(1), superStruc.weirdMasterCommand())),
-        Commands.deadline(
-            drive.driveToNoBumpDSReturn().withTimeout(2), superStruc.weirdMasterCommand()),
-        Commands.deadline(
-            drive.followPPPathCommand("DNZ-DB").withTimeout(4), superStruc.weirdMasterCommand()),
+                superStruc.deployPivot().withTimeout(1),
+                superStruc.stopPivot().withTimeout(0.1),
+                superStruc.weirdMasterCommand())),
+        drive.driveToDepotReturn().withTimeout(1),
+        drive.followPPPathCommand("DNZ-DB").withTimeout(3),
         score());
   }
 
-  public Command DDT() {
+  public Command DDBX2Q1() {
     return Commands.sequence(
-        Commands.parallel(superStruc.deployPivot()).withTimeout(2),
+        DDBQ1().withTimeout(9),
+        drive.driveToSecondPassStart().withTimeout(1),
         Commands.deadline(
-            drive.followPPPathCommand("DT-DNZ").withTimeout(5),
-            Commands.sequence(
-                superStruc.stopPivot().withTimeout(1), superStruc.weirdMasterCommand())),
-        // Commands.deadline(drive.driveToDepotReturn().withTimeout(2),
-        // superStruc.weirdMasterCommand()),
-        Commands.deadline(
-            drive.followPPPathCommand("DNZ-DT").withTimeout(4), superStruc.weirdMasterCommand()),
+            drive.followPPPathCommand("DT-DNZ-2").withTimeout(12), superStruc.weirdMasterCommand()),
         score());
   }
 
-  public Command DDTX2() {
+  public Command DDBQ2() {
     return Commands.sequence(
-        DDT().withTimeout(10),
+        Commands.deadline(
+            drive.followPPPathCommand("DT-DNZ-Q2").withTimeout(5),
+            Commands.sequence(
+                superStruc.deployPivot().withTimeout(1),
+                superStruc.stopPivot().withTimeout(0.1),
+                superStruc.weirdMasterCommand())),
+        drive.driveToDepotReturn().withTimeout(1),
+        drive.followPPPathCommand("DNZ-DB").withTimeout(3),
+        score());
+  }
+
+  public Command DDBX2Q2() {
+    return Commands.sequence(
+        DDBQ2().withTimeout(10),
         Commands.deadline(
             drive.followPPPathCommand("DT-DNZ-2").withTimeout(12), superStruc.weirdMasterCommand()),
         score());
@@ -137,11 +144,17 @@ public class AutoRoutines {
         score());
   }
 
-  public Command score() {
+  public Command scoreWithDriveAlign() {
     return Commands.sequence(
         drive.alignToHub().withTimeout(2),
         Commands.run(() -> drive.runVelocity(new ChassisSpeeds(0, 0, 0))).withTimeout(0.5),
         Commands.parallel(superStruc.masterCommand()));
+  }
+
+  public Command score() {
+    return Commands.parallel(
+        Commands.run(() -> drive.runVelocity(new ChassisSpeeds(0, 0, 0))).withTimeout(0.5),
+        superStruc.masterCommand());
   }
 
   public Command singleAuto() {
