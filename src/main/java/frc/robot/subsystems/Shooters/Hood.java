@@ -12,12 +12,15 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Second;
 
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.ExternalFeedbackConfigs;
+import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXSConfiguration;
+import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFXS;
@@ -25,6 +28,7 @@ import com.ctre.phoenix6.signals.ExternalFeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorArrangementValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.HoodConstants;
@@ -37,14 +41,17 @@ import org.littletonrobotics.junction.Logger;
  * and supports a side-specific zero offset.
  */
 public class Hood extends SubsystemBase {
-  private TalonFXS hoodMotor;
-  private CANcoder hoodEncoder;
+  private final TalonFXS hoodMotor;
+  private final CANcoder hoodEncoder;
   private final MotionMagicVoltage hoodRequest = new MotionMagicVoltage(0);
   private final TurretSim simTurret;
+  private final RobotSide side;
+  private final DutyCycleOut motorDutyCycleOut = new DutyCycleOut(0);
 
   public Hood(int motorID, int encoderID, RobotSide side, TurretSim simTurret) {
 
     this.simTurret = simTurret;
+    this.side = side;
 
     hoodMotor = new TalonFXS(motorID);
     hoodEncoder = new CANcoder(encoderID);
@@ -68,7 +75,7 @@ public class Hood extends SubsystemBase {
                     .withStatorCurrentLimitEnable(true))
             .withMotionMagic(
                 new MotionMagicConfigs()
-                    .withMotionMagicCruiseVelocity(RotationsPerSecond.of(5))
+                    .withMotionMagicCruiseVelocity(RotationsPerSecond.of(100))
                     .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(75))
                     .withMotionMagicJerk(RotationsPerSecondPerSecond.per(Second).of(100)))
             .withSlot0(
@@ -81,8 +88,17 @@ public class Hood extends SubsystemBase {
                     .withKA(HoodConstants.kA)
                     .withKG(HoodConstants.kG));
 
+    CANcoderConfiguration encCfg =
+        new CANcoderConfiguration()
+            .withMagnetSensor(
+                new MagnetSensorConfigs()
+                    .withSensorDirection(SensorDirectionValue.Clockwise_Positive));
+
     cfg.Commutation.MotorArrangement = MotorArrangementValue.Minion_JST;
 
+    hoodEncoder.setPosition(0);
+
+    hoodEncoder.getConfigurator().apply(encCfg);
     hoodMotor.getConfigurator().apply(cfg);
 
     hoodMotor.getConfigurator().setPosition(HoodConstants.kInitialHoodPosition);
@@ -104,7 +120,7 @@ public class Hood extends SubsystemBase {
 
   /** Returns the current hood angle in radians (0 = up, π/2 = horizontal, π = down). */
   public double getAngleRad() {
-    return hoodMotor.getPosition().getValueAsDouble() * 2 * Math.PI;
+    return hoodMotor.getPosition().getValueAsDouble() / 360 * 2 * Math.PI;
   }
 
   public Command toAngleRad(double angleRad) {
@@ -113,6 +129,13 @@ public class Hood extends SubsystemBase {
 
   public Command toAngleDegrees(double angleDeg) {
     return run(() -> setAngleDegrees(angleDeg));
+  }
+
+  public Command move() {
+    return run(
+        () -> {
+          hoodMotor.setControl(motorDutyCycleOut.withOutput(0.05));
+        });
   }
 
   /**
@@ -137,10 +160,11 @@ public class Hood extends SubsystemBase {
   public void periodic() {
     double angleRad = getAngleRad();
     double rawEncoderRotations = hoodMotor.getPosition().getValueAsDouble();
-    Logger.recordOutput("Hood/AngleRad", angleRad);
-    Logger.recordOutput("Hood/AngleDeg", Math.toDegrees(angleRad));
-    Logger.recordOutput("Hood/EncoderRotations", rawEncoderRotations);
-    Logger.recordOutput("Hood/StatorCurrentAmps", hoodMotor.getStatorCurrent().getValueAsDouble());
-    Logger.recordOutput("Hood/Voltage", hoodMotor.getMotorVoltage().getValueAsDouble());
+    Logger.recordOutput("Hood/AngleRad" + side, angleRad);
+    Logger.recordOutput("Hood/AngleDeg" + side, Math.toDegrees(angleRad));
+    Logger.recordOutput("Hood/EncoderRotations" + side, rawEncoderRotations);
+    Logger.recordOutput(
+        "Hood/StatorCurrentAmps" + side, hoodMotor.getStatorCurrent().getValueAsDouble());
+    Logger.recordOutput("Hood/Voltage" + side, hoodMotor.getMotorVoltage().getValueAsDouble());
   }
 }
