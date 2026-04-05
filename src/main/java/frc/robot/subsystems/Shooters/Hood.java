@@ -64,14 +64,14 @@ public class Hood extends SubsystemBase {
                     .withNeutralMode(NeutralModeValue.Brake))
             .withExternalFeedback(
                 new ExternalFeedbackConfigs()
-                    .withRotorToSensorRatio(6.125)
-                    .withSensorToMechanismRatio(435 / 26)
+                    // .withRotorToSensorRatio(1)
+                    // .withSensorToMechanismRatio(102.47596154)
                     .withFeedbackRemoteSensorID(encoderID)
                     .withExternalFeedbackSensorSource(
                         ExternalFeedbackSensorSourceValue.RemoteCANcoder))
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
-                    .withStatorCurrentLimit(Amps.of(40))
+                    .withStatorCurrentLimit(Amps.of(60))
                     .withStatorCurrentLimitEnable(true))
             .withMotionMagic(
                 new MotionMagicConfigs()
@@ -109,7 +109,9 @@ public class Hood extends SubsystemBase {
    * [kHoodMinAngleRad, kHoodMaxAngleRad].
    */
   public void setAngleRad(double angleRad) {
-    double setpointRotations = angleRad / (2 * Math.PI);
+    double setpointRotations = angleRad / (2 * Math.PI) * 16.73076923;
+
+    // Clamping values
     hoodMotor.setControl(hoodRequest.withPosition(setpointRotations));
   }
 
@@ -120,21 +122,35 @@ public class Hood extends SubsystemBase {
 
   /** Returns the current hood angle in radians (0 = up, π/2 = horizontal, π = down). */
   public double getAngleRad() {
-    return hoodMotor.getPosition().getValueAsDouble() / 360 * 2 * Math.PI;
+    return hoodMotor.getPosition().getValueAsDouble() * 2 * Math.PI / 16.73076923;
   }
 
   public Command toAngleRad(double angleRad) {
-    return run(() -> setAngleRad(angleRad));
+    return runOnce(() -> setAngleRad(angleRad));
   }
 
   public Command toAngleDegrees(double angleDeg) {
-    return run(() -> setAngleDegrees(angleDeg));
+    return runOnce(() -> setAngleDegrees(angleDeg));
   }
 
-  public Command move() {
+  public Command moveUp() {
     return run(
         () -> {
-          hoodMotor.setControl(motorDutyCycleOut.withOutput(0.05));
+          hoodMotor.setControl(motorDutyCycleOut.withOutput(0.04));
+        });
+  }
+
+  public Command moveDown() {
+    return run(
+        () -> {
+          hoodMotor.setControl(motorDutyCycleOut.withOutput(-0.035));
+        });
+  }
+
+  public Command stop() {
+    return run(
+        () -> {
+          hoodMotor.setControl(motorDutyCycleOut.withOutput(0.0));
         });
   }
 
