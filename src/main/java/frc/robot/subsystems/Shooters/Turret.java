@@ -56,7 +56,7 @@ public class Turret extends SubsystemBase {
         new TalonFXSConfiguration()
             .withMotorOutput(
                 new MotorOutputConfigs()
-                    .withInverted(InvertedValue.CounterClockwise_Positive)
+                    .withInverted(InvertedValue.Clockwise_Positive)
                     .withNeutralMode(NeutralModeValue.Brake))
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
@@ -143,7 +143,7 @@ public class Turret extends SubsystemBase {
       }
     }
 
-    return (angle - Math.PI / 2) / 36;
+    return (angle - Math.PI / 2) / (Math.PI / 5);
     // double minEncoderCount = -5;
     // double maxEncoderCount = 5;
     // double encoderRange = maxEncoderCount - minEncoderCount;
