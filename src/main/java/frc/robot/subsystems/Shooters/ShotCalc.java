@@ -6,6 +6,7 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.Constants;
+import frc.robot.Constants.HoodConstants;
 
 public class ShotCalc {
   double g = 9.81;
@@ -32,9 +33,10 @@ public class ShotCalc {
   }
 
   public double newGetPitch(double xf) {
-    double voy = Math.sqrt(2 * g * H);
-    double vx = g * xf / (voy + Math.sqrt(Math.pow(voy, 2) - 2 * g * yf));
-    return Math.atan(voy / vx);
+    // double voy = Math.sqrt(2 * g * H);
+    // double vx = g * xf / (voy + Math.sqrt(Math.pow(voy, 2) - 2 * g * yf));
+    // return Math.atan(voy / vx);
+    return HoodConstants.angleLerp.get(xf);
   }
 
   public double getVelocity8(ChassisSpeeds vr, double xf) {
@@ -44,13 +46,14 @@ public class ShotCalc {
   }
 
   public double getPitch(double v, double xf) {
-    double A = -g * Math.pow(xf, 2) / (2 * Math.pow(v, 2));
-    double B = xf;
-    double C = A - yf;
+    // double A = -g * Math.pow(xf, 2) / (2 * Math.pow(v, 2));
+    // double B = xf;
+    // double C = A - yf;
 
-    double theta = Math.atan((-B - Math.sqrt(Math.pow(B, 2) - 4 * A * C)) / (2 * A));
+    // double theta = Math.atan((-B - Math.sqrt(Math.pow(B, 2) - 4 * A * C)) / (2 * A));
 
-    return theta;
+    // return theta;
+    return HoodConstants.angleLerp.get(xf);
   }
 
   public double getYaw(Pose2d robotPose, double hubX) {
