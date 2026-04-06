@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.845,
-        "y": 3.55
+        "x": 7.653,
+        "y": 3.535
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.609526760225877,
-        "y": 1.8429701615246938
+        "x": 8.489486396721007,
+        "y": 2.2064250372849723
       },
       "isLocked": false,
       "linkedName": null
@@ -20,28 +20,12 @@
         "y": 2.5
       },
       "prevControl": {
-        "x": 5.955000997928307,
-        "y": 2.5
+        "x": 5.749998192385977,
+        "y": 2.499049314066614
       },
       "nextControl": {
-        "x": 4.58217336035317,
-        "y": 2.5
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 3.0,
-        "y": 2.5
-      },
-      "prevControl": {
-        "x": 3.4482926054425196,
-        "y": 2.5
-      },
-      "nextControl": {
-        "x": 2.5517073945574804,
-        "y": 2.5
+        "x": 4.988150683429955,
+        "y": 2.5019464458547978
       },
       "isLocked": false,
       "linkedName": null
@@ -49,11 +33,11 @@
     {
       "anchor": {
         "x": 2.0,
-        "y": 2.0
+        "y": 2.5
       },
       "prevControl": {
-        "x": 2.965234250952768,
-        "y": 2.0
+        "x": 2.767316576379267,
+        "y": 2.5381009419200247
       },
       "nextControl": null,
       "isLocked": false,
@@ -75,7 +59,7 @@
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
-    "unlimited": false
+    "unlimited": true
   },
   "goalEndState": {
     "velocity": 0,

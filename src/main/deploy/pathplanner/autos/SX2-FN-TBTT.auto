@@ -7,13 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "SB-SNZ"
+            "pathName": "ST-SNZ-F"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": null
+            "pathName": "SNZ-SB"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ST-SNZ-2"
           }
         }
       ]

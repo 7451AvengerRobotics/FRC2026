@@ -115,4 +115,13 @@ public final class Constants {
         new Translation2d(Robot.IsRedAlliance.getAsBoolean() ? 11.915 : 16.54 - 11.915, 4.035);
     public static final double yf = 1.32;
   }
+
+  public static enum AutoType {
+    NEARSOURCE,
+    FARSOURCE,
+    NEARDEPOT,
+    FARDEPOT,
+    NONE,
+    RUCKUS
+  }
 }

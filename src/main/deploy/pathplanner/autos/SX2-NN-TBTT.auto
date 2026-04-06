@@ -7,19 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "DT-DNZ-Q2"
+            "pathName": "ST-SNZ-N"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "DNZ-DB"
+            "pathName": "SNZ-SB"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "DT-DNZ-2"
+            "pathName": "ST-SNZ-2"
           }
         }
       ]
