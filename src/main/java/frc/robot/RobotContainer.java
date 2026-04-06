@@ -233,17 +233,16 @@ public class RobotContainer {
 
     // // Dropping the intake down
     // controller.L2().onTrue(superStructure.startIntake());
-
     // .toggleOnFalse(superStructure.stopIntake());
 
     controller.triangle().onTrue(superStructure.weirdMasterCommand());
     controller.circle().onTrue(superStructure.stopMasterCommand());
-    controller.cross().toggleOnTrue(superStructure.intakelessMasterCommand());
-    // controller.cross().whileTrue(leftHood.toAngleDegrees(15));
+    controller.cross().toggleOnTrue(superStructure.masterCommand());
+    // controller.cross().whileTrue(rightHood.toAngleDegrees(25));
 
     controller.square().onTrue(superStructure.deployPivot());
 
-    controller.povUp().toggleOnTrue(superStructure.startupMasterCommand());
+    // controller.povUp().toggleOnTrue(superStructure.startupMasterCommand());
 
     controller.touchpad().toggleOnTrue(superStructure.runShooters5000());
 
@@ -259,7 +258,9 @@ public class RobotContainer {
                 // drive.alignToHub().withTimeout(1.5)
                 ));
 
-    controller.R1().onTrue(rightTurret.followHub());
+    controller.povUp().onTrue(superStructure.runShooters5000());
+
+    controller.R1().onTrue(Commands.parallel(rightTurret.followHub(), leftTurret.followHub()));
 
     // controller
     //     .square()
@@ -306,17 +307,17 @@ public class RobotContainer {
     //     .povDown()
     //     .onTrue(superStructure.decreaseSpeed())
     //     .toggleOnTrue(superStructure.runShooters(0.9));
-    manip.povUp().whileTrue(rightHood.moveUp()).onFalse(rightHood.stop());
-    manip.povDown().whileTrue(rightHood.moveDown()).onFalse(rightHood.stop());
+    manip.povUp().whileTrue(superStructure.hoodsUp()).onFalse(superStructure.stopHoods());
+    manip.povDown().whileTrue(superStructure.hoodsDown()).onFalse(superStructure.stopHoods());
 
-    manip
-        .povLeft()
-        .onTrue(superStructure.increaseSpeed())
-        .toggleOnTrue(superStructure.runShooters(0.95));
-    manip
-        .povRight()
-        .onTrue(superStructure.decreaseSpeed())
-        .toggleOnTrue(superStructure.runShooters(1.05));
+    // manip
+    //     .povLeft()
+    //     .onTrue(superStructure.increaseSpeed())
+    //     .toggleOnTrue(superStructure.runShooters(0.95));
+    // manip
+    //     .povRight()
+    //     .onTrue(superStructure.decreaseSpeed())
+    //     .toggleOnTrue(superStructure.runShooters(1.05));
     manip.square().onTrue(drive.alignToHub(-5));
     manip.circle().onTrue(drive.alignToHub(5));
 
