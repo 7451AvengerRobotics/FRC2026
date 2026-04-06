@@ -83,15 +83,15 @@ public final class Constants {
 
   public static final class HoodConstants {
     public static final double kInitialHoodPosition = 0.0;
-    public static final int kLeftHoodMotorID = 28;
-    public static final int kRightHoodMotorID = 29;
+    public static final int kLeftHoodMotorID = 29;
+    public static final int kRightHoodMotorID = 28;
     public static final int kLeftHoodEncoderID = 0;
     public static final int kRightHoodEncoderID = 1;
-    public static final double kP = 3;
+    public static final double kP = 5;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
-    public static final double kS = 1.0;
-    public static final double kV = 0.0;
+    public static final double kS = 0.29;
+    public static final double kV = 0.5;
     public static final double kA = 0.0;
     public static final double kG = 0.0;
 
@@ -104,13 +104,13 @@ public final class Constants {
     public static final double kInitialLeftTurretPosition = 2.5;
     public static final double kInitialRightTurretPosition = 2.5;
     public static final double kTurretGearRatio = 1.0;
-    public static final double kP = 5;
+    public static final double kP = 4.5;
     public static final double kI = 0;
-    public static final double kD = 0.2;
-    public static final double kS = 0.9;
-    public static final double kV = 0.9;
+    public static final double kD = 0.35;
+    public static final double kS = 0.6;
+    public static final double kV = 1.0;
     public static final double kA = 0.0;
-    public static final double kG = 0.4;
+    public static final double kG = -0.6;
     public static final double latency = 0.02;
   }
   // HI SRIRAMMMMM ;p

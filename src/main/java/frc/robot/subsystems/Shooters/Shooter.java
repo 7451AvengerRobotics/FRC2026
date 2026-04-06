@@ -115,8 +115,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public void setVel(double rpm) {
-    closedLoopController.setSetpoint(
-        this.name == "left" ? -rpm : rpm, ControlType.kMAXMotionVelocityControl);
+    closedLoopController.setSetpoint(rpm, ControlType.kMAXMotionVelocityControl);
   }
 
   public Command setVelCommand(double rpm) {
@@ -185,7 +184,7 @@ public class Shooter extends SubsystemBase {
   public Command runShooter5000() {
     return run(
         () -> {
-          setVel(4000);
+          setVel(4500);
         });
   }
 
