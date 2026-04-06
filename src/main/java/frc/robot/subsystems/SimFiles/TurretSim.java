@@ -93,6 +93,7 @@ public class TurretSim extends SubsystemBase {
     Logger.recordOutput(
         "GamePieces/Fuel_" + name,
         activeFuel.stream().map(FuelSim::getPose).toArray(Pose3d[]::new));
+    Logger.recordOutput("Xf", xf);
 
     double v0 = shotCalc.newGetVelocity(xf);
     double pitch0 = shotCalc.newGetPitch(xf);
@@ -210,6 +211,17 @@ public class TurretSim extends SubsystemBase {
     double pitchf = shotCalc.newGetPitch(adjustedXf);
 
     return pitchf;
+  }
+
+  public double getMovingPitch() {
+    /**
+     * Procedure: 1. Get the required angle via lerp table with xf 2. Get the velocity that comes
+     * from that angle through regression 3. Get the time for this shot 4. Repeat the following
+     * steps 5 times - Get the adjustedXf with the time - Get the angle for that - Get the velocity
+     * for that - Get the time for that shot 5. Using the last time, get the last adjustedXf, and
+     * find angle 6. return angle
+     */
+    return 6.7;
   }
 
   public Command shootBallCommand() {

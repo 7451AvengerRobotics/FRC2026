@@ -4,9 +4,9 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.Constants;
-import frc.robot.Constants.HoodConstants;
 
 public class ShotCalc {
   double g = 9.81;
@@ -14,9 +14,11 @@ public class ShotCalc {
   double H = 2.5;
   public double pitch = Math.toRadians(60);
   Transform3d turretOffset = new Transform3d();
+  InterpolatingDoubleTreeMap angleLerp = new InterpolatingDoubleTreeMap();
 
   public ShotCalc(Transform3d turretOffset) {
     this.turretOffset = turretOffset;
+    angleLerp.put(0.0, 0.0);
   }
 
   public double getVelocity(double xf) {
@@ -36,7 +38,8 @@ public class ShotCalc {
     // double voy = Math.sqrt(2 * g * H);
     // double vx = g * xf / (voy + Math.sqrt(Math.pow(voy, 2) - 2 * g * yf));
     // return Math.atan(voy / vx);
-    return HoodConstants.angleLerp.get(xf);
+    // return HoodConstants.angleLerp.get(xf);
+    return 5;
   }
 
   public double getVelocity8(ChassisSpeeds vr, double xf) {
@@ -53,7 +56,8 @@ public class ShotCalc {
     // double theta = Math.atan((-B - Math.sqrt(Math.pow(B, 2) - 4 * A * C)) / (2 * A));
 
     // return theta;
-    return HoodConstants.angleLerp.get(xf);
+    // return HoodConstants.angleLerp.get(xf);
+    return 5;
   }
 
   public double getYaw(Pose2d robotPose, double hubX) {

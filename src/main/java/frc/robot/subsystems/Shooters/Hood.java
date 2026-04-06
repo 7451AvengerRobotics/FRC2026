@@ -136,7 +136,7 @@ public class Hood extends SubsystemBase {
   public Command moveUp() {
     return run(
         () -> {
-          hoodMotor.setControl(motorDutyCycleOut.withOutput(0.04));
+          hoodMotor.setControl(motorDutyCycleOut.withOutput(0.025));
         });
   }
 
@@ -162,7 +162,7 @@ public class Hood extends SubsystemBase {
   public Command trackHub() {
     return run(
         () -> {
-          double launchPitchRad = simTurret.getRequiredPitch();
+          double launchPitchRad = simTurret.getMovingPitch();
           setAngleRad(Math.PI / 2 - launchPitchRad);
         });
   }

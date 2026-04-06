@@ -137,6 +137,10 @@ public class SuperStructure {
     return Commands.parallel(leftShooter.runShooter5000(), rightShooter.runShooter5000());
   }
 
+  public Command runShooters3000() {
+    return Commands.parallel(leftShooter.runShooter3000(), rightShooter.runShooter3000());
+  }
+
   public Command stopShooters() {
     return Commands.parallel(leftShooter.stopShooter(), rightShooter.stopShooter());
   }
@@ -164,7 +168,8 @@ public class SuperStructure {
   public Command weirdMasterCommand() {
     return Commands.sequence(
         setPassing(false),
-        Commands.parallel(soleIntake(), index.runIndex(0.3), feeder.runFeeder(0.2), runShooters()));
+        Commands.parallel(
+            soleIntake(), index.runIndex(0.3), feeder.runFeeder(0.2), runShooters3000()));
   }
 
   public Command shooterlessMasterCommand() {

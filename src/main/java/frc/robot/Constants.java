@@ -8,8 +8,6 @@
 package frc.robot;
 
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
-import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
 import edu.wpi.first.wpilibj.RobotBase;
 
 /**
@@ -95,7 +93,7 @@ public final class Constants {
     public static final double kA = 0.0;
     public static final double kG = 0.0;
 
-    public static final InterpolatingDoubleTreeMap angleLerp = new InterpolatingDoubleTreeMap();
+    // public static InterpolatingDoubleTreeMap angleLerp = new InterpolatingDoubleTreeMap();
   }
 
   public static final class TurretConstants {
