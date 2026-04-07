@@ -163,7 +163,7 @@ public class Hood extends SubsystemBase {
     return run(
         () -> {
           double launchPitchRad = simTurret.getMovingPitch();
-          setAngleRad(Math.PI / 2 - launchPitchRad);
+          setAngleRad(launchPitchRad);
         });
   }
 

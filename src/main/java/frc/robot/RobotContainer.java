@@ -254,9 +254,8 @@ public class RobotContainer {
         .L1()
         .onTrue(
             Commands.parallel(
-                simTurretLeft.shootBallCommand(), simTurretRight.shootBallCommand()
-                // drive.alignToHub().withTimeout(1.5)
-                ));
+                simTurretLeft.shootBallCommand(), simTurretRight.shootBallCommand(),
+                leftHood.trackHub(), rightHood.trackHub()));
 
     controller.povUp().onTrue(superStructure.runShooters5000());
 
