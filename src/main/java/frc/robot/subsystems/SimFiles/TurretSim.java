@@ -221,7 +221,23 @@ public class TurretSim extends SubsystemBase {
      * for that - Get the time for that shot 5. Using the last time, get the last adjustedXf, and
      * find angle 6. return angle
      */
-    return 6.7;
+    double v0 = shotCalc.newGetVelocity(xf);
+    double pitch0 = shotCalc.newGetPitch(xf);
+
+    double time = calcShotTime(xf, v0, pitch0);
+    double adjustedXf = getXf(-vxr * time, -vyr * time);
+
+    double pitchf = shotCalc.newGetPitch(adjustedXf);
+
+    for(int i = 0; i < 5; i++) {
+      pitch0 = pitchf;
+      time = calcShotTime(xf, v0, pitch0);
+      adjustedXf = getXf(-vxr * time, -vyr * time);
+      
+      pitchf = shotCalc.newGetPitch(adjustedXf);
+    }
+
+    return pitchf;
   }
 
   public Command shootBallCommand() {
