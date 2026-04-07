@@ -191,7 +191,7 @@ public class Shooter extends SubsystemBase {
   public Command runShooter3000() {
     return run(
         () -> {
-          setVel(2750);
+          setVel(3500);
         });
   }
 
