@@ -589,20 +589,8 @@ public class Drive extends SubsystemBase {
   }
 
   public Command alignForTrench() {
-    return Commands.defer(
-        () -> {
-          boolean flipped = this.getPose().getX() > 4;
-
-          return Commands.run(
-              () -> {
-                this.driveToPose(
-                    new Pose2d(
-                        this.getPose().getX(),
-                        this.getPose().getY(),
-                        this.apply(new Rotation2d(flipped ? Math.PI : 0))));
-              });
-        },
-        Set.of(this));
+    double y = 0;
+    return driveToPose(new Pose2d(getPose().getX(), y, new Rotation2d()));
   }
 
   public Command boostShooters() {
