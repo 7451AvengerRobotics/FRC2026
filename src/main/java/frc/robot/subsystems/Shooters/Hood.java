@@ -29,6 +29,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorArrangementValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.HoodConstants;
@@ -96,7 +97,7 @@ public class Hood extends SubsystemBase {
 
     cfg.Commutation.MotorArrangement = MotorArrangementValue.Minion_JST;
 
-    hoodEncoder.setPosition(0);
+    hoodEncoder.setPosition(HoodConstants.kInitialHoodPosition);
 
     hoodEncoder.getConfigurator().apply(encCfg);
     hoodMotor.getConfigurator().apply(cfg);
@@ -163,7 +164,7 @@ public class Hood extends SubsystemBase {
     return run(
         () -> {
           double launchPitchRad = simTurret.getMovingPitch();
-          setAngleRad(launchPitchRad);
+          setAngleRad(MathUtil.clamp(launchPitchRad, Math.toRadians(14.66), Math.toRadians(47)));
         });
   }
 
@@ -178,6 +179,7 @@ public class Hood extends SubsystemBase {
     double rawEncoderRotations = hoodMotor.getPosition().getValueAsDouble();
     Logger.recordOutput("Hood/AngleRad" + side, angleRad);
     Logger.recordOutput("Hood/AngleDeg" + side, Math.toDegrees(angleRad));
+    Logger.recordOutput("Hood/AngleSuggested" + side, Math.toDegrees(simTurret.getMovingPitch()));
     Logger.recordOutput("Hood/EncoderRotations" + side, rawEncoderRotations);
     Logger.recordOutput(
         "Hood/StatorCurrentAmps" + side, hoodMotor.getStatorCurrent().getValueAsDouble());
