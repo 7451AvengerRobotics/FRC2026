@@ -80,7 +80,7 @@ public final class Constants {
   }
 
   public static final class HoodConstants {
-    public static final double kInitialHoodPosition = 0.0;
+    public static final double kInitialHoodPosition = Math.toRadians(0.68131410253);
     public static final int kLeftHoodMotorID = 29;
     public static final int kRightHoodMotorID = 28;
     public static final int kLeftHoodEncoderID = 0;

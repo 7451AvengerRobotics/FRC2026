@@ -81,7 +81,8 @@ public class ShotCalc {
     // double voy = Math.sqrt(2 * g * H);
     // double vx = g * xf / (voy + Math.sqrt(Math.pow(voy, 2) - 2 * g * yf));
     // return Math.sqrt(Math.pow(vx, 2) + Math.pow(voy, 2));
-    return 4000;
+    double angle = angleLerp.get(xf);
+    return velocityLerp.get(angle);
   }
 
   public double newGetPitch(double xf) {

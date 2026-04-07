@@ -125,7 +125,9 @@ public class Turret extends SubsystemBase {
   public Command followHub() {
     return Commands.run(
         () -> {
-          targetYaw = shotCalc.getRobotRelativeYaw(drive.getPose(), drive.applyX(TargetConstants.hub.getX()));
+          targetYaw =
+              shotCalc.getRobotRelativeYaw(
+                  drive.getPose(), drive.applyX(TargetConstants.hub.getX()));
 
           this.runEncoder(angleToEncoder(mod(targetYaw)));
         });
