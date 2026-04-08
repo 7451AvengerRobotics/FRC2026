@@ -33,7 +33,7 @@ public class Feeder extends SubsystemBase {
                     .withSensorToMechanismRatio(IntakePivotConstants.kIntakeGearRatio))
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
-                    .withStatorCurrentLimit(Amps.of(40))
+                    .withStatorCurrentLimit(Amps.of(50))
                     .withStatorCurrentLimitEnable(true));
 
     feederMotor.getConfigurator().apply(cfg);

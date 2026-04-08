@@ -20,7 +20,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.RobotSide;
-import frc.robot.Constants.TargetConstants;
 import frc.robot.Constants.TurretConstants;
 import frc.robot.subsystems.SimFiles.TurretSim;
 import frc.robot.subsystems.drive.Drive;
@@ -115,17 +114,25 @@ public class Turret extends SubsystemBase {
         "Turret Encoder Counts" + (robotSide == RobotSide.LEFT ? " Left" : " Right"),
         turretMotor.getPosition().getValueAsDouble());
 
-    targetYaw = shotCalc.getRobotRelativeYaw(drive.getPose(), (TargetConstants.hub.getX()));
+    targetYaw = simTurret.getMovingYaw();
 
     Logger.recordOutput(
         "Suggested Encoder Count" + (robotSide == RobotSide.LEFT ? " Left" : " Right"),
         angleToEncoder(mod(targetYaw)));
+
+    Logger.recordOutput(
+        "Turret Voltage" + (robotSide == RobotSide.LEFT ? " Left" : " Right"),
+        turretMotor.getMotorVoltage().getValueAsDouble());
+
+    Logger.recordOutput(
+        "Turret Current" + (robotSide == RobotSide.LEFT ? " Left" : " Right"),
+        turretMotor.getStatorCurrent().getValueAsDouble());
   }
 
   public Command followHub() {
     return Commands.run(
         () -> {
-          targetYaw = shotCalc.getRobotRelativeYaw(drive.getPose(), (TargetConstants.hub.getX()));
+          targetYaw = simTurret.getMovingYaw();
 
           this.runEncoder(angleToEncoder(mod(targetYaw)));
         });

@@ -240,6 +240,28 @@ public class TurretSim extends SubsystemBase {
     return pitchf;
   }
 
+  public double getMovingYaw() {
+    double v0 = shotCalc.newGetVelocity(xf);
+    double pitch0 = shotCalc.newGetPitch(xf);
+
+    double time = calcShotTime(xf, v0, Math.PI / 2 - pitch0);
+    double adjustedXf = getXf(-vxr * time, -vyr * time);
+
+    double pitchf = shotCalc.newGetPitch(adjustedXf);
+
+    for (int i = 0; i < 5; i++) {
+      pitch0 = pitchf;
+      time = calcShotTime(xf, v0, Math.PI / 2 - pitch0);
+      adjustedXf = getXf(-vxr * time, -vyr * time);
+
+      pitchf = shotCalc.newGetPitch(adjustedXf);
+    }
+
+    double returnedYaw = shotCalc.getYaw(drive.getPose(), -vxr * time, -vyr * time);
+
+    return returnedYaw;
+  }
+
   public Command shootBallCommand() {
     return runOnce(
         () -> {
