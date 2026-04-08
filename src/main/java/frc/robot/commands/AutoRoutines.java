@@ -284,7 +284,9 @@ public class AutoRoutines {
   public Command score() {
     return Commands.parallel(
         Commands.run(() -> drive.runVelocity(new ChassisSpeeds(0, 0, 0))).withTimeout(0.5),
-        superStruc.masterCommand());
+        superStruc.masterCommand(),
+        superStruc.trackHub(),
+        superStruc.followHub());
   }
 
   public Command singleAuto() {

@@ -241,13 +241,15 @@ public class RobotContainer {
     controller.cross().toggleOnTrue(superStructure.masterCommand());
     // controller.cross().whileTrue(rightHood.toAngleDegrees(25));
 
-    controller
-        .square()
-        .onTrue(Commands.parallel(superStructure.cutTurrets(), superStructure.resetHoods()));
+    controller.square().onTrue(superStructure.cut());
 
     // controller.povUp().toggleOnTrue(superStructure.startupMasterCommand());
 
-    controller.touchpad().toggleOnTrue(superStructure.runShooters5000());
+    controller
+        .touchpad()
+        .onTrue(
+            Commands.parallel(
+                leftTurret.pass(), rightTurret.pass(), leftHood.pass(), rightHood.pass()));
 
     // controller.L1().onTrue(superStructure.masterCommand());
     // controller.R1().onTrue(superStructure.stopMasterCommand());
@@ -259,8 +261,6 @@ public class RobotContainer {
             Commands.parallel(
                 simTurretLeft.shootBallCommand(), simTurretRight.shootBallCommand(),
                 leftHood.trackHub(), rightHood.trackHub()));
-
-    controller.povUp().onTrue(superStructure.runShooters5000());
 
     controller.R1().onTrue(Commands.parallel(rightTurret.followHub(), leftTurret.followHub()));
 
@@ -321,12 +321,12 @@ public class RobotContainer {
     manip.povDown().whileTrue(superStructure.hoodsDown()).onFalse(superStructure.stopHoods());
     manip
         .povLeft()
-        .onTrue(
+        .whileTrue(
             Commands.parallel(
                 leftTurret.alignWithOffsetAngle(-5), rightTurret.alignWithOffsetAngle(-5)));
     manip
         .povRight()
-        .onTrue(
+        .whileTrue(
             Commands.parallel(
                 leftTurret.alignWithOffsetAngle(5), rightTurret.alignWithOffsetAngle(5)));
 
@@ -338,8 +338,8 @@ public class RobotContainer {
     //     .povRight()
     //     .onTrue(superStructure.decreaseSpeed())
     //     .toggleOnTrue(superStructure.runShooters(1.05));
-    manip.square().onTrue(drive.alignToHub(-5));
-    manip.circle().onTrue(drive.alignToHub(5));
+    // manip.square().onTrue(drive.alignToHub(-5));
+    // manip.circle().onTrue(drive.alignToHub(5));
 
     manip.cross().onTrue(superStructure.stopMasterCommand());
     // controller.L1().onTrue(rightTurret.disableTurret());

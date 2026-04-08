@@ -139,6 +139,15 @@ public class Turret extends SubsystemBase {
         });
   }
 
+  public Command pass() {
+    return Commands.run(
+        () -> {
+          targetYaw = simTurret.getPassingYaw();
+
+          this.runEncoder(angleToEncoder(mod(targetYaw)));
+        });
+  }
+
   public Command alignWithOffsetAngle(double angle) {
     return Commands.run(
         () -> {

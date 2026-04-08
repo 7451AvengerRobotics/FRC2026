@@ -89,8 +89,8 @@ public final class Constants {
     public static final double kI = 0.0;
     public static final double kD = 0.1;
     public static final double kS = 0.31;
-    public static final double kV = 0.5;
-    public static final double kA = 0.0;
+    public static final double kV = 0.55;
+    public static final double kA = 0.02;
     public static final double kG = 0.0;
 
     // public static InterpolatingDoubleTreeMap angleLerp = new InterpolatingDoubleTreeMap();
@@ -102,13 +102,13 @@ public final class Constants {
     public static final double kInitialLeftTurretPosition = 2.5;
     public static final double kInitialRightTurretPosition = 2.5;
     public static final double kTurretGearRatio = 1.0;
-    public static final double kP = 4.5;
+    public static final double kP = 5;
     public static final double kI = 0;
     public static final double kD = 0.37;
     public static final double kS = 0.8;
     public static final double kV = 1.5;
     public static final double kA = 0.04;
-    public static final double kG = -0.6;
+    public static final double kG = -0.65;
     public static final double latency = 0.02;
   }
   // HI SRIRAMMMMM ;p

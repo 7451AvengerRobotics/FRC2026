@@ -221,4 +221,16 @@ public class SuperStructure {
   public Command resetHoods() {
     return Commands.parallel(leftHood.resetHood(), rightHood.resetHood());
   }
+
+  public Command cut() {
+    return Commands.parallel(cutTurrets(), resetHoods());
+  }
+
+  public Command trackHub() {
+    return Commands.parallel(leftHood.trackHub(), rightHood.trackHub());
+  }
+
+  public Command followHub() {
+    return Commands.parallel(leftTurret.followHub(), rightTurret.followHub());
+  }
 }

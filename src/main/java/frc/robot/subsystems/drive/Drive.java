@@ -497,11 +497,16 @@ public class Drive extends SubsystemBase {
 
   public Command linkJiggle() {
     return Commands.repeatingSequence(
-      driveToPose(new Pose2d(this.getPose().getX(), this.getPose().getY(), 
-        apply(this.getPose().getRotation().plus(new Rotation2d(Math.toRadians(3)))))),
-      driveToPose(new Pose2d(this.getPose().getX(), this.getPose().getY(), 
-        apply(this.getPose().getRotation().plus(new Rotation2d(Math.toRadians(-3))))))
-    );
+        driveToPose(
+            new Pose2d(
+                this.getPose().getX(),
+                this.getPose().getY(),
+                apply(this.getPose().getRotation().plus(new Rotation2d(Math.toRadians(3)))))),
+        driveToPose(
+            new Pose2d(
+                this.getPose().getX(),
+                this.getPose().getY(),
+                apply(this.getPose().getRotation().plus(new Rotation2d(Math.toRadians(-3)))))));
   }
 
   public Command driveToDX2Start() {

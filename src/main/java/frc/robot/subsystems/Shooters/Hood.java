@@ -168,6 +168,14 @@ public class Hood extends SubsystemBase {
         });
   }
 
+  public Command pass() {
+    return run(
+        () -> {
+          double launchPitchRad = simTurret.getPassingPitch();
+          setAngleRad(MathUtil.clamp(launchPitchRad, Math.toRadians(14.66), Math.toRadians(47)));
+        });
+  }
+
   /** Cuts power */
   public Command stopHood() {
     return run(() -> hoodMotor.set(0));
