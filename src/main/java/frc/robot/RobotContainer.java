@@ -10,6 +10,7 @@ package frc.robot;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -263,7 +264,13 @@ public class RobotContainer {
 
     controller.R1().onTrue(Commands.parallel(rightTurret.followHub(), leftTurret.followHub()));
 
-    controller.povLeft().onTrue(drive.alignForTrench());
+    controller
+        .povLeft()
+        .whileTrue(drive.alignForTrench())
+        .onFalse(Commands.run(() -> drive.runVelocity(new ChassisSpeeds(0, 0, 0))));
+    controller.povDown().whileTrue(drive.moveBackward());
+    controller.povUp().whileTrue(drive.moveForward());
+    controller.povRight().onTrue(superStructure.deployPivot());
 
     // controller
     //     .square()
@@ -312,6 +319,16 @@ public class RobotContainer {
     //     .toggleOnTrue(superStructure.runShooters(0.9));
     manip.povUp().whileTrue(superStructure.hoodsUp()).onFalse(superStructure.stopHoods());
     manip.povDown().whileTrue(superStructure.hoodsDown()).onFalse(superStructure.stopHoods());
+    manip
+        .povLeft()
+        .onTrue(
+            Commands.parallel(
+                leftTurret.alignWithOffsetAngle(-5), rightTurret.alignWithOffsetAngle(-5)));
+    manip
+        .povRight()
+        .onTrue(
+            Commands.parallel(
+                leftTurret.alignWithOffsetAngle(5), rightTurret.alignWithOffsetAngle(5)));
 
     // manip
     //     .povLeft()
