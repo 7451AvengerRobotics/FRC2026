@@ -181,5 +181,7 @@ public class Hood extends SubsystemBase {
   public void periodic() {
     double angleRad = getAngleRad();
     Logger.recordOutput("Hood/AngleDeg" + side, Math.toDegrees(angleRad));
+    Logger.recordOutput(
+        "Hood/SuggestedAngleDeg" + side, Math.toDegrees(simTurret.getMovingPitch()));
   }
 }
