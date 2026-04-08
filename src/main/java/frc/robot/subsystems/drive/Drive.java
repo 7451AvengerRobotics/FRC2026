@@ -422,7 +422,7 @@ public class Drive extends SubsystemBase {
   }
 
   public boolean shouldFlip() {
-    return Robot.IsRedAlliance.getAsBoolean();
+    return DriverStation.getAlliance().get() == DriverStation.Alliance.Red;
   }
 
   public Command driveToStartDT() {

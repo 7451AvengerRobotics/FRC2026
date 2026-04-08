@@ -80,15 +80,15 @@ public final class Constants {
   }
 
   public static final class HoodConstants {
-    public static final double kInitialHoodPosition = Math.toRadians(0.68131410253);
+    public static final double kInitialHoodPosition = 0.68131410253;
     public static final int kLeftHoodMotorID = 29;
     public static final int kRightHoodMotorID = 28;
     public static final int kLeftHoodEncoderID = 0;
     public static final int kRightHoodEncoderID = 1;
     public static final double kP = 5;
     public static final double kI = 0.0;
-    public static final double kD = 0.0;
-    public static final double kS = 0.29;
+    public static final double kD = 0.1;
+    public static final double kS = 0.31;
     public static final double kV = 0.5;
     public static final double kA = 0.0;
     public static final double kG = 0.0;
@@ -102,12 +102,12 @@ public final class Constants {
     public static final double kInitialLeftTurretPosition = 2.5;
     public static final double kInitialRightTurretPosition = 2.5;
     public static final double kTurretGearRatio = 1.0;
-    public static final double kP = 4.5;
+    public static final double kP = 4.8;
     public static final double kI = 0;
     public static final double kD = 0.35;
-    public static final double kS = 0.6;
-    public static final double kV = 1.0;
-    public static final double kA = 0.0;
+    public static final double kS = 0.7;
+    public static final double kV = 1.2;
+    public static final double kA = 0.02;
     public static final double kG = -0.6;
     public static final double latency = 0.02;
   }
