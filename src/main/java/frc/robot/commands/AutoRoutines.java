@@ -50,10 +50,11 @@ public class AutoRoutines {
     return Robot.IsRedAlliance.getAsBoolean();
   }
 
-  public Command DDBQ1() {
+  // Depot Side Autons
+  public Command DF() {
     return Commands.sequence(
         Commands.deadline(
-            drive.followPPPathCommand("DT-DNZ-Q1").withTimeout(5),
+            drive.followPPPathCommand("DT-DNZ-F").withTimeout(5),
             Commands.sequence(
                 superStruc.deployPivot().withTimeout(1),
                 superStruc.stopPivot().withTimeout(0.1),
@@ -63,19 +64,25 @@ public class AutoRoutines {
         score());
   }
 
-  public Command DDBX2Q1() {
+  public Command D2() {
     return Commands.sequence(
-        DDBQ1().withTimeout(9),
-        drive.driveToSecondPassStart().withTimeout(1),
+      drive.driveToDX2Start().withTimeout(1),
         Commands.deadline(
             drive.followPPPathCommand("DT-DNZ-2").withTimeout(12), superStruc.weirdMasterCommand()),
         score());
   }
 
-  public Command DDBQ2() {
+  public Command DF_D2() {
+    return Commands.sequence(
+        DF().withTimeout(9),
+        D2()
+    );
+  }
+
+  public Command DN() {
     return Commands.sequence(
         Commands.deadline(
-            drive.followPPPathCommand("DT-DNZ-Q2").withTimeout(5),
+            drive.followPPPathCommand("DT-DNZ-N").withTimeout(5),
             Commands.sequence(
                 superStruc.deployPivot().withTimeout(1),
                 superStruc.stopPivot().withTimeout(0.1),
@@ -85,14 +92,157 @@ public class AutoRoutines {
         score());
   }
 
-  public Command DDBX2Q2() {
+  public Command DN_D2() {
     return Commands.sequence(
-        DDBQ2().withTimeout(10),
+        DN().withTimeout(10),
+        D2());
+  }
+
+  // Sweve Align Auto
+  public Command DF_Sw() {
+    return Commands.sequence(
+        Commands.deadline(
+            drive.followPPPathCommand("DT-DNZ-F").withTimeout(5),
+            Commands.sequence(
+                superStruc.deployPivot().withTimeout(1),
+                superStruc.stopPivot().withTimeout(0.1),
+                superStruc.weirdMasterCommand())),
+        drive.driveToDepotReturn().withTimeout(1),
+        drive.followPPPathCommand("DNZ-DB").withTimeout(3),
+        score());
+  }
+
+  public Command D2_Sw() {
+    return Commands.sequence(
+      drive.driveToDX2Start().withTimeout(1),
         Commands.deadline(
             drive.followPPPathCommand("DT-DNZ-2").withTimeout(12), superStruc.weirdMasterCommand()),
         score());
   }
 
+  public Command DN_Sw() {
+    return Commands.sequence(
+        Commands.deadline(
+            drive.followPPPathCommand("DT-DNZ-N").withTimeout(5),
+            Commands.sequence(
+                superStruc.deployPivot().withTimeout(1),
+                superStruc.stopPivot().withTimeout(0.1),
+                superStruc.weirdMasterCommand())),
+        drive.driveToDepotReturn().withTimeout(1),
+        drive.followPPPathCommand("DNZ-DB").withTimeout(3),
+        score());
+  }
+
+  public Command DF_D2_Sw() {
+    return Commands.sequence(
+        DF_Sw().withTimeout(9),
+        D2_Sw()
+    );
+  }
+  
+  public Command DN_D2_Sw() {
+    return Commands.sequence(
+        DN_Sw().withTimeout(10),
+        D2_Sw());
+  }
+
+  // Source Side Autons
+  public Command SF() {
+    return Commands.sequence(
+        Commands.deadline(
+            drive.followPPPathCommand("DT-DNZ-F").withTimeout(5),
+            Commands.sequence(
+                superStruc.deployPivot().withTimeout(1),
+                superStruc.stopPivot().withTimeout(0.1),
+                superStruc.weirdMasterCommand())),
+        drive.driveToDepotReturn().withTimeout(1),
+        drive.followPPPathCommand("DNZ-DB").withTimeout(3),
+        score());
+  }
+
+  public Command S2() {
+    return Commands.sequence(
+      drive.driveToDX2Start().withTimeout(1),
+        Commands.deadline(
+            drive.followPPPathCommand("DT-DNZ-2").withTimeout(12), superStruc.weirdMasterCommand()),
+        score());
+  }
+
+  public Command SF_S2() {
+    return Commands.sequence(
+        SF().withTimeout(9),
+        S2()
+    );
+  }
+
+  public Command SN() {
+    return Commands.sequence(
+        Commands.deadline(
+            drive.followPPPathCommand("ST-SNZ-N").withTimeout(5),
+            Commands.sequence(
+                superStruc.deployPivot().withTimeout(1),
+                superStruc.stopPivot().withTimeout(0.1),
+                superStruc.weirdMasterCommand())),
+        drive.driveToDepotReturn().withTimeout(1),
+        drive.followPPPathCommand("SNZ-SB").withTimeout(3),
+        score());
+  }
+
+  public Command SN_S2() {
+    return Commands.sequence(
+        SN().withTimeout(10),
+        S2());
+  }
+
+  // Sweve Align Auto
+  public Command SF_Sw() {
+    return Commands.sequence(
+        Commands.deadline(
+            drive.followPPPathCommand("ST-SNZ-F").withTimeout(5),
+            Commands.sequence(
+                superStruc.deployPivot().withTimeout(1),
+                superStruc.stopPivot().withTimeout(0.1),
+                superStruc.weirdMasterCommand())),
+        drive.driveToDepotReturn().withTimeout(1),
+        drive.followPPPathCommand("SNZ-SB").withTimeout(3),
+        score());
+  }
+
+  public Command S2_Sw() {
+    return Commands.sequence(
+      drive.driveToDX2Start().withTimeout(1),
+        Commands.deadline(
+            drive.followPPPathCommand("ST-SNZ-2").withTimeout(12), superStruc.weirdMasterCommand()),
+        score());
+  }
+
+  public Command SF_S2_Sw() {
+    return Commands.sequence(
+        SF_Sw().withTimeout(9),
+        S2_Sw()
+    );
+  }
+
+  public Command SN_Sw() {
+    return Commands.sequence(
+        Commands.deadline(
+            drive.followPPPathCommand("ST-SNZ-N").withTimeout(5),
+            Commands.sequence(
+                superStruc.deployPivot().withTimeout(1),
+                superStruc.stopPivot().withTimeout(0.1),
+                superStruc.weirdMasterCommand())),
+        drive.driveToDepotReturn().withTimeout(1),
+        drive.followPPPathCommand("SNZ-SB").withTimeout(3),
+        score());
+  }
+
+  public Command SN_S2_Sw() {
+    return Commands.sequence(
+        SN_Sw().withTimeout(10),
+        S2_Sw());
+  }
+
+  // Bump Start Autons
   public Command depotDepot() {
     return Commands.sequence(
         Commands.parallel(superStruc.deployPivot()).withTimeout(2),
@@ -127,7 +277,7 @@ public class AutoRoutines {
             Commands.sequence(
                 superStruc.deployPivot().withTimeout(1), superStruc.weirdMasterCommand())),
         Commands.deadline(
-            Commands.deadline(drive.driveToSSReturn()), superStruc.weirdMasterCommand()),
+            Commands.deadline(drive.driveToSourceReturn()), superStruc.weirdMasterCommand()),
         Commands.deadline(drive.followPPPathCommand("SNZ-SB"), superStruc.weirdMasterCommand()),
         score());
   }
@@ -139,8 +289,8 @@ public class AutoRoutines {
             drive.followPPPathCommand("SB-SNZ"),
             Commands.sequence(
                 superStruc.deployPivot().withTimeout(1), superStruc.weirdMasterCommand())),
-        Commands.deadline(drive.driveToSSReturn(), superStruc.weirdMasterCommand()),
-        Commands.deadline(drive.followPPPathCommand("SNZDB"), superStruc.weirdMasterCommand()),
+        Commands.deadline(drive.driveToSourceReturn(), superStruc.weirdMasterCommand()),
+        Commands.deadline(drive.followPPPathCommand("SNZ-DB"), superStruc.weirdMasterCommand()),
         score());
   }
 

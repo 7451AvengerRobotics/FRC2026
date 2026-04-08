@@ -381,12 +381,38 @@ public class RobotContainer {
     //     "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
     // autoChooser.addOption(
     //     "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+
+    // Depot Side
+    autoChooser.addOption("DF", autos.DF());
+    autoChooser.addOption("DN", autos.DN());
+    autoChooser.addOption("DF_D2", autos.DF_D2());
+    autoChooser.addOption("DN_D2", autos.DN_D2());
+
+    // Swerve Align Depot
+    autoChooser.addOption("DF_Sw", autos.DF_Sw());
+    autoChooser.addOption("DN_Sw", autos.DN_Sw());
+    autoChooser.addOption("DF_D2_Sw", autos.DF_D2_Sw());
+    autoChooser.addOption("DN_D2_Sw", autos.DN_D2_Sw());
+
+    // Source Side
+    autoChooser.addOption("SF", autos.SF());
+    autoChooser.addOption("SN", autos.SN());
+    autoChooser.addOption("SF_S2", autos.SF_S2());
+    autoChooser.addOption("SN_S2", autos.SN_S2());
+
+    // Swerve Align Source
+    autoChooser.addOption("SF_Sw", autos.SF_Sw());
+    autoChooser.addOption("SN_Sw", autos.SN_Sw());
+    autoChooser.addOption("SF_S2_Sw", autos.SF_S2_Sw());
+    autoChooser.addOption("SN_S2_Sw", autos.SN_S2_Sw());
+
+    // Bump Start
     autoChooser.addOption("DepotDepot", autos.depotDepot());
-    autoChooser.addOption("DDBQ1", autos.DDBQ1());
-    autoChooser.addOption("DDBX2Q1", autos.DDBX2Q1());
     autoChooser.addOption("DepotSource", autos.depotSource());
     autoChooser.addOption("SourceDepot", autos.sourceDepot());
     autoChooser.addOption("SourceSource", autos.sourceSource());
+    
+    // Preload
     autoChooser.addOption("Single Auto", autos.singleAuto());
   }
 
