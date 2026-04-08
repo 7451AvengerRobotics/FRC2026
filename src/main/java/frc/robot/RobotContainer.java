@@ -240,7 +240,9 @@ public class RobotContainer {
     controller.cross().toggleOnTrue(superStructure.masterCommand());
     // controller.cross().whileTrue(rightHood.toAngleDegrees(25));
 
-    controller.square().onTrue(superStructure.deployPivot());
+    controller
+        .square()
+        .onTrue(Commands.parallel(superStructure.cutTurrets(), superStructure.resetHoods()));
 
     // controller.povUp().toggleOnTrue(superStructure.startupMasterCommand());
 
@@ -260,6 +262,8 @@ public class RobotContainer {
     controller.povUp().onTrue(superStructure.runShooters5000());
 
     controller.R1().onTrue(Commands.parallel(rightTurret.followHub(), leftTurret.followHub()));
+
+    controller.povLeft().onTrue(drive.alignForTrench());
 
     // controller
     //     .square()
@@ -411,7 +415,7 @@ public class RobotContainer {
     autoChooser.addOption("DepotSource", autos.depotSource());
     autoChooser.addOption("SourceDepot", autos.sourceDepot());
     autoChooser.addOption("SourceSource", autos.sourceSource());
-    
+
     // Preload
     autoChooser.addOption("Single Auto", autos.singleAuto());
   }

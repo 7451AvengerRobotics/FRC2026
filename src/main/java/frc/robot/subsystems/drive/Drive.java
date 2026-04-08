@@ -489,8 +489,7 @@ public class Drive extends SubsystemBase {
   public Command driveToDX2Start() {
     return Commands.defer(
         () -> {
-          return driveToPose(
-              new Pose2d(applyX(2.8), applyY(7.4), apply(new Rotation2d())));
+          return driveToPose(new Pose2d(applyX(2.8), applyY(7.4), apply(new Rotation2d())));
         },
         Set.of(this));
   }
@@ -498,8 +497,7 @@ public class Drive extends SubsystemBase {
   public Command driveToSX2Start() {
     return Commands.defer(
         () -> {
-          return driveToPose(
-              new Pose2d(applyX(2.8), applyY(0.6), apply(new Rotation2d())));
+          return driveToPose(new Pose2d(applyX(2.8), applyY(0.6), apply(new Rotation2d())));
         },
         Set.of(this));
   }
@@ -607,7 +605,7 @@ public class Drive extends SubsystemBase {
   }
 
   public Command alignForTrench() {
-    double y = 0;
+    double y = getPose().getY() > 4.034 ? 7.043 : 0.576;
     return driveToPose(new Pose2d(getPose().getX(), y, new Rotation2d()));
   }
 

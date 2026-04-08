@@ -93,22 +93,6 @@ public class TurretSim extends SubsystemBase {
     Logger.recordOutput(
         "GamePieces/Fuel_" + name,
         activeFuel.stream().map(FuelSim::getPose).toArray(Pose3d[]::new));
-    Logger.recordOutput("Xf", xf);
-
-    double v0 = shotCalc.newGetVelocity(xf);
-    double pitch0 = shotCalc.newGetPitch(xf);
-    double yaw0 = shotCalc.getYaw(drive.getPose(), TargetConstants.hub.getX());
-
-    double time = calcShotTime(xf, v0, pitch0);
-    double adjustedXf = getXf(-vxr * time, -vyr * time);
-
-    double vf = shotCalc.newGetVelocity(adjustedXf);
-    double pitchf = shotCalc.newGetPitch(adjustedXf);
-    double yawf = shotCalc.getYaw(drive.getPose(), -vxr * time, -vyr * time);
-
-    Logger.recordOutput("vf_" + name, vf);
-    Logger.recordOutput("pitchf_" + name, pitchf * 180 / Math.PI);
-    Logger.recordOutput("yawf_" + name, yawf * 180 / Math.PI);
   }
 
   public double calcYaw() {

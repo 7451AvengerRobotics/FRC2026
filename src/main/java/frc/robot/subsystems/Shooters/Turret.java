@@ -10,6 +10,7 @@ import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXSConfiguration;
+import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFXS;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -63,7 +64,7 @@ public class Turret extends SubsystemBase {
                     .withStatorCurrentLimitEnable(true))
             .withMotionMagic(
                 new MotionMagicConfigs()
-                    .withMotionMagicCruiseVelocity(RotationsPerSecond.of(10))
+                    .withMotionMagicCruiseVelocity(RotationsPerSecond.of(13))
                     .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(75))
                     .withMotionMagicJerk(RotationsPerSecondPerSecond.per(Second).of(100)))
             .withSlot0(
@@ -181,10 +182,10 @@ public class Turret extends SubsystemBase {
         });
   }
 
-  public Command stopTurret() {
+  public Command cutTurret() {
     return run(
         () -> {
-          turretMotor.set(0);
+          turretMotor.setControl(new DutyCycleOut(0));
         });
   }
 

@@ -102,11 +102,6 @@ public class Shooter extends SubsystemBase {
   @Override
   public void periodic() {
     Logger.recordOutput("Velocity in RPM_" + name, shooterLeader.getEncoder().getVelocity());
-    Logger.recordOutput("Voltage in Volts_" + name, shooterLeader.getAppliedOutput());
-    Logger.recordOutput("Current in Amps_" + name, shooterLeader.getOutputCurrent());
-
-    ballRequiredVel = simTurret.getRequiredVelocity();
-    Logger.recordOutput("Required Velocity" + name, ballRequiredVel);
   }
 
   public void run(double power) {
