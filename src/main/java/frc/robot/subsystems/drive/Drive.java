@@ -95,6 +95,7 @@ public class Drive extends SubsystemBase {
   private Pose2d holonomicPoseTarget = new Pose2d();
   private Rotation2d rotation2d = new Rotation2d();
   private final HolonomicDriveWithPIDController holonomicDriveWithPIDController;
+  private final HolonomicDriveWithPIDController holonomicDriveWithPIDControllerStrong;
 
   static final Lock odometryLock = new ReentrantLock();
   private final GyroIO gyroIO;
@@ -131,6 +132,14 @@ public class Drive extends SubsystemBase {
         new HolonomicDriveWithPIDController(
             new PIDController(4, 0, 0),
             new PIDController(4, 0, 0),
+            headingController,
+            0.5,
+            new Pose2d(0.04, 0.04, Rotation2d.fromDegrees(2)),
+            1);
+    this.holonomicDriveWithPIDControllerStrong =
+        new HolonomicDriveWithPIDController(
+            new PIDController(4, 0, 0),
+            new PIDController(7, 0, 0),
             headingController,
             0.5,
             new Pose2d(0.04, 0.04, Rotation2d.fromDegrees(2)),
@@ -488,18 +497,22 @@ public class Drive extends SubsystemBase {
 
   public Command linkJiggle() {
     return Commands.repeatingSequence(
-      driveToPose(new Pose2d(this.getPose().getX(), this.getPose().getY(), 
-        apply(this.getPose().getRotation().plus(new Rotation2d(Math.toRadians(3)))))),
-      driveToPose(new Pose2d(this.getPose().getX(), this.getPose().getY(), 
-        apply(this.getPose().getRotation().plus(new Rotation2d(Math.toRadians(-3))))))
-    );
+        driveToPose(
+            new Pose2d(
+                this.getPose().getX(),
+                this.getPose().getY(),
+                apply(this.getPose().getRotation().plus(new Rotation2d(Math.toRadians(3)))))),
+        driveToPose(
+            new Pose2d(
+                this.getPose().getX(),
+                this.getPose().getY(),
+                apply(this.getPose().getRotation().plus(new Rotation2d(Math.toRadians(-3)))))));
   }
 
   public Command driveToDX2Start() {
     return Commands.defer(
         () -> {
-          return driveToPose(
-              new Pose2d(applyX(2.8), applyY(7.4), apply(new Rotation2d())));
+          return driveToPose(new Pose2d(applyX(2.8), applyY(7.4), apply(new Rotation2d())));
         },
         Set.of(this));
   }
@@ -507,8 +520,7 @@ public class Drive extends SubsystemBase {
   public Command driveToSX2Start() {
     return Commands.defer(
         () -> {
-          return driveToPose(
-              new Pose2d(applyX(2.8), applyY(0.6), apply(new Rotation2d())));
+          return driveToPose(new Pose2d(applyX(2.8), applyY(0.6), apply(new Rotation2d())));
         },
         Set.of(this));
   }
@@ -533,6 +545,31 @@ public class Drive extends SubsystemBase {
                       holonomicDriveWithPIDController.rotationReferenceReached());
                 })
                 .until(holonomicDriveWithPIDController::atReference),
+            runOnce(this::stop))
+        .finallyDo(() -> holonomicControllerActive = false);
+  }
+
+  public Command driveToPoseStrong(Pose2d pose) {
+    return Commands.sequence(
+            runOnce(
+                () -> {
+                  holonomicControllerActive = true;
+                  holonomicDriveWithPIDControllerStrong.reset(getPose(), getRobotRelativeSpeeds());
+                }),
+            run(() -> {
+                  this.holonomicPoseTarget = pose;
+                  runVelocity(
+                      holonomicDriveWithPIDControllerStrong.calculate(
+                          getPose(), holonomicPoseTarget));
+                  SmartDashboard.putBoolean(
+                      "x controller", holonomicDriveWithPIDControllerStrong.xReferenceReached());
+                  SmartDashboard.putBoolean(
+                      "y controller", holonomicDriveWithPIDControllerStrong.yReferenceReached());
+                  SmartDashboard.putBoolean(
+                      "rotation controller",
+                      holonomicDriveWithPIDControllerStrong.rotationReferenceReached());
+                })
+                .until(holonomicDriveWithPIDControllerStrong::atReference),
             runOnce(this::stop))
         .finallyDo(() -> holonomicControllerActive = false);
   }
@@ -616,8 +653,32 @@ public class Drive extends SubsystemBase {
   }
 
   public Command alignForTrench() {
-    double y = 0;
-    return driveToPose(new Pose2d(getPose().getX(), y, new Rotation2d()));
+    return Commands.defer(
+        () -> {
+          double y = getPose().getY() > 4.034 ? 7.492 : 0.576;
+          return driveToPoseStrong(new Pose2d(getPose().getX(), y, getPose().getRotation()));
+        },
+        Set.of(this));
+  }
+
+  public Command moveForward() {
+    return Commands.run(
+        () -> {
+          double what = shouldFlip() ? -1 : 1;
+          runVelocity(
+              ChassisSpeeds.fromFieldRelativeSpeeds(
+                  new ChassisSpeeds(2 * what, 0, 0), getPose().getRotation()));
+        });
+  }
+
+  public Command moveBackward() {
+    return Commands.run(
+        () -> {
+          double what = shouldFlip() ? -1 : 1;
+          runVelocity(
+              ChassisSpeeds.fromFieldRelativeSpeeds(
+                  new ChassisSpeeds(-2 * what, 0, 0), getPose().getRotation()));
+        });
   }
 
   public Command boostShooters() {

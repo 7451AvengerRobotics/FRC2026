@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.TargetConstants;
 import frc.robot.Constants.TurretConstants;
 import frc.robot.subsystems.Shooters.ShotCalc;
@@ -34,6 +35,7 @@ public class TurretSim extends SubsystemBase {
   private Translation2d target;
   double yf = 1.329;
   double xf;
+  double passingXf;
   double g = 9.8;
   double a = -g;
 
@@ -78,6 +80,9 @@ public class TurretSim extends SubsystemBase {
     vyr = Math.abs(Vr.vyMetersPerSecond) < 0.01 ? 0 : Vr.vyMetersPerSecond;
 
     xf = this.getXf(0, 0);
+    passingXf = this.getPassingXf(0, 0);
+
+    Logger.recordOutput("Vr_" + name, Math.hypot(vxr, vyr));
 
     Logger.recordOutput("ZeroedComponentPoses_" + name, new Pose3d[] {new Pose3d()});
     Logger.recordOutput(
@@ -93,22 +98,6 @@ public class TurretSim extends SubsystemBase {
     Logger.recordOutput(
         "GamePieces/Fuel_" + name,
         activeFuel.stream().map(FuelSim::getPose).toArray(Pose3d[]::new));
-    Logger.recordOutput("Xf", xf);
-
-    double v0 = shotCalc.newGetVelocity(xf);
-    double pitch0 = shotCalc.newGetPitch(xf);
-    double yaw0 = shotCalc.getYaw(drive.getPose(), TargetConstants.hub.getX());
-
-    double time = calcShotTime(xf, v0, pitch0);
-    double adjustedXf = getXf(-vxr * time, -vyr * time);
-
-    double vf = shotCalc.newGetVelocity(adjustedXf);
-    double pitchf = shotCalc.newGetPitch(adjustedXf);
-    double yawf = shotCalc.getYaw(drive.getPose(), -vxr * time, -vyr * time);
-
-    Logger.recordOutput("vf_" + name, vf);
-    Logger.recordOutput("pitchf_" + name, pitchf * 180 / Math.PI);
-    Logger.recordOutput("yawf_" + name, yawf * 180 / Math.PI);
   }
 
   public double calcYaw() {
@@ -240,6 +229,33 @@ public class TurretSim extends SubsystemBase {
     return pitchf;
   }
 
+  public double getPassingPitch() {
+    /**
+     * Procedure: 1. Get the required angle via lerp table with xf 2. Get the velocity that comes
+     * from that angle through regression 3. Get the time for this shot 4. Repeat the following
+     * steps 5 times - Get the adjustedXf with the time - Get the angle for that - Get the velocity
+     * for that - Get the time for that shot 5. Using the last time, get the last adjustedXf, and
+     * find angle 6. return angle
+     */
+    double v0 = shotCalc.newGetVelocity(passingXf);
+    double pitch0 = shotCalc.newGetPitch(passingXf);
+
+    double time = calcShotTime(passingXf, v0, Math.PI / 2 - pitch0);
+    double adjustedXf = getPassingXf(-vxr * time, -vyr * time);
+
+    double pitchf = shotCalc.newGetPitch(adjustedXf);
+
+    for (int i = 0; i < 5; i++) {
+      pitch0 = pitchf;
+      time = calcShotTime(passingXf, v0, Math.PI / 2 - pitch0);
+      adjustedXf = getPassingXf(-vxr * time, -vyr * time);
+
+      pitchf = shotCalc.newGetPitch(adjustedXf);
+    }
+
+    return pitchf;
+  }
+
   public double getMovingYaw() {
     double v0 = shotCalc.newGetVelocity(xf);
     double pitch0 = shotCalc.newGetPitch(xf);
@@ -253,6 +269,28 @@ public class TurretSim extends SubsystemBase {
       pitch0 = pitchf;
       time = calcShotTime(xf, v0, Math.PI / 2 - pitch0);
       adjustedXf = getXf(-vxr * time, -vyr * time);
+
+      pitchf = shotCalc.newGetPitch(adjustedXf);
+    }
+
+    double returnedYaw = shotCalc.getYaw(drive.getPose(), -vxr * time, -vyr * time);
+
+    return returnedYaw;
+  }
+
+  public double getPassingYaw() {
+    double v0 = shotCalc.newGetVelocity(passingXf);
+    double pitch0 = shotCalc.newGetPitch(passingXf);
+
+    double time = calcShotTime(passingXf, v0, Math.PI / 2 - pitch0);
+    double adjustedXf = getPassingXf(-vxr * time, -vyr * time);
+
+    double pitchf = shotCalc.newGetPitch(adjustedXf);
+
+    for (int i = 0; i < 5; i++) {
+      pitch0 = pitchf;
+      time = calcShotTime(passingXf, v0, Math.PI / 2 - pitch0);
+      adjustedXf = getPassingXf(-vxr * time, -vyr * time);
 
       pitchf = shotCalc.newGetPitch(adjustedXf);
     }
@@ -290,6 +328,24 @@ public class TurretSim extends SubsystemBase {
         Math.sqrt(
             Math.pow((drive.applyX(target.getX()) - turretPositionPose2d.getX() + xOffset), 2)
                 + Math.pow((target.getY() - turretPositionPose2d.getY() + yOffset), 2));
+
+    return xf;
+  }
+
+  public double getPassingXf(double xOffset, double yOffset) {
+
+    xf =
+        Math.sqrt(
+            Math.pow(
+                    (drive.applyX(Constants.TargetConstants.pass1.getX())
+                        - turretPositionPose2d.getX()
+                        + xOffset),
+                    2)
+                + Math.pow(
+                    (Constants.TargetConstants.pass1.getY()
+                        - turretPositionPose2d.getY()
+                        + yOffset),
+                    2));
 
     return xf;
   }

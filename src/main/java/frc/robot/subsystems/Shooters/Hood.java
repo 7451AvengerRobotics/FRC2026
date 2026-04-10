@@ -76,7 +76,7 @@ public class Hood extends SubsystemBase {
                     .withStatorCurrentLimitEnable(true))
             .withMotionMagic(
                 new MotionMagicConfigs()
-                    .withMotionMagicCruiseVelocity(RotationsPerSecond.of(100))
+                    .withMotionMagicCruiseVelocity(RotationsPerSecond.of(120))
                     .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(75))
                     .withMotionMagicJerk(RotationsPerSecondPerSecond.per(Second).of(100)))
             .withSlot0(
@@ -168,21 +168,28 @@ public class Hood extends SubsystemBase {
         });
   }
 
+  public Command pass() {
+    return run(
+        () -> {
+          double launchPitchRad = simTurret.getPassingPitch();
+          setAngleRad(MathUtil.clamp(launchPitchRad, Math.toRadians(14.66), Math.toRadians(47)));
+        });
+  }
+
   /** Cuts power */
   public Command stopHood() {
     return run(() -> hoodMotor.set(0));
   }
 
+  public Command resetHood() {
+    return toAngleDegrees(14.66);
+  }
+
   @Override
   public void periodic() {
     double angleRad = getAngleRad();
-    double rawEncoderRotations = hoodMotor.getPosition().getValueAsDouble();
-    Logger.recordOutput("Hood/AngleRad" + side, angleRad);
     Logger.recordOutput("Hood/AngleDeg" + side, Math.toDegrees(angleRad));
-    Logger.recordOutput("Hood/AngleSuggested" + side, Math.toDegrees(simTurret.getMovingPitch()));
-    Logger.recordOutput("Hood/EncoderRotations" + side, rawEncoderRotations);
     Logger.recordOutput(
-        "Hood/StatorCurrentAmps" + side, hoodMotor.getStatorCurrent().getValueAsDouble());
-    Logger.recordOutput("Hood/Voltage" + side, hoodMotor.getMotorVoltage().getValueAsDouble());
+        "Hood/SuggestedAngleDeg" + side, Math.toDegrees(simTurret.getMovingPitch()));
   }
 }

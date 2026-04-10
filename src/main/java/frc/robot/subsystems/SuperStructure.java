@@ -56,7 +56,7 @@ public class SuperStructure {
   }
 
   public Command soleIntake() {
-    return intake.runIntake(-0.6);
+    return intake.runIntake(-0.8);
   }
 
   public Command soleIndex() {
@@ -81,10 +81,6 @@ public class SuperStructure {
 
   public Command reverseIndex() {
     return index.runIndex(0.3);
-  }
-
-  public Command stopTurret() {
-    return leftTurret.stopTurret();
   }
 
   public Command leftShoot() {
@@ -216,5 +212,25 @@ public class SuperStructure {
 
   public Command outtake() {
     return Commands.parallel(index.runIndex(0.9), intake.runIntake(1.0));
+  }
+
+  public Command cutTurrets() {
+    return Commands.parallel(leftTurret.cutTurret(), rightTurret.cutTurret());
+  }
+
+  public Command resetHoods() {
+    return Commands.parallel(leftHood.resetHood(), rightHood.resetHood());
+  }
+
+  public Command cut() {
+    return Commands.parallel(cutTurrets(), resetHoods());
+  }
+
+  public Command trackHub() {
+    return Commands.parallel(leftHood.trackHub(), rightHood.trackHub());
+  }
+
+  public Command followHub() {
+    return Commands.parallel(leftTurret.followHub(), rightTurret.followHub());
   }
 }

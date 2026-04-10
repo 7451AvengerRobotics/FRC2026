@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.IndexConstants;
 import frc.robot.Constants.IntakePivotConstants;
-import org.littletonrobotics.junction.Logger;
 
 public class Index extends SubsystemBase {
 
@@ -38,15 +37,6 @@ public class Index extends SubsystemBase {
                     .withStatorCurrentLimitEnable(true));
 
     indexMotor.getConfigurator().apply(cfg);
-  }
-
-  @Override
-  public void periodic() {
-    Logger.recordOutput("Index Supply Voltage", indexMotor.getSupplyVoltage().getValueAsDouble());
-    Logger.recordOutput("Index Supply Amperage", indexMotor.getSupplyCurrent().getValueAsDouble());
-    Logger.recordOutput("Index Stator Amperage", indexMotor.getStatorCurrent().getValueAsDouble());
-
-    Logger.recordOutput("Index Motor Voltage", indexMotor.getMotorVoltage().getValueAsDouble());
   }
 
   public void run(double speed) {

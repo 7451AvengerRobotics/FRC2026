@@ -10,6 +10,7 @@ import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXSConfiguration;
+import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFXS;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -57,13 +58,14 @@ public class Turret extends SubsystemBase {
                 new MotorOutputConfigs()
                     .withInverted(InvertedValue.Clockwise_Positive)
                     .withNeutralMode(NeutralModeValue.Brake))
+            // .withSoftwareLimitSwitch(new SoftwareLimitSwitchConfigs(true, true, -5, 5))
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
                     .withStatorCurrentLimit(Amps.of(80))
                     .withStatorCurrentLimitEnable(true))
             .withMotionMagic(
                 new MotionMagicConfigs()
-                    .withMotionMagicCruiseVelocity(RotationsPerSecond.of(10))
+                    .withMotionMagicCruiseVelocity(RotationsPerSecond.of(13))
                     .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(75))
                     .withMotionMagicJerk(RotationsPerSecondPerSecond.per(Second).of(100)))
             .withSlot0(
@@ -138,6 +140,25 @@ public class Turret extends SubsystemBase {
         });
   }
 
+  public Command pass() {
+    return Commands.run(
+        () -> {
+          targetYaw = simTurret.getPassingYaw();
+
+          this.runEncoder(angleToEncoder(mod(targetYaw)));
+        });
+  }
+
+  public Command alignWithOffsetAngle(double angle) {
+    return Commands.run(
+        () -> {
+          targetYaw = simTurret.getMovingYaw();
+          double offset = Math.toRadians(angle);
+
+          this.runEncoder(angleToEncoder(mod(targetYaw + offset)));
+        });
+  }
+
   public double angleToEncoder(double angle) {
     if (this.robotSide == RobotSide.LEFT) {
       if (angle < Math.PI / 2) {
@@ -181,10 +202,10 @@ public class Turret extends SubsystemBase {
         });
   }
 
-  public Command stopTurret() {
+  public Command cutTurret() {
     return run(
         () -> {
-          turretMotor.set(0);
+          turretMotor.setControl(new DutyCycleOut(0));
         });
   }
 

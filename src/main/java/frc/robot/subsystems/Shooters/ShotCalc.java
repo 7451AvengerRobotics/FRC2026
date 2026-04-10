@@ -12,6 +12,7 @@ public class ShotCalc {
   double g = 9.81;
   double yf = Constants.TargetConstants.yf;
   double H = 2.5;
+  double shotOffset = -0.35;
   public double pitch = Math.toRadians(60);
   Transform3d turretOffset = new Transform3d();
   InterpolatingDoubleTreeMap angleLerp = new InterpolatingDoubleTreeMap();
@@ -19,30 +20,30 @@ public class ShotCalc {
 
   public ShotCalc(Transform3d turretOffset) {
     this.turretOffset = turretOffset;
-    angleLerp.put(1.0687 + 0.1, 0.2548162392); // 14.6°
-    angleLerp.put(1.42 + 0.1, 0.2715680592); // 15.56°
-    angleLerp.put(1.87 + 0.1, 0.2858797963); // 16.38°
-    angleLerp.put(2.24 + 0.1, 0.3053273467); // 17.5°
-    angleLerp.put(2.465 + 0.1, 0.3249698457); // 18.62°
-    angleLerp.put(2.7 + 0.1, 0.3403288802); // 19.5°
-    angleLerp.put(3.03 + 0.1, 0.3589263261); // 20.56°
-    angleLerp.put(3.15 + 0.1, 0.3938758705); // 22.56°
-    angleLerp.put(3.3 + 0.1, 0.4099923863); // 23.48°
-    angleLerp.put(3.45 + 0.1, 0.4257852268); // 24.39°
-    angleLerp.put(3.65 + 0.1, 0.4485343888); // 25.7°
-    angleLerp.put(3.84 + 0.1, 0.4669553025); // 26.75°
-    angleLerp.put(3.97 + 0.1, 0.4839191944); // 27.727°
-    angleLerp.put(4.07 + 0.1, 0.5028848730); // 28.81°
-    angleLerp.put(4.15 + 0.1, 0.5152020140); // 29.52°
-    angleLerp.put(4.32 + 0.1, 0.5327448563); // 30.53°
-    angleLerp.put(4.34 + 0.1, 0.5501223593); // 31.52°
-    angleLerp.put(4.41 + 0.1, 0.5860784353); // 33.57°
-    angleLerp.put(4.56 + 0.1, 0.6083099749); // 34.85°
-    angleLerp.put(4.69 + 0.1, 0.6592155526); // 37.76°
-    angleLerp.put(4.63 + 0.1, 0.6835955730); // 39.16°
-    angleLerp.put(4.83 + 0.1, 0.7133274470); // 40.87°
-    angleLerp.put(4.69 + 0.1, 0.7436549058); // 42.63°
-    angleLerp.put(4.94 + 0.1, 0.7940919579); // 45.5°
+    angleLerp.put(1.0687 + shotOffset, 0.2548162392); // 14.6°
+    angleLerp.put(1.42 + shotOffset, 0.2715680592); // 15.56°
+    angleLerp.put(1.87 + shotOffset, 0.2858797963); // 16.38°
+    angleLerp.put(2.24 + shotOffset, 0.3053273467); // 17.5°
+    angleLerp.put(2.465 + shotOffset, 0.3249698457); // 18.62°
+    angleLerp.put(2.7 + shotOffset, 0.3403288802); // 19.5°
+    angleLerp.put(3.03 + shotOffset, 0.3589263261); // 20.56°
+    angleLerp.put(3.15 + shotOffset, 0.3938758705); // 22.56°
+    angleLerp.put(3.3 + shotOffset, 0.4099923863); // 23.48°
+    angleLerp.put(3.45 + shotOffset, 0.4257852268); // 24.39°
+    angleLerp.put(3.65 + shotOffset, 0.4485343888); // 25.7°
+    angleLerp.put(3.84 + shotOffset, 0.4669553025); // 26.75°
+    angleLerp.put(3.97 + shotOffset, 0.4839191944); // 27.727°
+    angleLerp.put(4.07 + shotOffset, 0.5028848730); // 28.81°
+    angleLerp.put(4.15 + shotOffset, 0.5152020140); // 29.52°
+    angleLerp.put(4.32 + shotOffset, 0.5327448563); // 30.53°
+    angleLerp.put(4.34 + shotOffset, 0.5501223593); // 31.52°
+    angleLerp.put(4.41 + shotOffset, 0.5860784353); // 33.57°
+    angleLerp.put(4.56 + shotOffset, 0.6083099749); // 34.85°
+    angleLerp.put(4.69 + shotOffset, 0.6592155526); // 37.76°
+    angleLerp.put(4.63 + shotOffset, 0.6835955730); // 39.16°
+    angleLerp.put(4.83 + shotOffset, 0.7133274470); // 40.87°
+    angleLerp.put(4.69 + shotOffset, 0.7436549058); // 42.63°
+    angleLerp.put(4.94 + shotOffset, 0.7940919579); // 45.5°
 
     velocityLerp.put(0.2548162392, 5.628777321); // 14.6°
     velocityLerp.put(0.2715680592, 6.030438178); // 15.56°
@@ -133,6 +134,21 @@ public class ShotCalc {
 
     double deltax = Constants.TargetConstants.hub.getX() - turretPositionPose2d.getX() + xOffset;
     double deltay = Constants.TargetConstants.hub.getY() - turretPositionPose2d.getY() + yOffset;
+
+    double initTheta = Math.PI - Math.atan2(deltay, -deltax);
+
+    double theta = (initTheta - robotPose.getRotation().getRadians());
+
+    return mod(theta);
+  }
+
+  public double getPassingYaw(Pose2d robotPose, double xOffset, double yOffset) {
+    Transform2d turretOffsetTransform2d =
+        new Transform2d(turretOffset.getX(), turretOffset.getY(), new Rotation2d());
+    Pose2d turretPositionPose2d = robotPose.plus(turretOffsetTransform2d);
+
+    double deltax = Constants.TargetConstants.pass1.getX() - turretPositionPose2d.getX() + xOffset;
+    double deltay = Constants.TargetConstants.pass1.getY() - turretPositionPose2d.getY() + yOffset;
 
     double initTheta = Math.PI - Math.atan2(deltay, -deltax);
 

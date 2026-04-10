@@ -10,6 +10,7 @@ package frc.robot;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -240,11 +241,15 @@ public class RobotContainer {
     controller.cross().toggleOnTrue(superStructure.masterCommand());
     // controller.cross().whileTrue(rightHood.toAngleDegrees(25));
 
-    controller.square().onTrue(superStructure.deployPivot());
+    controller.square().onTrue(superStructure.cut());
 
     // controller.povUp().toggleOnTrue(superStructure.startupMasterCommand());
 
-    controller.touchpad().toggleOnTrue(superStructure.runShooters5000());
+    controller
+        .touchpad()
+        .onTrue(
+            Commands.parallel(
+                leftTurret.pass(), rightTurret.pass(), leftHood.pass(), rightHood.pass()));
 
     // controller.L1().onTrue(superStructure.masterCommand());
     // controller.R1().onTrue(superStructure.stopMasterCommand());
@@ -257,9 +262,15 @@ public class RobotContainer {
                 simTurretLeft.shootBallCommand(), simTurretRight.shootBallCommand(),
                 leftHood.trackHub(), rightHood.trackHub()));
 
-    controller.povUp().onTrue(superStructure.runShooters5000());
-
     controller.R1().onTrue(Commands.parallel(rightTurret.followHub(), leftTurret.followHub()));
+
+    controller
+        .povLeft()
+        .whileTrue(drive.alignForTrench())
+        .onFalse(Commands.run(() -> drive.runVelocity(new ChassisSpeeds(0, 0, 0))));
+    controller.povDown().whileTrue(drive.moveBackward());
+    controller.povUp().whileTrue(drive.moveForward());
+    controller.povRight().onTrue(superStructure.deployPivot());
 
     // controller
     //     .square()
@@ -308,6 +319,16 @@ public class RobotContainer {
     //     .toggleOnTrue(superStructure.runShooters(0.9));
     manip.povUp().whileTrue(superStructure.hoodsUp()).onFalse(superStructure.stopHoods());
     manip.povDown().whileTrue(superStructure.hoodsDown()).onFalse(superStructure.stopHoods());
+    manip
+        .povLeft()
+        .whileTrue(
+            Commands.parallel(
+                leftTurret.alignWithOffsetAngle(-5), rightTurret.alignWithOffsetAngle(-5)));
+    manip
+        .povRight()
+        .whileTrue(
+            Commands.parallel(
+                leftTurret.alignWithOffsetAngle(5), rightTurret.alignWithOffsetAngle(5)));
 
     // manip
     //     .povLeft()
@@ -317,12 +338,18 @@ public class RobotContainer {
     //     .povRight()
     //     .onTrue(superStructure.decreaseSpeed())
     //     .toggleOnTrue(superStructure.runShooters(1.05));
-    manip.square().onTrue(drive.alignToHub(-5));
-    manip.circle().onTrue(drive.alignToHub(5));
+    // manip.square().onTrue(drive.alignToHub(-5));
+    // manip.circle().onTrue(drive.alignToHub(5));
 
     manip.cross().onTrue(superStructure.stopMasterCommand());
     // controller.L1().onTrue(rightTurret.disableTurret());
     manip.L1().onTrue(superStructure.jiggle()).onFalse(superStructure.stopJiggle());
+    manip.R1().onTrue(pivot.runPivot(0));
+    manip
+        .touchpad()
+        .onTrue(
+            Commands.parallel(
+                leftTurret.setTurretPosEncoder(2.5), rightTurret.setTurretPosEncoder(2.5)));
 
     // manip.triangle().whileTrue(superStructure.reverseIntake());
 
@@ -411,7 +438,7 @@ public class RobotContainer {
     autoChooser.addOption("DepotSource", autos.depotSource());
     autoChooser.addOption("SourceDepot", autos.sourceDepot());
     autoChooser.addOption("SourceSource", autos.sourceSource());
-    
+
     // Preload
     autoChooser.addOption("Single Auto", autos.singleAuto());
   }
