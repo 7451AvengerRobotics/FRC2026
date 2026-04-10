@@ -43,7 +43,7 @@ public final class Constants {
   public static final class IntakePivotConstants {
     public static final int kIntakePivotID = 22;
     public static final double kIntakeGearRatio = 4;
-    public static final double kP = 1;
+    public static final double kP = 2;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
     public static final double kS = 0.0;
@@ -72,7 +72,7 @@ public final class Constants {
     public static final int RightShooterLeaderID = 51;
     public static final double kShooterGearRatio = 1.0;
     public static final double kS = 0;
-    public static final double kP = 0.0075 / 100 * 0.05;
+    public static final double kP = 0.0075 / 100 * 0.08;
     public static final double kD = 0.0075 / 100 * 2;
     public static final double kI = 0.0075 / 100 * 4;
     public static final double kV = 0.0022;
@@ -105,16 +105,20 @@ public final class Constants {
     public static final double kP = 5;
     public static final double kI = 0;
     public static final double kD = 0.37;
-    public static final double kS = 0.8;
+    public static final double kS = 0.9;
     public static final double kV = 1.5;
     public static final double kA = 0.04;
-    public static final double kG = -0.65;
+    public static final double kG = -0.6;
     public static final double latency = 0.02;
   }
   // HI SRIRAMMMMM ;p
   public static final class TargetConstants {
     public static final Translation2d hub =
         new Translation2d(Robot.IsRedAlliance.getAsBoolean() ? 11.915 : 16.54 - 11.915, 4.035);
+    public static final Translation2d pass1 =
+        new Translation2d(
+            !Robot.IsRedAlliance.getAsBoolean() ? 2.54 : 16.54 - 2.54,
+            !Robot.IsRedAlliance.getAsBoolean() ? 0.762 : 8.07 - 0.762);
     public static final double yf = 1.32;
   }
 

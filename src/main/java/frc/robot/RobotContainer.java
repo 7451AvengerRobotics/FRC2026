@@ -344,6 +344,12 @@ public class RobotContainer {
     manip.cross().onTrue(superStructure.stopMasterCommand());
     // controller.L1().onTrue(rightTurret.disableTurret());
     manip.L1().onTrue(superStructure.jiggle()).onFalse(superStructure.stopJiggle());
+    manip.R1().onTrue(pivot.runPivot(0));
+    manip
+        .touchpad()
+        .onTrue(
+            Commands.parallel(
+                leftTurret.setTurretPosEncoder(2.5), rightTurret.setTurretPosEncoder(2.5)));
 
     // manip.triangle().whileTrue(superStructure.reverseIntake());
 

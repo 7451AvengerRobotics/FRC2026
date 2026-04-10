@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.TargetConstants;
 import frc.robot.Constants.TurretConstants;
 import frc.robot.subsystems.Shooters.ShotCalc;
@@ -80,6 +81,8 @@ public class TurretSim extends SubsystemBase {
 
     xf = this.getXf(0, 0);
     passingXf = this.getPassingXf(0, 0);
+
+    Logger.recordOutput("Vr_" + name, Math.hypot(vxr, vyr));
 
     Logger.recordOutput("ZeroedComponentPoses_" + name, new Pose3d[] {new Pose3d()});
     Logger.recordOutput(
@@ -330,12 +333,19 @@ public class TurretSim extends SubsystemBase {
   }
 
   public double getPassingXf(double xOffset, double yOffset) {
-    Translation2d passPosition = new Translation2d(2.54, 0.762);
 
     xf =
         Math.sqrt(
-            Math.pow((drive.applyX(passPosition.getX()) - turretPositionPose2d.getX() + xOffset), 2)
-                + Math.pow((passPosition.getY() - turretPositionPose2d.getY() + yOffset), 2));
+            Math.pow(
+                    (drive.applyX(Constants.TargetConstants.pass1.getX())
+                        - turretPositionPose2d.getX()
+                        + xOffset),
+                    2)
+                + Math.pow(
+                    (Constants.TargetConstants.pass1.getY()
+                        - turretPositionPose2d.getY()
+                        + yOffset),
+                    2));
 
     return xf;
   }

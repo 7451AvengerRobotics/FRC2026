@@ -58,6 +58,7 @@ public class Turret extends SubsystemBase {
                 new MotorOutputConfigs()
                     .withInverted(InvertedValue.Clockwise_Positive)
                     .withNeutralMode(NeutralModeValue.Brake))
+            // .withSoftwareLimitSwitch(new SoftwareLimitSwitchConfigs(true, true, -5, 5))
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
                     .withStatorCurrentLimit(Amps.of(80))
