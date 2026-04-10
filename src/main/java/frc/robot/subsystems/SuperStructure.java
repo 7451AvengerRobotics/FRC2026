@@ -168,6 +168,13 @@ public class SuperStructure {
             soleIntake(), index.runIndex(0.3), feeder.runFeeder(0.2), runShooters5000()));
   }
 
+  public Command strongWeirdMasterCommand() {
+    return Commands.sequence(
+        setPassing(false),
+        Commands.parallel(
+            soleIntake(), index.runIndex(0.6), feeder.runFeeder(0.6), runShooters5000()));
+  }
+
   public Command shooterlessMasterCommand() {
     return Commands.parallel(soleIntake(), index.runIndex(-0.9), feeder.runFeeder(-0.9));
   }

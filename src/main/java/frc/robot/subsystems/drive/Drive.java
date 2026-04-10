@@ -91,6 +91,7 @@ public class Drive extends SubsystemBase {
   public double velOffset = 1;
 
   private final PIDController headingController = new PIDController(2.5, 0.0, 0.0);
+  private final PIDController headingControllerStrong = new PIDController(5, 0.0, 0.0);
   private boolean holonomicControllerActive = false;
   private Pose2d holonomicPoseTarget = new Pose2d();
   private Rotation2d rotation2d = new Rotation2d();
@@ -140,7 +141,7 @@ public class Drive extends SubsystemBase {
         new HolonomicDriveWithPIDController(
             new PIDController(4, 0, 0),
             new PIDController(7, 0, 0),
-            headingController,
+            headingControllerStrong,
             0.5,
             new Pose2d(0.04, 0.04, Rotation2d.fromDegrees(2)),
             1);
@@ -667,7 +668,7 @@ public class Drive extends SubsystemBase {
           double what = shouldFlip() ? -1 : 1;
           runVelocity(
               ChassisSpeeds.fromFieldRelativeSpeeds(
-                  new ChassisSpeeds(2 * what, 0, 0), getPose().getRotation()));
+                  new ChassisSpeeds(4 * what, 0, 0), getPose().getRotation()));
         });
   }
 
@@ -677,7 +678,7 @@ public class Drive extends SubsystemBase {
           double what = shouldFlip() ? -1 : 1;
           runVelocity(
               ChassisSpeeds.fromFieldRelativeSpeeds(
-                  new ChassisSpeeds(-2 * what, 0, 0), getPose().getRotation()));
+                  new ChassisSpeeds(-4 * what, 0, 0), getPose().getRotation()));
         });
   }
 

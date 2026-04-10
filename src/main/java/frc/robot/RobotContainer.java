@@ -241,15 +241,15 @@ public class RobotContainer {
     controller.cross().toggleOnTrue(superStructure.masterCommand());
     // controller.cross().whileTrue(rightHood.toAngleDegrees(25));
 
-    controller.square().onTrue(superStructure.cut());
+    controller.square().onTrue(superStructure.deployPivot());
 
     // controller.povUp().toggleOnTrue(superStructure.startupMasterCommand());
 
-    controller
-        .touchpad()
-        .onTrue(
-            Commands.parallel(
-                leftTurret.pass(), rightTurret.pass(), leftHood.pass(), rightHood.pass()));
+    // controller
+    //     .touchpad()
+    //     .onTrue(
+    //         Commands.parallel(
+    //             leftTurret.pass(), rightTurret.pass(), leftHood.pass(), rightHood.pass()));
 
     // controller.L1().onTrue(superStructure.masterCommand());
     // controller.R1().onTrue(superStructure.stopMasterCommand());
@@ -257,20 +257,16 @@ public class RobotContainer {
     // controller.L1().onTrue(simTurretLeft.shootBallCommand());
     controller
         .L1()
-        .onTrue(
-            Commands.parallel(
-                simTurretLeft.shootBallCommand(), simTurretRight.shootBallCommand(),
-                leftHood.trackHub(), rightHood.trackHub()));
+        .onTrue(drive.alignToHub(0));
 
-    controller.R1().onTrue(Commands.parallel(rightTurret.followHub(), leftTurret.followHub()));
+    // controller.R1().onTrue(Commands.parallel(rightTurret.followHub(), leftTurret.followHub()));
 
     controller
         .povLeft()
         .whileTrue(drive.alignForTrench())
         .onFalse(Commands.run(() -> drive.runVelocity(new ChassisSpeeds(0, 0, 0))));
-    controller.povDown().whileTrue(drive.moveBackward());
-    controller.povUp().whileTrue(drive.moveForward());
-    controller.povRight().onTrue(superStructure.deployPivot());
+    manip.povDown().whileTrue(drive.moveBackward());
+    manip.povUp().whileTrue(drive.moveForward());
 
     // controller
     //     .square()
@@ -299,7 +295,7 @@ public class RobotContainer {
 
     // controller.touchpad().onTrue(drive.driveOverBump());
 
-    manip.PS().onTrue(superStructure.stopIntake());
+    // manip.PS().onTrue(superStructure.stopIntake());
 
     // manip.povLeft().onTrue(superStructure.offsetTurrets(-5 * Math.PI / 180));
     // manip.povRight().onTrue(superStructure.offsetTurrets(5 * Math.PI / 180));
@@ -319,16 +315,16 @@ public class RobotContainer {
     //     .toggleOnTrue(superStructure.runShooters(0.9));
     manip.povUp().whileTrue(superStructure.hoodsUp()).onFalse(superStructure.stopHoods());
     manip.povDown().whileTrue(superStructure.hoodsDown()).onFalse(superStructure.stopHoods());
-    manip
-        .povLeft()
-        .whileTrue(
-            Commands.parallel(
-                leftTurret.alignWithOffsetAngle(-5), rightTurret.alignWithOffsetAngle(-5)));
-    manip
-        .povRight()
-        .whileTrue(
-            Commands.parallel(
-                leftTurret.alignWithOffsetAngle(5), rightTurret.alignWithOffsetAngle(5)));
+    // manip
+    //     .povLeft()
+    //     .whileTrue(
+    //         Commands.parallel(
+    //             leftTurret.alignWithOffsetAngle(-5), rightTurret.alignWithOffsetAngle(-5)));
+    // manip
+    //     .povRight()
+    //     .whileTrue(
+    //         Commands.parallel(
+    //             leftTurret.alignWithOffsetAngle(5), rightTurret.alignWithOffsetAngle(5)));
 
     // manip
     //     .povLeft()
@@ -341,15 +337,17 @@ public class RobotContainer {
     // manip.square().onTrue(drive.alignToHub(-5));
     // manip.circle().onTrue(drive.alignToHub(5));
 
-    manip.cross().onTrue(superStructure.stopMasterCommand());
+    manip.circle().onTrue(superStructure.stopMasterCommand());
+    manip.cross().onTrue(superStructure.masterCommand());
+    manip.triangle().onTrue(superStructure.strongWeirdMasterCommand());
     // controller.L1().onTrue(rightTurret.disableTurret());
     manip.L1().onTrue(superStructure.jiggle()).onFalse(superStructure.stopJiggle());
     manip.R1().onTrue(pivot.runPivot(0));
-    manip
-        .touchpad()
-        .onTrue(
-            Commands.parallel(
-                leftTurret.setTurretPosEncoder(2.5), rightTurret.setTurretPosEncoder(2.5)));
+    // manip
+    //     .touchpad()
+    //     .onTrue(
+    //         Commands.parallel(
+    //             leftTurret.setTurretPosEncoder(2.5), rightTurret.setTurretPosEncoder(2.5)));
 
     // manip.triangle().whileTrue(superStructure.reverseIntake());
 
