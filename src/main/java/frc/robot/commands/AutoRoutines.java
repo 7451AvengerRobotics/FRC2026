@@ -100,7 +100,7 @@ public class AutoRoutines {
             drive.followPPPathCommand("DT-DNZ-F").withTimeout(5), superStruc.weirdMasterCommand()),
         drive.driveToDepotReturn().withTimeout(1),
         drive.followPPPathCommand("DNZ-DB").withTimeout(3),
-        score());
+        scoreWithDriveAlign());
   }
 
   public Command D2_Sw() {
@@ -108,7 +108,7 @@ public class AutoRoutines {
         drive.driveToDX2Start().withTimeout(1),
         Commands.deadline(
             drive.followPPPathCommand("DT-DNZ-2").withTimeout(12), superStruc.weirdMasterCommand()),
-        score());
+        scoreWithDriveAlign());
   }
 
   public Command DN_Sw() {
@@ -119,7 +119,7 @@ public class AutoRoutines {
             drive.followPPPathCommand("DT-DNZ-N").withTimeout(5), superStruc.weirdMasterCommand()),
         drive.driveToDepotReturn().withTimeout(1),
         drive.followPPPathCommand("DNZ-DB").withTimeout(3),
-        score());
+        scoreWithDriveAlign());
   }
 
   public Command DF_D2_Sw() {
@@ -175,10 +175,10 @@ public class AutoRoutines {
         superStruc.deployPivot().withTimeout(2.5),
         superStruc.stopPivot().withTimeout(0.1),
         Commands.deadline(
-            drive.followPPPathCommand("ST-SNZ-N").withTimeout(5), superStruc.weirdMasterCommand()),
+            drive.followPPPathCommand("ST-SNZ-F").withTimeout(5), superStruc.weirdMasterCommand()),
         drive.driveToDepotReturn().withTimeout(1),
         drive.followPPPathCommand("SNZ-SB").withTimeout(3),
-        score());
+        scoreWithDriveAlign());
   }
 
   public Command S2_Sw() {
@@ -186,7 +186,7 @@ public class AutoRoutines {
         drive.driveToDX2Start().withTimeout(1),
         Commands.deadline(
             drive.followPPPathCommand("ST-SNZ-2").withTimeout(12), superStruc.weirdMasterCommand()),
-        score());
+        scoreWithDriveAlign());
   }
 
   public Command SF_S2_Sw() {
@@ -201,7 +201,7 @@ public class AutoRoutines {
             drive.followPPPathCommand("ST-SNZ-N").withTimeout(5), superStruc.weirdMasterCommand()),
         drive.driveToDepotReturn().withTimeout(1),
         drive.followPPPathCommand("SNZ-SB").withTimeout(3),
-        score());
+        scoreWithDriveAlign());
   }
 
   public Command SN_S2_Sw() {
