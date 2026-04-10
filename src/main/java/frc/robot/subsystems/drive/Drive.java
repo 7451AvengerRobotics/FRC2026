@@ -91,7 +91,7 @@ public class Drive extends SubsystemBase {
   public double velOffset = 1;
 
   private final PIDController headingController = new PIDController(2.5, 0.0, 0.0);
-  private final PIDController headingControllerStrong = new PIDController(5, 0.0, 0.0);
+  private final PIDController headingControllerStrong = new PIDController(5, 2, 0.0);
   private boolean holonomicControllerActive = false;
   private Pose2d holonomicPoseTarget = new Pose2d();
   private Rotation2d rotation2d = new Rotation2d();
@@ -580,21 +580,22 @@ public class Drive extends SubsystemBase {
             runOnce(
                 () -> {
                   holonomicControllerActive = true;
-                  holonomicDriveWithPIDController.reset(getPose(), getRobotRelativeSpeeds());
+                  holonomicDriveWithPIDControllerStrong.reset(getPose(), getRobotRelativeSpeeds());
                 }),
             run(() -> {
                   this.rotation2d = rotation;
                   runVelocity(
-                      holonomicDriveWithPIDController.calculateRotations(getPose(), rotation2d));
+                      holonomicDriveWithPIDControllerStrong.calculateRotations(
+                          getPose(), rotation2d));
                   SmartDashboard.putBoolean(
-                      "x controller", holonomicDriveWithPIDController.xReferenceReached());
+                      "x controller", holonomicDriveWithPIDControllerStrong.xReferenceReached());
                   SmartDashboard.putBoolean(
-                      "y controller", holonomicDriveWithPIDController.yReferenceReached());
+                      "y controller", holonomicDriveWithPIDControllerStrong.yReferenceReached());
                   SmartDashboard.putBoolean(
                       "rotation controller",
-                      holonomicDriveWithPIDController.rotationReferenceReached());
+                      holonomicDriveWithPIDControllerStrong.rotationReferenceReached());
                 })
-                .until(holonomicDriveWithPIDController::atReference),
+                .until(holonomicDriveWithPIDControllerStrong::atReference),
             runOnce(this::stop))
         .finallyDo(() -> holonomicControllerActive = false);
   }

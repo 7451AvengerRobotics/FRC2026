@@ -34,6 +34,7 @@ public class Robot extends LoggedRobot {
         Optional<DriverStation.Alliance> alliance = DriverStation.getAlliance();
         return alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red;
         // return true;
+        
       };
 
   public Robot() {

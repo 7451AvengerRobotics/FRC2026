@@ -33,7 +33,7 @@ public class Index extends SubsystemBase {
                     .withSensorToMechanismRatio(IntakePivotConstants.kIntakeGearRatio))
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
-                    .withStatorCurrentLimit(Amps.of(100))
+                    .withStatorCurrentLimit(Amps.of(60))
                     .withStatorCurrentLimitEnable(true));
 
     indexMotor.getConfigurator().apply(cfg);

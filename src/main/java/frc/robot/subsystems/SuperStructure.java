@@ -230,7 +230,7 @@ public class SuperStructure {
   }
 
   public Command cut() {
-    return Commands.parallel(cutTurrets(), resetHoods());
+    return Commands.parallel(resetHoods());
   }
 
   public Command trackHub() {

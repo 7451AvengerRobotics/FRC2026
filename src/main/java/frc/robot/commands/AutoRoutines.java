@@ -99,7 +99,7 @@ public class AutoRoutines {
         Commands.deadline(
             drive.followPPPathCommand("DT-DNZ-F").withTimeout(5), superStruc.weirdMasterCommand()),
         drive.driveToDepotReturn().withTimeout(1),
-        drive.followPPPathCommand("DNZ-DB").withTimeout(3),
+        drive.followPPPathCommand("DNZ-DB").withTimeout(5),
         scoreWithDriveAlign());
   }
 
@@ -113,21 +113,23 @@ public class AutoRoutines {
 
   public Command DN_Sw() {
     return Commands.sequence(
-        superStruc.deployPivot().withTimeout(2.5),
-        superStruc.stopPivot().withTimeout(0.1),
         Commands.deadline(
-            drive.followPPPathCommand("DT-DNZ-N").withTimeout(5), superStruc.weirdMasterCommand()),
+            drive.followPPPathCommand("DT-DNZ-N").withTimeout(5),
+            Commands.sequence(
+                superStruc.deployPivot().withTimeout(2),
+                superStruc.stopPivot().withTimeout(0.1),
+                superStruc.weirdMasterCommand())),
         drive.driveToDepotReturn().withTimeout(1),
-        drive.followPPPathCommand("DNZ-DB").withTimeout(3),
+        drive.followPPPathCommand("DNZ-DB").withTimeout(5),
         scoreWithDriveAlign());
   }
 
   public Command DF_D2_Sw() {
-    return Commands.sequence(DF_Sw().withTimeout(9), D2_Sw());
+    return Commands.sequence(DF_Sw().withTimeout(18), D2_Sw());
   }
 
   public Command DN_D2_Sw() {
-    return Commands.sequence(DN_Sw().withTimeout(10), D2_Sw());
+    return Commands.sequence(DN_Sw().withTimeout(15), D2_Sw());
   }
 
   // Source Side Autons
@@ -176,14 +178,14 @@ public class AutoRoutines {
         superStruc.stopPivot().withTimeout(0.1),
         Commands.deadline(
             drive.followPPPathCommand("ST-SNZ-F").withTimeout(5), superStruc.weirdMasterCommand()),
-        drive.driveToDepotReturn().withTimeout(1),
+        drive.driveToSourceReturn().withTimeout(1),
         drive.followPPPathCommand("SNZ-SB").withTimeout(3),
         scoreWithDriveAlign());
   }
 
   public Command S2_Sw() {
     return Commands.sequence(
-        drive.driveToDX2Start().withTimeout(1),
+        drive.driveToSX2Start().withTimeout(1),
         Commands.deadline(
             drive.followPPPathCommand("ST-SNZ-2").withTimeout(12), superStruc.weirdMasterCommand()),
         scoreWithDriveAlign());
@@ -199,7 +201,7 @@ public class AutoRoutines {
         superStruc.stopPivot().withTimeout(0.1),
         Commands.deadline(
             drive.followPPPathCommand("ST-SNZ-N").withTimeout(5), superStruc.weirdMasterCommand()),
-        drive.driveToDepotReturn().withTimeout(1),
+        drive.driveToSourceReturn().withTimeout(1),
         drive.followPPPathCommand("SNZ-SB").withTimeout(3),
         scoreWithDriveAlign());
   }

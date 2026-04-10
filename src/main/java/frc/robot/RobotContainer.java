@@ -257,7 +257,14 @@ public class RobotContainer {
     // controller.L1().onTrue(simTurretLeft.shootBallCommand());
     controller
         .L1()
-        .onTrue(drive.alignToHub(0));
+        .toggleOnTrue(
+            Commands.parallel(
+                // simTurretLeft.shootBallCommand(), simTurretRight.shootBallCommand(),
+                leftHood.trackHub(), rightHood.trackHub()));
+    controller
+        .R1()
+        .whileTrue(drive.alignToHub(0))
+        .onFalse(Commands.run(() -> drive.runVelocity(new ChassisSpeeds(0, 0, 0))));
 
     // controller.R1().onTrue(Commands.parallel(rightTurret.followHub(), leftTurret.followHub()));
 
@@ -265,8 +272,8 @@ public class RobotContainer {
         .povLeft()
         .whileTrue(drive.alignForTrench())
         .onFalse(Commands.run(() -> drive.runVelocity(new ChassisSpeeds(0, 0, 0))));
-    manip.povDown().whileTrue(drive.moveBackward());
-    manip.povUp().whileTrue(drive.moveForward());
+    controller.povDown().whileTrue(drive.moveBackward());
+    controller.povUp().whileTrue(drive.moveForward());
 
     // controller
     //     .square()
@@ -343,6 +350,8 @@ public class RobotContainer {
     // controller.L1().onTrue(rightTurret.disableTurret());
     manip.L1().onTrue(superStructure.jiggle()).onFalse(superStructure.stopJiggle());
     manip.R1().onTrue(pivot.runPivot(0));
+
+    controller.povRight().onTrue(superStructure.cut());
     // manip
     //     .touchpad()
     //     .onTrue(
