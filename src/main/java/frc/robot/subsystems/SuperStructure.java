@@ -94,7 +94,7 @@ public class SuperStructure {
     return hood.moveDown();
   }
 
-  public Command stopHoods() {
+  public Command stopHood() {
     return hood.stop();
   }
 

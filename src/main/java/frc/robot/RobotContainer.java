@@ -141,16 +141,8 @@ public class RobotContainer {
     }
 
     // Other subsystems
-    // leftTurret =
-    //     new TurretSim(drive, new Transform3d(-0.17, -0.15, 0.39, new Rotation3d()), "Left");
-    // rightTurret =
-    //     new TurretSim(drive, new Transform3d(-0.17, 0.15, 0.39, new Rotation3d()), "Right");
     simTurret = new TurretSim(drive, new Transform3d(-0.17, 0, 0.39, new Rotation3d()));
-    
-    // simTurret = new TurretSim(drive, new Transform3d(), "Left");
-
     shooter = new Shooter(ShooterConstants.ShooterLeaderID, ShooterConstants.ShooterFollowerID, simTurret, drive);
-
     hood =
         new Hood(
             HoodConstants.kLeftHoodMotorID,
@@ -189,35 +181,11 @@ public class RobotContainer {
             () -> -controller.getLeftX(),
             () -> -controller.getRightX()));
 
-    // // Switch to X pattern when X button is pressed
-    // controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
-
-    // controller.L1().onTrue(leftTurret.shootBallCommand());
-    // controller.R1().onTrue(rightTurret.shootBallCommand());
-
-    // // Dropping the intake down
-    // controller.L2().onTrue(superStructure.startIntake());
-    // .toggleOnFalse(superStructure.stopIntake());
-
     controller.triangle().onTrue(superStructure.weirdMasterCommand());
     controller.circle().onTrue(superStructure.stopMasterCommand());
     controller.cross().toggleOnTrue(superStructure.masterCommand());
-    // controller.cross().whileTrue(rightHood.toAngleDegrees(25));
-
     controller.square().onTrue(superStructure.deployPivot());
 
-    // controller.povUp().toggleOnTrue(superStructure.startupMasterCommand());
-
-    // controller
-    //     .touchpad()
-    //     .onTrue(
-    //         Commands.parallel(
-    //             leftTurret.pass(), rightTurret.pass(), leftHood.pass(), rightHood.pass()));
-
-    // controller.L1().onTrue(superStructure.masterCommand());
-    // controller.R1().onTrue(superStructure.stopMasterCommand());
-
-    // controller.L1().onTrue(simTurretLeft.shootBallCommand());
     controller
         .L1()
         .toggleOnTrue(hood.trackHub());
@@ -226,138 +194,24 @@ public class RobotContainer {
         .whileTrue(drive.alignToHub(0))
         .onFalse(Commands.run(() -> drive.runVelocity(new ChassisSpeeds(0, 0, 0))));
 
-    // controller.R1().onTrue(Commands.parallel(rightTurret.followHub(), leftTurret.followHub()));
-
     controller
         .povLeft()
         .whileTrue(drive.alignForTrench())
         .onFalse(Commands.run(() -> drive.runVelocity(new ChassisSpeeds(0, 0, 0))));
     controller.povDown().whileTrue(drive.moveBackward());
     controller.povUp().whileTrue(drive.moveForward());
-
-    // controller
-    //     .square()
-    //     .onTrue(
-    //         Commands.parallel(
-    //             simTurretLeft.setTargetCommand(TargetConstants.hub),
-    //             simTurretRight.setTargetCommand((TargetConstants.hub))));
-    // controller
-    //     .triangle()
-    //     .onTrue(
-    //         Commands.parallel(
-    //             simTurretLeft.setTargetCommand(TargetConstants.hub),
-    //             simTurretRight.setTargetCommand((TargetConstants.hub))));
-    // controller
-    //     .circle()
-    //     .onTrue(
-    //         Commands.parallel(
-    //             simTurretLeft.setTargetCommand(TargetConstants.hub),
-    //             simTurretRight.setTargetCommand((TargetConstants.hub))));
-    // controller
-    //     .cross()
-    //     .onTrue(
-    //         Commands.parallel(
-    //             simTurretLeft.setTargetCommand(TargetConstants.hub),
-    //             simTurretRight.setTargetCommand((TargetConstants.hub))));
-
-    // controller.touchpad().onTrue(drive.driveOverBump());
-
-    // manip.PS().onTrue(superStructure.stopIntake());
-
-    // manip.povLeft().onTrue(superStructure.offsetTurrets(-5 * Math.PI / 180));
-    // manip.povRight().onTrue(superStructure.offsetTurrets(5 * Math.PI / 180));
-
-    // manip
-    //    .L1()
-    //    .whileTrue(Commands.parallel(superStructure.jiggle(), superStructure.stopIntake()))
-    //    .onFalse(Commands.parallel(superStructure.stopJiggle()));
-    // // manip.R1().onTrue(superStructure.stopPivot());
-    // manip
-    //     .povUp()
-    //     .onTrue(superStructure.increaseSpeed())
-    //     .toggleOnTrue(superStructure.runShooters(1.1));
-    // manip
-    //     .povDown()
-    //     .onTrue(superStructure.decreaseSpeed())
-    //     .toggleOnTrue(superStructure.runShooters(0.9));
-    manip.povUp().whileTrue(superStructure.hoodsUp()).onFalse(superStructure.stopHoods());
-    manip.povDown().whileTrue(superStructure.hoodsDown()).onFalse(superStructure.stopHoods());
-    // manip
-    //     .povLeft()
-    //     .whileTrue(
-    //         Commands.parallel(
-    //             leftTurret.alignWithOffsetAngle(-5), rightTurret.alignWithOffsetAngle(-5)));
-    // manip
-    //     .povRight()
-    //     .whileTrue(
-    //         Commands.parallel(
-    //             leftTurret.alignWithOffsetAngle(5), rightTurret.alignWithOffsetAngle(5)));
-
-    // manip
-    //     .povLeft()
-    //     .onTrue(superStructure.increaseSpeed())
-    //     .toggleOnTrue(superStructure.runShooters(0.95));
-    // manip
-    //     .povRight()
-    //     .onTrue(superStructure.decreaseSpeed())
-    //     .toggleOnTrue(superStructure.runShooters(1.05));
-    // manip.square().onTrue(drive.alignToHub(-5));
-    // manip.circle().onTrue(drive.alignToHub(5));
-
+    controller.povRight().onTrue(superStructure.cut());
+ 
     manip.circle().onTrue(superStructure.stopMasterCommand());
     manip.cross().onTrue(superStructure.masterCommand());
     manip.triangle().onTrue(superStructure.strongWeirdMasterCommand());
-    // controller.L1().onTrue(rightTurret.disableTurret());
+    
     manip.L1().onTrue(superStructure.jiggle()).onFalse(superStructure.stopJiggle());
     manip.R1().onTrue(pivot.runPivot(0));
 
-    controller.povRight().onTrue(superStructure.cut());
-    // manip
-    //     .touchpad()
-    //     .onTrue(
-    //         Commands.parallel(
-    //             leftTurret.setTurretPosEncoder(2.5), rightTurret.setTurretPosEncoder(2.5)));
-
-    // manip.triangle().whileTrue(superStructure.reverseIntake());
-
-    // manip.R1().onTrue(superStructure.deployPivot());
-    // manip.R1().onTrue(superStructure.offsetShooters(0.025));
-
-    // controller.PS().onTrue(superStructure.stopShooters());
-
-    // controller.touchpad().toggleOnTrue(superStructure.playThrough());
+    manip.povUp().whileTrue(superStructure.hoodsUp()).onFalse(superStructure.stopHood());
+    manip.povDown().whileTrue(superStructure.hoodsDown()).onFalse(superStructure.stopHood());
   }
-
-  // public Command driveOverSourceSideBump(){
-  //   return Commands.sequence(Commands.run(() -> {
-  //     drive.driveToPose(new Pose2d(0, 0, null))
-  //   }, null))
-  // }
-
-  /*
-  > Task :discoverroborio
-  Discovering Target roborio
-  admin @ 10.74.51.2: Resolved but not connected.
-    Reason: TimeoutException
-    Discovery timed out.
-  admin @ 172.22.11.2: Resolved but not connected.
-    Reason: TimeoutException
-    Discovery timed out.
-  admin @ roborio-7451-FRC.lan: Resolved but not connected.
-    Reason: TimeoutException
-    Discovery timed out.
-  admin @ roborio-7451-FRC: Resolved but not connected.
-    Reason: TimeoutException
-    Discovery timed out.
-  admin @ roborio-7451-FRC.local: Resolved but not connected.
-    Reason: TimeoutException
-    Discovery timed out.
-  admin @ null: Resolved but not connected.
-    Reason: TimeoutException
-    Discovery timed out.
-  admin @ roborio-7451-FRC.frc-field.local: Failed resolution.
-    Reason: RuntimeException
-    Unknown Host */
 
   public void configureAutos() {
     // AdvantageKit autos

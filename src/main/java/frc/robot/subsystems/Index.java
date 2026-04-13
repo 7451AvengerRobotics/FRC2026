@@ -61,7 +61,6 @@ public class Index extends SubsystemBase {
   @Override
   public void periodic() {
     Logger.recordOutput("Index Voltage", indexMotor.getMotorVoltage().getValueAsDouble());
-
     Logger.recordOutput("Index Current", indexMotor.getStatorCurrent().getValueAsDouble());
   }
 }
