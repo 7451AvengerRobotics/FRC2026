@@ -29,7 +29,6 @@ import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.Intake.IntakePivot;
 import frc.robot.subsystems.Shooters.Hood;
 import frc.robot.subsystems.Shooters.Shooter;
-import frc.robot.subsystems.Shooters.Turret;
 import frc.robot.subsystems.SimFiles.TurretSim;
 import frc.robot.subsystems.SuperStructure;
 import frc.robot.subsystems.drive.Drive;
@@ -51,16 +50,13 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   private final Vision vision;
-  private final Turret leftTurret;
-  private final Turret rightTurret;
   private final TurretSim simTurretLeft;
   private final TurretSim simTurretRight;
   private final Index index = new Index();
   private final Intake intake = new Intake();
   private final Feeder feeder = new Feeder();
   private final IntakePivot pivot = new IntakePivot();
-  private final Shooter leftShooter;
-  private final Shooter rightShooter;
+  private final Shooter shooter;
   private final Hood leftHood;
   private final Hood rightHood;
   private final SuperStructure superStructure;
@@ -158,24 +154,7 @@ public class RobotContainer {
 
     // simTurret = new TurretSim(drive, new Transform3d(), "Left");
 
-    leftShooter = new Shooter(ShooterConstants.LeftShooterLeaderID, "left", simTurretLeft, drive);
-    rightShooter =
-        new Shooter(ShooterConstants.RightShooterLeaderID, "right", simTurretRight, drive);
-
-    leftTurret =
-        new Turret(
-            TurretConstants.kLeftTurretID,
-            Constants.RobotSide.LEFT,
-            drive,
-            new Transform3d(-0.17, 0.15, 0.39, new Rotation3d()),
-            simTurretLeft);
-    rightTurret =
-        new Turret(
-            TurretConstants.kRightTurretID,
-            Constants.RobotSide.RIGHT,
-            drive,
-            new Transform3d(-0.17, -0.15, 0.39, new Rotation3d()),
-            simTurretRight);
+    shooter = new Shooter(ShooterConstants.LeftShooterLeaderID, simTurretLeft, drive);
 
     leftHood =
         new Hood(
@@ -194,10 +173,7 @@ public class RobotContainer {
             index,
             intake,
             feeder,
-            leftShooter,
-            rightShooter,
-            leftTurret,
-            rightTurret,
+            shooter,
             leftHood,
             rightHood,
             pivot);

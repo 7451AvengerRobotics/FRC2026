@@ -8,16 +8,12 @@ import frc.robot.subsystems.Intake.IntakePivot;
 import frc.robot.subsystems.Intake.IntakePivot.PivotPosition;
 import frc.robot.subsystems.Shooters.Hood;
 import frc.robot.subsystems.Shooters.Shooter;
-import frc.robot.subsystems.Shooters.Turret;
 
 public class SuperStructure {
   private final Intake intake;
   private final Index index;
   private final Feeder feeder;
-  private final Shooter leftShooter;
-  private final Shooter rightShooter;
-  private final Turret leftTurret;
-  private final Turret rightTurret;
+  private final Shooter shooter;
   private final Hood leftHood;
   private final Hood rightHood;
   private final IntakePivot pivot;
@@ -29,20 +25,14 @@ public class SuperStructure {
       Index index,
       Intake intake,
       Feeder feeder,
-      Shooter leftShooter,
-      Shooter rightShooter,
-      Turret leftTurret,
-      Turret rightTurret,
+      Shooter shooter,
       Hood leftHood,
       Hood rightHood,
       IntakePivot pivot) {
     this.intake = intake;
     this.index = index;
     this.feeder = feeder;
-    this.leftShooter = leftShooter;
-    this.rightShooter = rightShooter;
-    this.leftTurret = leftTurret;
-    this.rightTurret = rightTurret;
+    this.shooter = shooter;
     this.leftHood = leftHood;
     this.rightHood = rightHood;
     this.pivot = pivot;
@@ -83,14 +73,6 @@ public class SuperStructure {
     return index.runIndex(0.3);
   }
 
-  public Command leftShoot() {
-    return leftShooter.runShooter(shooterOffset);
-  }
-
-  public Command rightShoot() {
-    return rightShooter.runShooter(shooterOffset);
-  }
-
   public Command increaseSpeed() {
     return Commands.runOnce(() -> shooterOffset += 0.025);
   }
@@ -99,18 +81,8 @@ public class SuperStructure {
     return Commands.runOnce(() -> shooterOffset -= 0.025);
   }
 
-  public Command runShooters() {
-    return Commands.parallel(
-        leftShooter.runShooter(shooterOffset), rightShooter.runShooter(shooterOffset));
-  }
-
-  public Command runShooters(double shooterOffset) {
-    return Commands.parallel(
-        leftShooter.runShooter(shooterOffset), rightShooter.runShooter(shooterOffset));
-  }
-
-  public Command trackTurrets() {
-    return Commands.parallel(leftTurret.followHub(), rightTurret.followHub());
+  public Command runShooter() {
+    return shooter.runShooter(shooterOffset);
   }
 
   public Command setHoods() {
@@ -130,15 +102,15 @@ public class SuperStructure {
   }
 
   public Command runShooters5000() {
-    return Commands.parallel(leftShooter.runShooter5000(), rightShooter.runShooter5000());
+    return shooter.runShooter5000();
   }
 
   public Command runShooters3000() {
-    return Commands.parallel(leftShooter.runShooter3000(), rightShooter.runShooter3000());
+    return shooter.runShooter3000();
   }
 
   public Command stopShooters() {
-    return Commands.parallel(leftShooter.stopShooter(), rightShooter.stopShooter());
+    return shooter.stopShooter();
   }
 
   public Command masterCommand() {
@@ -154,7 +126,7 @@ public class SuperStructure {
   public Command startupMasterCommand() {
     return Commands.parallel( // These run immediately
         soleIntake(),
-        runShooters(),
+        runShooter(),
 
         // This branch waits, then starts feeder/index
         Commands.sequence(
@@ -181,7 +153,7 @@ public class SuperStructure {
 
   public Command intakelessMasterCommand() {
     return Commands.parallel(
-        intake.stopIntake(), index.runIndex(-0.9), feeder.runFeeder(-0.9), runShooters());
+        intake.stopIntake(), index.runIndex(-0.9), feeder.runFeeder(-0.9), runShooter());
   }
 
   public Command shooterlessWeirdMasterCommand() {
@@ -213,16 +185,8 @@ public class SuperStructure {
     return pivot.toPosition(0);
   }
 
-  public Command shootOnMove() {
-    return Commands.parallel(trackTurrets(), setHoods(), runShooters());
-  }
-
   public Command outtake() {
     return Commands.parallel(index.runIndex(0.9), intake.runIntake(1.0));
-  }
-
-  public Command cutTurrets() {
-    return Commands.parallel(leftTurret.cutTurret(), rightTurret.cutTurret());
   }
 
   public Command resetHoods() {
@@ -235,9 +199,5 @@ public class SuperStructure {
 
   public Command trackHub() {
     return Commands.parallel(leftHood.trackHub(), rightHood.trackHub());
-  }
-
-  public Command followHub() {
-    return Commands.parallel(leftTurret.followHub(), rightTurret.followHub());
   }
 }

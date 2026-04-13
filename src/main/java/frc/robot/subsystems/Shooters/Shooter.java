@@ -22,17 +22,15 @@ public class Shooter extends SubsystemBase {
   private final SparkFlex shooterLeader;
   private final SparkClosedLoopController closedLoopController;
   private final ShotCalc shotCalc;
-  private final String name;
   private TurretSim simTurret;
   private Drive drive;
   private double velOffset = 1;
 
   private double ballRequiredVel;
 
-  public Shooter(int leaderID, String name, TurretSim simTurret, Drive drive) {
+  public Shooter(int leaderID, TurretSim simTurret, Drive drive) {
 
     shooterLeader = new SparkFlex(leaderID, MotorType.kBrushless);
-    this.name = name;
     this.simTurret = simTurret;
     this.drive = drive;
     closedLoopController = shooterLeader.getClosedLoopController();
@@ -101,10 +99,10 @@ public class Shooter extends SubsystemBase {
 
   @Override
   public void periodic() {
-    Logger.recordOutput("Velocity in RPM_" + name, shooterLeader.getEncoder().getVelocity());
-    Logger.recordOutput("Shooter Voltage" + name, shooterLeader.getAppliedOutput());
+    Logger.recordOutput("Velocity in RPM", shooterLeader.getEncoder().getVelocity());
+    Logger.recordOutput("Shooter Voltage", shooterLeader.getAppliedOutput());
 
-    Logger.recordOutput("Shooter Current" + name, shooterLeader.getOutputCurrent());
+    Logger.recordOutput("Shooter Current", shooterLeader.getOutputCurrent());
   }
 
   public void run(double power) {
