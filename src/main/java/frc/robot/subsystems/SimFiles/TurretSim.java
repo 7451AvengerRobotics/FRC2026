@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.TargetConstants;
-import frc.robot.Constants.TurretConstants;
 import frc.robot.subsystems.Shooters.ShotCalc;
 import frc.robot.subsystems.drive.Drive;
 import java.util.ArrayList;
@@ -99,8 +98,8 @@ public class TurretSim extends SubsystemBase {
   }
 
   public double calcYaw() {
-    double deltax = target.getX() - turretPositionPose2d.getX() + vxr * TurretConstants.latency;
-    double deltay = target.getY() - turretPositionPose2d.getY() + vyr * TurretConstants.latency;
+    double deltax = target.getX() - turretPositionPose2d.getX();
+    double deltay = target.getY() - turretPositionPose2d.getY();
     double initTheta;
 
     if (deltax == 0) {
