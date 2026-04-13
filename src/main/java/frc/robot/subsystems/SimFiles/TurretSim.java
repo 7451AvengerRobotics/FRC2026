@@ -22,7 +22,6 @@ import org.littletonrobotics.junction.Logger;
 public class TurretSim extends SubsystemBase {
   Drive drive;
   Transform3d turretOffset;
-  String name;
   Transform2d turretOffsetTransform2d;
   Pose2d turretPositionPose2d;
 
@@ -41,10 +40,9 @@ public class TurretSim extends SubsystemBase {
 
   private final ShotCalc shotCalc;
 
-  public TurretSim(Drive drive, Transform3d turretOffset, String name) {
+  public TurretSim(Drive drive, Transform3d turretOffset) {
     this.drive = drive;
     this.turretOffset = turretOffset;
-    this.name = name;
 
     turretOffsetTransform2d =
         new Transform2d(turretOffset.getX(), turretOffset.getY(), new Rotation2d());
@@ -82,11 +80,11 @@ public class TurretSim extends SubsystemBase {
     xf = this.getXf(0, 0);
     passingXf = this.getPassingXf(0, 0);
 
-    Logger.recordOutput("Vr_" + name, Math.hypot(vxr, vyr));
+    Logger.recordOutput("Vr_", Math.hypot(vxr, vyr));
 
-    Logger.recordOutput("ZeroedComponentPoses_" + name, new Pose3d[] {new Pose3d()});
+    Logger.recordOutput("ZeroedComponentPoses_", new Pose3d[] {new Pose3d()});
     Logger.recordOutput(
-        "FinalPoses_" + name,
+        "FinalPoses_",
         new Pose3d[] {new Pose3d(turretOffset.getTranslation(), new Rotation3d(0, 0, calcYaw()))});
 
     activeFuel.removeIf(
@@ -96,7 +94,7 @@ public class TurretSim extends SubsystemBase {
         });
 
     Logger.recordOutput(
-        "GamePieces/Fuel_" + name,
+        "GamePieces/Fuel_",
         activeFuel.stream().map(FuelSim::getPose).toArray(Pose3d[]::new));
   }
 

@@ -50,8 +50,7 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   private final Vision vision;
-  private final TurretSim simTurretLeft;
-  private final TurretSim simTurretRight;
+  private final TurretSim simTurret;
   private final Index index = new Index();
   private final Intake intake = new Intake();
   private final Feeder feeder = new Feeder();
@@ -146,20 +145,17 @@ public class RobotContainer {
     //     new TurretSim(drive, new Transform3d(-0.17, -0.15, 0.39, new Rotation3d()), "Left");
     // rightTurret =
     //     new TurretSim(drive, new Transform3d(-0.17, 0.15, 0.39, new Rotation3d()), "Right");
-    simTurretLeft =
-        new TurretSim(drive, new Transform3d(-0.17, 0.15, 0.39, new Rotation3d()), "Left");
-    simTurretRight =
-        new TurretSim(drive, new Transform3d(-0.17, -0.15, 0.39, new Rotation3d()), "Right");
-
+    simTurret = new TurretSim(drive, new Transform3d(-0.17, 0, 0.39, new Rotation3d()));
+    
     // simTurret = new TurretSim(drive, new Transform3d(), "Left");
 
-    shooter = new Shooter(ShooterConstants.ShooterLeaderID, ShooterConstants.ShooterFollowerID, simTurretLeft, drive);
+    shooter = new Shooter(ShooterConstants.ShooterLeaderID, ShooterConstants.ShooterFollowerID, simTurret, drive);
 
     hood =
         new Hood(
             HoodConstants.kLeftHoodMotorID,
             HoodConstants.kLeftHoodEncoderID,
-            simTurretLeft);
+            simTurret);
     superStructure =
         new SuperStructure(
             index,
