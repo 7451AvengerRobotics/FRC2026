@@ -282,8 +282,7 @@ public class AutoRoutines {
     return Commands.parallel(
         Commands.run(() -> drive.runVelocity(new ChassisSpeeds(0, 0, 0))).withTimeout(0.5),
         Commands.sequence(new WaitCommand(1), superStruc.masterCommand()),
-        superStruc.trackHub(),
-        superStruc.followHub());
+        superStruc.trackHub());
   }
 
   public Command singleAuto() {
