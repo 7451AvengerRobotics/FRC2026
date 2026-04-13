@@ -191,5 +191,12 @@ public class Hood extends SubsystemBase {
     Logger.recordOutput("Hood/AngleDeg" + side, Math.toDegrees(angleRad));
     Logger.recordOutput(
         "Hood/SuggestedAngleDeg" + side, Math.toDegrees(simTurret.getMovingPitch()));
+    Logger.recordOutput(
+        "hood Voltage" + (side == RobotSide.LEFT ? " Left" : " Right"),
+        hoodMotor.getMotorVoltage().getValueAsDouble());
+
+    Logger.recordOutput(
+        "hood Current" + (side == RobotSide.LEFT ? " Left" : " Right"),
+        hoodMotor.getStatorCurrent().getValueAsDouble());
   }
 }

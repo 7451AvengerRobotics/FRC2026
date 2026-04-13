@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.IndexConstants;
 import frc.robot.Constants.IntakePivotConstants;
+import org.littletonrobotics.junction.Logger;
 
 public class Index extends SubsystemBase {
 
@@ -55,5 +56,12 @@ public class Index extends SubsystemBase {
         () -> {
           this.run(0);
         });
+  }
+
+  @Override
+  public void periodic() {
+    Logger.recordOutput("Index Voltage", indexMotor.getMotorVoltage().getValueAsDouble());
+
+    Logger.recordOutput("Index Current", indexMotor.getStatorCurrent().getValueAsDouble());
   }
 }

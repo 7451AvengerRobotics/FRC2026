@@ -19,6 +19,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.IntakePivotConstants;
+import org.littletonrobotics.junction.Logger;
 
 /* TODO
  * 1. Find proper inverted value
@@ -115,5 +116,12 @@ public class IntakePivot extends SubsystemBase {
     private PivotPosition(double rotations) {
       this.rotations = rotations;
     }
+  }
+
+  @Override
+  public void periodic() {
+    Logger.recordOutput("Pivot Voltage", intakePivot.getMotorVoltage().getValueAsDouble());
+
+    Logger.recordOutput("Pivot Current", intakePivot.getStatorCurrent().getValueAsDouble());
   }
 }

@@ -29,12 +29,17 @@ public class Robot extends LoggedRobot {
   private Command autonomousCommand;
   private RobotContainer robotContainer;
 
-  public static BooleanSupplier IsRedAlliance =
+  public static final BooleanSupplier IsRedAlliance =
       () -> {
-        Optional<DriverStation.Alliance> alliance = DriverStation.getAlliance();
+        while (DriverStation.getAlliance().isEmpty()) {
+          try {
+            Thread.sleep(10);
+          } catch (InterruptedException e) {
+
+          }
+        }
+        final Optional<DriverStation.Alliance> alliance = DriverStation.getAlliance();
         return alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red;
-        // return true;
-        
       };
 
   public Robot() {

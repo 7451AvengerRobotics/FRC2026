@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.IntakePivotConstants;
+import org.littletonrobotics.junction.Logger;
 
 public class Intake extends SubsystemBase {
 
@@ -33,7 +34,7 @@ public class Intake extends SubsystemBase {
                     .withSensorToMechanismRatio(IntakePivotConstants.kIntakeGearRatio))
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
-                    .withStatorCurrentLimit(Amps.of(80))
+                    .withStatorCurrentLimit(Amps.of(60))
                     .withStatorCurrentLimitEnable(true));
 
     intake.getConfigurator().apply(cfg);
@@ -61,5 +62,11 @@ public class Intake extends SubsystemBase {
         () -> {
           this.setIntakePower(0);
         });
+  }
+
+  @Override
+  public void periodic() {
+    Logger.recordOutput("Intake Voltage", intake.getMotorVoltage().getValueAsDouble());
+    Logger.recordOutput("Intake Current", intake.getStatorCurrent().getValueAsDouble());
   }
 }

@@ -102,6 +102,9 @@ public class Shooter extends SubsystemBase {
   @Override
   public void periodic() {
     Logger.recordOutput("Velocity in RPM_" + name, shooterLeader.getEncoder().getVelocity());
+    Logger.recordOutput("Shooter Voltage" + name, shooterLeader.getAppliedOutput());
+
+    Logger.recordOutput("Shooter Current" + name, shooterLeader.getOutputCurrent());
   }
 
   public void run(double power) {
