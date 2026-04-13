@@ -82,7 +82,7 @@ public class AutoRoutines {
         superStruc.stopPivot().withTimeout(0.1),
         Commands.deadline(
             drive.followPPPathCommand("DT-DNZ-N").withTimeout(5), superStruc.weirdMasterCommand()),
-        drive.driveToDepotReturn().withTimeout(1),
+        drive.driveToDepotReturn().withTimeout(3),
         drive.followPPPathCommand("DNZ-DB").withTimeout(3),
         score());
   }
@@ -262,7 +262,7 @@ public class AutoRoutines {
 
   public Command scoreWithDriveAlign() {
     return Commands.sequence(
-        Commands.deadline(drive.alignToHub().withTimeout(2), superStruc.trackHub()),
+        Commands.parallel(drive.alignToHub(), superStruc.trackHub()).withTimeout(2),
         Commands.run(() -> drive.runVelocity(new ChassisSpeeds(0, 0, 0))).withTimeout(0.5),
         // Commands.repeatingSequence(
         //     superStruc.masterCommand().withTimeout(3),
