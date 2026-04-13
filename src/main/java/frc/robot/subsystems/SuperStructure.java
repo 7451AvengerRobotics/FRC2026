@@ -14,8 +14,7 @@ public class SuperStructure {
   private final Index index;
   private final Feeder feeder;
   private final Shooter shooter;
-  private final Hood leftHood;
-  private final Hood rightHood;
+  private final Hood hood;
   private final IntakePivot pivot;
   private double shooterOffset = 1;
 
@@ -26,15 +25,13 @@ public class SuperStructure {
       Intake intake,
       Feeder feeder,
       Shooter shooter,
-      Hood leftHood,
-      Hood rightHood,
+      Hood hood,
       IntakePivot pivot) {
     this.intake = intake;
     this.index = index;
     this.feeder = feeder;
     this.shooter = shooter;
-    this.leftHood = leftHood;
-    this.rightHood = rightHood;
+    this.hood = hood;
     this.pivot = pivot;
   }
 
@@ -86,19 +83,19 @@ public class SuperStructure {
   }
 
   public Command setHoods() {
-    return Commands.parallel(leftHood.trackHub(), rightHood.trackHub());
+    return hood.trackHub();
   }
 
   public Command hoodsUp() {
-    return Commands.parallel(leftHood.moveUp(), rightHood.moveUp());
+    return hood.moveUp();
   }
 
   public Command hoodsDown() {
-    return Commands.parallel(leftHood.moveDown(), rightHood.moveDown());
+    return hood.moveDown();
   }
 
   public Command stopHoods() {
-    return Commands.parallel(leftHood.stop(), rightHood.stop());
+    return hood.stop();
   }
 
   public Command runShooters5000() {
@@ -190,7 +187,7 @@ public class SuperStructure {
   }
 
   public Command resetHoods() {
-    return Commands.parallel(leftHood.resetHood(), rightHood.resetHood());
+    return hood.resetHood();
   }
 
   public Command cut() {
@@ -198,6 +195,6 @@ public class SuperStructure {
   }
 
   public Command trackHub() {
-    return Commands.parallel(leftHood.trackHub(), rightHood.trackHub());
+    return hood.trackHub();
   }
 }

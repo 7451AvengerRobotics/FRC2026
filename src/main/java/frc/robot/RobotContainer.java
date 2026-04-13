@@ -57,8 +57,7 @@ public class RobotContainer {
   private final Feeder feeder = new Feeder();
   private final IntakePivot pivot = new IntakePivot();
   private final Shooter shooter;
-  private final Hood leftHood;
-  private final Hood rightHood;
+  private final Hood hood;
   private final SuperStructure superStructure;
 
   // Controller
@@ -156,26 +155,18 @@ public class RobotContainer {
 
     shooter = new Shooter(ShooterConstants.ShooterLeaderID, ShooterConstants.ShooterFollowerID, simTurretLeft, drive);
 
-    leftHood =
+    hood =
         new Hood(
             HoodConstants.kLeftHoodMotorID,
             HoodConstants.kLeftHoodEncoderID,
-            RobotSide.LEFT,
             simTurretLeft);
-    rightHood =
-        new Hood(
-            HoodConstants.kRightHoodMotorID,
-            HoodConstants.kRightHoodEncoderID,
-            RobotSide.RIGHT,
-            simTurretRight);
     superStructure =
         new SuperStructure(
             index,
             intake,
             feeder,
             shooter,
-            leftHood,
-            rightHood,
+            hood,
             pivot);
 
     // Set up auto routines
@@ -233,10 +224,7 @@ public class RobotContainer {
     // controller.L1().onTrue(simTurretLeft.shootBallCommand());
     controller
         .L1()
-        .toggleOnTrue(
-            Commands.parallel(
-                // simTurretLeft.shootBallCommand(), simTurretRight.shootBallCommand(),
-                leftHood.trackHub(), rightHood.trackHub()));
+        .toggleOnTrue(hood.trackHub());
     controller
         .R1()
         .whileTrue(drive.alignToHub(0))

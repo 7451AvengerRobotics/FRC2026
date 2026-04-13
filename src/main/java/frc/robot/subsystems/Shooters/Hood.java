@@ -46,13 +46,11 @@ public class Hood extends SubsystemBase {
   private final CANcoder hoodEncoder;
   private final MotionMagicVoltage hoodRequest = new MotionMagicVoltage(0);
   private final TurretSim simTurret;
-  private final RobotSide side;
   private final DutyCycleOut motorDutyCycleOut = new DutyCycleOut(0);
 
-  public Hood(int motorID, int encoderID, RobotSide side, TurretSim simTurret) {
+  public Hood(int motorID, int encoderID, TurretSim simTurret) {
 
     this.simTurret = simTurret;
-    this.side = side;
 
     hoodMotor = new TalonFXS(motorID);
     hoodEncoder = new CANcoder(encoderID);
@@ -65,8 +63,6 @@ public class Hood extends SubsystemBase {
                     .withNeutralMode(NeutralModeValue.Brake))
             .withExternalFeedback(
                 new ExternalFeedbackConfigs()
-                    // .withRotorToSensorRatio(1)
-                    // .withSensorToMechanismRatio(102.47596154)
                     .withFeedbackRemoteSensorID(encoderID)
                     .withExternalFeedbackSensorSource(
                         ExternalFeedbackSensorSourceValue.RemoteCANcoder))
@@ -188,15 +184,14 @@ public class Hood extends SubsystemBase {
   @Override
   public void periodic() {
     double angleRad = getAngleRad();
-    Logger.recordOutput("Hood/AngleDeg" + side, Math.toDegrees(angleRad));
+    Logger.recordOutput("Hood/AngleDeg", Math.toDegrees(angleRad));
     Logger.recordOutput(
-        "Hood/SuggestedAngleDeg" + side, Math.toDegrees(simTurret.getMovingPitch()));
+        "Hood/SuggestedAngleDeg", Math.toDegrees(simTurret.getMovingPitch()));
     Logger.recordOutput(
-        "hood Voltage" + (side == RobotSide.LEFT ? " Left" : " Right"),
+        "hood Voltage",
         hoodMotor.getMotorVoltage().getValueAsDouble());
-
     Logger.recordOutput(
-        "hood Current" + (side == RobotSide.LEFT ? " Left" : " Right"),
+        "hood Current",
         hoodMotor.getStatorCurrent().getValueAsDouble());
   }
 }
