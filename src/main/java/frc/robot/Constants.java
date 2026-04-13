@@ -68,8 +68,8 @@ public final class Constants {
   }
 
   public static final class ShooterConstants {
-    public static final int LeftShooterLeaderID = 50;
-    public static final int RightShooterLeaderID = 51;
+    public static final int ShooterLeaderID = 50;
+    public static final int ShooterFollowerID = 51;
     public static final double kShooterGearRatio = 1.0;
     public static final double kS = 0;
     public static final double kP = 0.0075 / 100 * 0.08;

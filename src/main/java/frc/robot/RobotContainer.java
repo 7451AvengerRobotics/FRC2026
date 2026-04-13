@@ -154,7 +154,7 @@ public class RobotContainer {
 
     // simTurret = new TurretSim(drive, new Transform3d(), "Left");
 
-    shooter = new Shooter(ShooterConstants.LeftShooterLeaderID, simTurretLeft, drive);
+    shooter = new Shooter(ShooterConstants.ShooterLeaderID, ShooterConstants.ShooterFollowerID, simTurretLeft, drive);
 
     leftHood =
         new Hood(
