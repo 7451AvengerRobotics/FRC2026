@@ -183,7 +183,7 @@ public class RobotContainer {
         .onFalse(Commands.run(() -> drive.runVelocity(new ChassisSpeeds(0, 0, 0))));
     controller.povDown().whileTrue(drive.moveBackward());
     controller.povUp().whileTrue(drive.moveForward());
-    controller.povRight().onTrue(superStructure.cut());
+    controller.povRight().onTrue(superStructure.resetHoods());
 
     manip.circle().onTrue(superStructure.stopMasterCommand());
     manip.cross().onTrue(superStructure.masterCommand());

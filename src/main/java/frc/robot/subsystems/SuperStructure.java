@@ -15,9 +15,6 @@ public class SuperStructure {
   private final Shooter shooter;
   private final Hood hood;
   private final IntakePivot pivot;
-  private double shooterOffset = 1;
-
-  private boolean passing = false;
 
   public SuperStructure(
       Index index,
@@ -30,13 +27,6 @@ public class SuperStructure {
     this.shooter = shooter;
     this.hood = hood;
     this.pivot = pivot;
-  }
-
-  public Command setPassing(boolean passing) {
-    return Commands.runOnce(
-        () -> {
-          this.passing = passing;
-        });
   }
 
   public Command soleIntake() {
@@ -57,18 +47,6 @@ public class SuperStructure {
 
   public Command reverseIndex() {
     return index.runIndex(0.3);
-  }
-
-  public Command increaseSpeed() {
-    return Commands.runOnce(() -> shooterOffset += 0.025);
-  }
-
-  public Command decreaseSpeed() {
-    return Commands.runOnce(() -> shooterOffset -= 0.025);
-  }
-
-  public Command runShooter() {
-    return shooter.runShooter(shooterOffset);
   }
 
   public Command setHoods() {
@@ -111,7 +89,7 @@ public class SuperStructure {
   public Command startupMasterCommand() {
     return Commands.parallel( // These run immediately
         soleIntake(),
-        runShooter(),
+        runShooters5000(),
 
         // This branch waits, then starts feeder/index
         Commands.sequence(
@@ -119,30 +97,37 @@ public class SuperStructure {
   }
 
   public Command weirdMasterCommand() {
-    return Commands.sequence(
-        setPassing(false),
-        Commands.parallel(
-            soleIntake(), index.runIndex(0.3), runShooters5000()));
+    return Commands.parallel(
+      soleIntake(), 
+      index.runIndex(0.3), 
+      runShooters5000());
   }
 
   public Command strongWeirdMasterCommand() {
-    return Commands.sequence(
-        setPassing(false),
-        Commands.parallel(
-            soleIntake(), index.runIndex(0.6), runShooters5000()));
+    return Commands.parallel(
+      soleIntake(), 
+      index.runIndex(0.6), 
+      runShooters5000());
   }
 
   public Command shooterlessMasterCommand() {
-    return Commands.parallel(soleIntake(), index.runIndex(-0.9));
+    return Commands.parallel(
+      soleIntake(), 
+      index.runIndex(-0.9),
+      shooter.stopShooter());
   }
 
   public Command intakelessMasterCommand() {
     return Commands.parallel(
-        intake.stopIntake(), index.runIndex(-0.9), runShooter());
+        intake.stopIntake(), 
+        index.runIndex(-0.9), 
+        runShooters5000());
   }
 
   public Command shooterlessWeirdMasterCommand() {
-    return Commands.parallel(soleIntake(), index.runIndex(0.6));
+    return Commands.parallel(
+      soleIntake(), 
+      index.runIndex(0.6));
   }
 
   public Command stopMasterCommand() {
@@ -170,16 +155,8 @@ public class SuperStructure {
     return pivot.toPosition(0);
   }
 
-  public Command outtake() {
-    return Commands.parallel(index.runIndex(0.9), intake.runIntake(1.0));
-  }
-
   public Command resetHoods() {
     return hood.resetHood();
-  }
-
-  public Command cut() {
-    return Commands.parallel(resetHoods());
   }
 
   public Command trackHub() {
