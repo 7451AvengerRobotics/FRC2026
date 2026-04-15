@@ -30,11 +30,6 @@ public final class Constants {
     REPLAY
   }
 
-  public static enum Side {
-    SOURCE,
-    DEPOT
-  }
-
   public static final class IntakePivotConstants {
     public static final int kIntakePivotID = 22;
     public static final double kIntakeGearRatio = 4;
@@ -95,14 +90,5 @@ public final class Constants {
             !Robot.IsRedAlliance.getAsBoolean() ? 2.54 : 16.54 - 2.54,
             !Robot.IsRedAlliance.getAsBoolean() ? 0.762 : 8.07 - 0.762);
     public static final double yf = 1.32;
-  }
-
-  public static enum AutoType {
-    NEARSOURCE,
-    FARSOURCE,
-    NEARDEPOT,
-    FARDEPOT,
-    NONE,
-    RUCKUS
   }
 }
