@@ -7,18 +7,20 @@ import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.IndexConstants;
-import frc.robot.Constants.IntakePivotConstants;
 import org.littletonrobotics.junction.Logger;
 
 public class Index extends SubsystemBase {
 
-  private final TalonFX indexMotor = new TalonFX(IndexConstants.kIndexID);
+  private final TalonFX indexLeader = new TalonFX(IndexConstants.kIndexLeaderID);
+  private final TalonFX indexFollower = new TalonFX(IndexConstants.kIndexFollowerID);
   private final DutyCycleOut motorDutyCycleOut = new DutyCycleOut(0);
 
   public Index() {
@@ -28,20 +30,19 @@ public class Index extends SubsystemBase {
                 new MotorOutputConfigs()
                     .withInverted(InvertedValue.CounterClockwise_Positive)
                     .withNeutralMode(NeutralModeValue.Coast))
-            .withFeedback(
-                new FeedbackConfigs()
-                    .withRotorToSensorRatio(1)
-                    .withSensorToMechanismRatio(IntakePivotConstants.kIntakeGearRatio))
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
-                    .withStatorCurrentLimit(Amps.of(60))
+                    .withStatorCurrentLimit(Amps.of(50))
                     .withStatorCurrentLimitEnable(true));
 
-    indexMotor.getConfigurator().apply(cfg);
+    indexLeader.getConfigurator().apply(cfg);
+    indexFollower.getConfigurator().apply(cfg);
+
+    indexFollower.setControl(new Follower(IndexConstants.kIndexLeaderID, MotorAlignmentValue.Aligned));
   }
 
   public void run(double speed) {
-    indexMotor.setControl(motorDutyCycleOut.withOutput(speed));
+    indexLeader.setControl(motorDutyCycleOut.withOutput(speed));
   }
 
   public Command runIndex(double power) {
@@ -60,7 +61,7 @@ public class Index extends SubsystemBase {
 
   @Override
   public void periodic() {
-    Logger.recordOutput("Index Voltage", indexMotor.getMotorVoltage().getValueAsDouble());
-    Logger.recordOutput("Index Current", indexMotor.getStatorCurrent().getValueAsDouble());
+    Logger.recordOutput("Index Voltage", indexLeader.getMotorVoltage().getValueAsDouble());
+    Logger.recordOutput("Index Current", indexLeader.getStatorCurrent().getValueAsDouble());
   }
 }

@@ -49,7 +49,8 @@ public final class Constants {
   }
 
   public static final class IndexConstants {
-    public static final int kIndexID = 16;
+    public static final int kIndexLeaderID = 16;
+    public static final int kIndexFollowerID = 17;
     public static final double kIndexGearRatio = 1.0;
   }
 
