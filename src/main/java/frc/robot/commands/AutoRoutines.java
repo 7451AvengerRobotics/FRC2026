@@ -193,6 +193,14 @@ public class AutoRoutines {
     return Commands.sequence(SF_Sw().withTimeout(14), superStruc.cut().withTimeout(1), S2_Sw());
   }
 
+  public Command H_to_S() {
+    return Commands.parallel(
+        drive.followPPPathCommand("H_to_S").withTimeout(1.6),
+        Commands.run(() -> drive.runVelocity(new ChassisSpeeds(0, 0, 0))).withTimeout(0.5),
+        Commands.sequence(new WaitCommand(1), superStruc.masterCommand()),
+        superStruc.trackHub());
+  }
+
   public Command SN_Sw() {
     return Commands.sequence(
         superStruc.deployPivot().withTimeout(2.5),
