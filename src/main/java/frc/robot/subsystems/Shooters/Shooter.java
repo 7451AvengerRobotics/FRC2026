@@ -1,92 +1,72 @@
 package frc.robot.subsystems.Shooters;
 
-import com.revrobotics.PersistMode;
-import com.revrobotics.ResetMode;
-import com.revrobotics.spark.SparkBase.ControlType;
-import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.SparkFlex;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.SparkFlexConfig;
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.RobotController;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.subsystems.SimFiles.TurretSim;
 import frc.robot.subsystems.drive.Drive;
+
+import static edu.wpi.first.units.Units.Amps;
+
 import org.littletonrobotics.junction.Logger;
 
 public class Shooter extends SubsystemBase {
 
-  private final SparkFlex shooterLeader;
-  private final SparkFlex shooterFollower;
-  private final SparkClosedLoopController closedLoopController;
-  private final ShotCalc shotCalc;
+  private final TalonFX shooterLeader;
+  private final TalonFX shooterFollower;
+  private final VelocityTorqueCurrentFOC velocityRequest =
+      new VelocityTorqueCurrentFOC(0);
   private TurretSim simTurret;
   private Drive drive;
-  private double velOffset = 1;
 
-  private double ballRequiredVel;
+  public Shooter(TurretSim simTurret, Drive drive) {
 
-  public Shooter(int leaderID, int followerID, TurretSim simTurret, Drive drive) {
-
-    shooterLeader = new SparkFlex(leaderID, MotorType.kBrushless);
-    shooterFollower = new SparkFlex(followerID, MotorType.kBrushless);
     this.simTurret = simTurret;
     this.drive = drive;
-    closedLoopController = shooterLeader.getClosedLoopController();
-    this.shotCalc = new ShotCalc(simTurret.getTurretOffset());
 
-    SparkFlexConfig globalCfg = new SparkFlexConfig();
-    SparkFlexConfig leaderCfg = new SparkFlexConfig();
-    SparkFlexConfig followerCfg = new SparkFlexConfig();
+    shooterLeader = new TalonFX(ShooterConstants.kShooterLeaderID);
+    shooterFollower = new TalonFX(ShooterConstants.kShooterFollowerID);
 
-    globalCfg.idleMode(IdleMode.kCoast);
+    TalonFXConfiguration cfg =
+        new TalonFXConfiguration()
+            .withMotorOutput(
+                new MotorOutputConfigs()
+                    .withInverted(InvertedValue.CounterClockwise_Positive)
+                    .withNeutralMode(NeutralModeValue.Brake))
+            .withCurrentLimits(
+                new CurrentLimitsConfigs()
+                    .withStatorCurrentLimit(Amps.of(60))
+                    .withStatorCurrentLimitEnable(true))
+            .withSlot0(
+                new Slot0Configs()
+                    .withKP(ShooterConstants.kP)
+                    .withKI(ShooterConstants.kI)
+                    .withKD(ShooterConstants.kD)
+                    .withKS(ShooterConstants.kS)
+                    .withKV(ShooterConstants.kV)
+                    .withKA(ShooterConstants.kA));
 
-    globalCfg.smartCurrentLimit(40);
-    globalCfg.voltageCompensation(12.0);
+    shooterLeader.getConfigurator().apply(cfg);
+    shooterFollower.getConfigurator().apply(cfg);
 
-    globalCfg.closedLoop.p(ShooterConstants.kP).d(ShooterConstants.kD);
-    globalCfg
-        .closedLoop
-        .feedForward
-        .kS(ShooterConstants.kS)
-        .kV(ShooterConstants.kV)
-        .kA(ShooterConstants.kA);
-
-    globalCfg
-        .closedLoop
-        .maxMotion
-          .maxAcceleration(2000)
-          .allowedProfileError(1);
-
-    leaderCfg.apply(globalCfg).disableFollowerMode();
-    followerCfg.apply(globalCfg).follow(shooterLeader, true);
-
-    shooterLeader.configure(
-        leaderCfg, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    shooterFollower.configure(
-        followerCfg, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-  }
-
-  public void setVelOffset(double offset) {
-    this.velOffset = offset;
-  }
-
-  public double getVelOffset() {
-    return this.velOffset;
-  }
-
-  public double getRPM() {
-    return shooterLeader.getEncoder().getVelocity();
+    shooterFollower.setControl(new Follower(ShooterConstants.kShooterLeaderID, MotorAlignmentValue.Aligned));
   }
 
   @Override
   public void periodic() {
-    Logger.recordOutput("Velocity in RPM", shooterLeader.getEncoder().getVelocity());
-    Logger.recordOutput("Shooter Voltage", shooterLeader.getAppliedOutput());
-    Logger.recordOutput("Shooter Current", shooterLeader.getOutputCurrent());
+    Logger.recordOutput("Velocity in RPM", shooterLeader.getVelocity().getValueAsDouble());
+    Logger.recordOutput("Shooter Voltage", shooterLeader.getStatorCurrent().getValueAsDouble());
+    Logger.recordOutput("Shooter Current", shooterLeader.getMotorVoltage().getValueAsDouble());
   }
 
   public void run(double power) {
@@ -94,7 +74,8 @@ public class Shooter extends SubsystemBase {
   }
 
   public void setVel(double rpm) {
-    closedLoopController.setSetpoint(rpm, ControlType.kMAXMotionVelocityControl);
+    shooterLeader.setControl(
+        velocityRequest.withVelocity(rpm / 60));
   }
 
   public Command setVelCommand(double rpm) {
@@ -107,31 +88,7 @@ public class Shooter extends SubsystemBase {
   public Command runShooter(double velOffset) {
     return run(
         () -> {
-          ballRequiredVel = simTurret.getColumbusVelocity();
-
-          double velocityRequired = ballRequiredVel;
-
-          double a = 0.368653;
-          double b = 2.13185;
-          double c = -0.526856;
-
-          a = 0.103284;
-          b = 3.2632;
-
-          double a2 = 4.4763;
-          a2 = 4;
-          double flywheelVel =
-              (a * Math.pow(velocityRequired, 2) + b * velocityRequired)
-                  * 60
-                  / (2 * Math.PI * 4 * 0.0254);
-
-          double battery = RobotController.getBatteryVoltage();
-          double factor = -0.1333 * battery + 2.3663;
-
-          factor = MathUtil.clamp(factor, 0.8, 1.4);
-          flywheelVel = MathUtil.clamp(flywheelVel, 0, 5000);
-
-          setVel(flywheelVel * velOffset * 1.05);
+          
         });
   }
 

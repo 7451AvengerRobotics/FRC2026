@@ -138,9 +138,7 @@ public class RobotContainer {
 
     // Other subsystems
     simTurret = new TurretSim(drive, new Transform3d(-0.17, 0, 0.39, new Rotation3d()));
-    shooter =
-        new Shooter(
-            ShooterConstants.ShooterLeaderID, ShooterConstants.ShooterFollowerID, simTurret, drive);
+    shooter = new Shooter(simTurret, drive);
     hood = new Hood(HoodConstants.kHoodMotorID, HoodConstants.kHoodEncoderID, simTurret);
     superStructure = new SuperStructure(index, intake, shooter, hood, pivot);
 
