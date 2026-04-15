@@ -71,7 +71,10 @@ public final class Constants {
   }
 
   public static final class HoodConstants {
-    public static final double kInitialHoodPosition = 0.68131410253;
+    public static final double kInitialHoodEncoderPosition = 0.68131410253;
+    public static final double kHoodGearRatio = 16.73076923;
+    public static final double kInitialHoodAnglePosition = kInitialHoodEncoderPosition / kHoodGearRatio * 360;
+    public static final double kMaxHoodAnglePosition = 47;
     public static final int kHoodMotorID = 29;
     public static final int kHoodEncoderID = 0;
     public static final double kP = 6;

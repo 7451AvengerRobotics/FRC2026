@@ -90,35 +90,25 @@ public class Hood extends SubsystemBase {
                 new MagnetSensorConfigs()
                     .withSensorDirection(SensorDirectionValue.Clockwise_Positive));
 
-    cfg.Commutation.MotorArrangement = MotorArrangementValue.Minion_JST;
-
-    hoodEncoder.setPosition(HoodConstants.kInitialHoodPosition);
+    hoodEncoder.setPosition(HoodConstants.kInitialHoodEncoderPosition);
 
     hoodEncoder.getConfigurator().apply(encCfg);
     hoodMotor.getConfigurator().apply(cfg);
 
-    hoodMotor.getConfigurator().setPosition(HoodConstants.kInitialHoodPosition);
+    hoodMotor.getConfigurator().setPosition(HoodConstants.kInitialHoodEncoderPosition);
   }
 
-  /**
-   * Sets the hood angle setpoint in radians (0 = up, π/2 = horizontal, π = down). Clamped to
-   * [kHoodMinAngleRad, kHoodMaxAngleRad].
-   */
   public void setAngleRad(double angleRad) {
-    double setpointRotations = angleRad / (2 * Math.PI) * 16.73076923;
-
-    // Clamping values
+    double setpointRotations = angleRad / (2 * Math.PI) * HoodConstants.kHoodGearRatio;
     hoodMotor.setControl(hoodRequest.withPosition(setpointRotations));
   }
 
-  /** Sets the hood angle setpoint in degrees. */
   public void setAngleDegrees(double angleDeg) {
     setAngleRad(Math.toRadians(angleDeg));
   }
 
-  /** Returns the current hood angle in radians (0 = up, π/2 = horizontal, π = down). */
   public double getAngleRad() {
-    return hoodMotor.getPosition().getValueAsDouble() * 2 * Math.PI / 16.73076923;
+    return hoodMotor.getPosition().getValueAsDouble() * 2 * Math.PI / HoodConstants.kHoodGearRatio;
   }
 
   public Command toAngleRad(double angleRad) {
@@ -139,7 +129,7 @@ public class Hood extends SubsystemBase {
   public Command moveDown() {
     return run(
         () -> {
-          hoodMotor.setControl(motorDutyCycleOut.withOutput(-0.035));
+          hoodMotor.setControl(motorDutyCycleOut.withOutput(-0.025));
         });
   }
 
@@ -150,16 +140,11 @@ public class Hood extends SubsystemBase {
         });
   }
 
-  /**
-   * Continuously updates setpoint from ShotCalc for hub tracking. Converts launch angle (0 =
-   * horizontal, π/2 = up) to hood angle (0 = up, π/2 = horizontal, π = down): hoodAngle = π/2 -
-   * launchPitch.
-   */
   public Command trackHub() {
     return run(
         () -> {
           double launchPitchRad = simTurret.getMovingPitch();
-          setAngleRad(MathUtil.clamp(launchPitchRad, Math.toRadians(14.66), Math.toRadians(47)));
+          setAngleRad(MathUtil.clamp(launchPitchRad, Math.toRadians(HoodConstants.kInitialHoodAnglePosition), Math.toRadians(HoodConstants.kMaxHoodAnglePosition)));
         });
   }
 
@@ -167,17 +152,16 @@ public class Hood extends SubsystemBase {
     return run(
         () -> {
           double launchPitchRad = simTurret.getPassingPitch();
-          setAngleRad(MathUtil.clamp(launchPitchRad, Math.toRadians(14.66), Math.toRadians(47)));
+          setAngleRad(MathUtil.clamp(launchPitchRad, Math.toRadians(HoodConstants.kInitialHoodAnglePosition), Math.toRadians(HoodConstants.kMaxHoodAnglePosition)));
         });
   }
 
-  /** Cuts power */
   public Command stopHood() {
     return run(() -> hoodMotor.set(0));
   }
 
   public Command resetHood() {
-    return toAngleDegrees(14.66);
+    return toAngleDegrees(HoodConstants.kInitialHoodAnglePosition);
   }
 
   @Override
