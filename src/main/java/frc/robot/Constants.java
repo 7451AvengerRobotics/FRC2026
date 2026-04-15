@@ -35,11 +35,6 @@ public final class Constants {
     DEPOT
   }
 
-  public static enum RobotSide {
-    LEFT,
-    RIGHT
-  }
-
   public static final class IntakePivotConstants {
     public static final int kIntakePivotID = 22;
     public static final double kIntakeGearRatio = 4;

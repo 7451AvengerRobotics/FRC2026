@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import frc.robot.Constants.HoodConstants;
-import frc.robot.Constants.RobotSide;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.commands.AutoRoutines;
 import frc.robot.commands.DriveCommands;
@@ -141,20 +140,11 @@ public class RobotContainer {
 
     // Other subsystems
     simTurret = new TurretSim(drive, new Transform3d(-0.17, 0, 0.39, new Rotation3d()));
-    shooter = new Shooter(ShooterConstants.ShooterLeaderID, ShooterConstants.ShooterFollowerID, simTurret, drive);
-    hood =
-        new Hood(
-            HoodConstants.kHoodMotorID,
-            HoodConstants.kHoodEncoderID,
-            simTurret);
-    superStructure =
-        new SuperStructure(
-            index,
-            intake,
-            feeder,
-            shooter,
-            hood,
-            pivot);
+    shooter =
+        new Shooter(
+            ShooterConstants.ShooterLeaderID, ShooterConstants.ShooterFollowerID, simTurret, drive);
+    hood = new Hood(HoodConstants.kHoodMotorID, HoodConstants.kHoodEncoderID, simTurret);
+    superStructure = new SuperStructure(index, intake, feeder, shooter, hood, pivot);
 
     // Set up auto routines
     autos = new AutoRoutines(drive, superStructure);
@@ -185,9 +175,7 @@ public class RobotContainer {
     controller.cross().toggleOnTrue(superStructure.masterCommand());
     controller.square().onTrue(superStructure.deployPivot());
 
-    controller
-        .L1()
-        .toggleOnTrue(hood.trackHub());
+    controller.L1().toggleOnTrue(hood.trackHub());
     controller
         .R1()
         .whileTrue(drive.alignToHub(0))
@@ -200,11 +188,11 @@ public class RobotContainer {
     controller.povDown().whileTrue(drive.moveBackward());
     controller.povUp().whileTrue(drive.moveForward());
     controller.povRight().onTrue(superStructure.cut());
- 
+
     manip.circle().onTrue(superStructure.stopMasterCommand());
     manip.cross().onTrue(superStructure.masterCommand());
     manip.triangle().onTrue(superStructure.strongWeirdMasterCommand());
-    
+
     manip.L1().onTrue(superStructure.jiggle()).onFalse(superStructure.stopJiggle());
     manip.R1().onTrue(pivot.runPivot(0));
 
@@ -234,6 +222,8 @@ public class RobotContainer {
     autoChooser.addOption("DN", autos.DN());
     autoChooser.addOption("DF_D2", autos.DF_D2());
     autoChooser.addOption("DN_D2", autos.DN_D2());
+
+    autoChooser.addOption("Hub to Shoot", autos.H_to_S());
 
     // Swerve Align Depot
     autoChooser.addOption("DF_Sw", autos.DF_Sw());

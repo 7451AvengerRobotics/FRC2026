@@ -33,7 +33,6 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.HoodConstants;
-import frc.robot.Constants.RobotSide;
 import frc.robot.subsystems.SimFiles.TurretSim;
 import org.littletonrobotics.junction.Logger;
 
@@ -185,13 +184,8 @@ public class Hood extends SubsystemBase {
   public void periodic() {
     double angleRad = getAngleRad();
     Logger.recordOutput("Hood/AngleDeg", Math.toDegrees(angleRad));
-    Logger.recordOutput(
-        "Hood/SuggestedAngleDeg", Math.toDegrees(simTurret.getMovingPitch()));
-    Logger.recordOutput(
-        "hood Voltage",
-        hoodMotor.getMotorVoltage().getValueAsDouble());
-    Logger.recordOutput(
-        "hood Current",
-        hoodMotor.getStatorCurrent().getValueAsDouble());
+    Logger.recordOutput("Hood/SuggestedAngleDeg", Math.toDegrees(simTurret.getMovingPitch()));
+    Logger.recordOutput("hood Voltage", hoodMotor.getMotorVoltage().getValueAsDouble());
+    Logger.recordOutput("hood Current", hoodMotor.getStatorCurrent().getValueAsDouble());
   }
 }
