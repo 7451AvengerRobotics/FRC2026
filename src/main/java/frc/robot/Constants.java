@@ -31,7 +31,8 @@ public final class Constants {
   }
 
   public static final class IntakePivotConstants {
-    public static final int kIntakePivotID = 22;
+    public static final int kPivotLeaderID = 22;
+    public static final int kPivotFollowerID = 23;
     public static final double kIntakeGearRatio = 4;
     public static final double kP = 2;
     public static final double kI = 0.0;

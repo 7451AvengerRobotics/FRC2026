@@ -12,24 +12,21 @@ import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.IntakePivotConstants;
 import org.littletonrobotics.junction.Logger;
 
-/* TODO
- * 1. Find proper inverted value
- * 2. Confirm coast vs. brake
- * 3. Set gear ratio
- * 4. Find STOW and DEPLOYED positions
- * 5. Tune PID values
- */
 public class IntakePivot extends SubsystemBase {
-  private final TalonFX intakePivot = new TalonFX(IntakePivotConstants.kIntakePivotID);
+  private final TalonFX pivotLeader = new TalonFX(IntakePivotConstants.kPivotLeaderID);
+  private final TalonFX pivotFollower = new TalonFX(IntakePivotConstants.kPivotFollowerID);
   private final MotionMagicVoltage pivotRequest = new MotionMagicVoltage(0);
 
   public IntakePivot() {
@@ -41,7 +38,6 @@ public class IntakePivot extends SubsystemBase {
                     .withNeutralMode(NeutralModeValue.Brake))
             .withFeedback(
                 new FeedbackConfigs()
-                    .withRotorToSensorRatio(1)
                     .withSensorToMechanismRatio(IntakePivotConstants.kIntakeGearRatio))
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
@@ -62,31 +58,26 @@ public class IntakePivot extends SubsystemBase {
                     .withKV(IntakePivotConstants.kV)
                     .withKA(IntakePivotConstants.kA));
 
-    intakePivot.getConfigurator().apply(cfg);
+    pivotLeader.getConfigurator().apply(cfg);
+    pivotFollower.getConfigurator().apply(cfg);
 
-    intakePivot.getConfigurator().setPosition(0);
+    pivotFollower.setControl(new Follower(IntakeConstants.kIntakeLeaderID, MotorAlignmentValue.Opposed));
+
+    pivotLeader.getConfigurator().setPosition(0);
   }
 
   public void pivotIntake(double rotations) {
-    intakePivot.setControl(pivotRequest.withPosition(rotations));
+    pivotLeader.setControl(pivotRequest.withPosition(rotations));
   }
 
   public Command runPivot(double value) {
-    return run(() -> intakePivot.setControl(new DutyCycleOut(value)));
+    return run(() -> pivotLeader.setControl(new DutyCycleOut(value)));
   }
 
   public boolean nearSetpoint(double rotations) {
-    double diff = intakePivot.getPosition().getValueAsDouble() - rotations;
+    double diff = pivotLeader.getPosition().getValueAsDouble() - rotations;
     return Math.abs(diff) <= 0.1;
   }
-
-  // public boolean atStow() {
-  //   return nearSetpoint(PivotPosition.STOW);
-  // }
-
-  // public boolean atDeployed() {
-  //   return nearSetpoint(PivotPosition.DEPLOYED);
-  // }
 
   public Command setIntakePivotAngle(double rotations) {
     return run(
@@ -120,8 +111,7 @@ public class IntakePivot extends SubsystemBase {
 
   @Override
   public void periodic() {
-    Logger.recordOutput("Pivot Voltage", intakePivot.getMotorVoltage().getValueAsDouble());
-
-    Logger.recordOutput("Pivot Current", intakePivot.getStatorCurrent().getValueAsDouble());
+    Logger.recordOutput("Pivot Voltage", pivotLeader.getMotorVoltage().getValueAsDouble());
+    Logger.recordOutput("Pivot Current", pivotLeader.getStatorCurrent().getValueAsDouble());
   }
 }
