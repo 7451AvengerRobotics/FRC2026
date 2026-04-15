@@ -21,7 +21,6 @@ import frc.robot.Constants.ShooterConstants;
 import frc.robot.commands.AutoRoutines;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.Index;
 import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.Intake.IntakePivot;
@@ -51,7 +50,6 @@ public class RobotContainer {
   private final TurretSim simTurret;
   private final Index index = new Index();
   private final Intake intake = new Intake();
-  private final Feeder feeder = new Feeder();
   private final IntakePivot pivot = new IntakePivot();
   private final Shooter shooter;
   private final Hood hood;
@@ -144,7 +142,7 @@ public class RobotContainer {
         new Shooter(
             ShooterConstants.ShooterLeaderID, ShooterConstants.ShooterFollowerID, simTurret, drive);
     hood = new Hood(HoodConstants.kHoodMotorID, HoodConstants.kHoodEncoderID, simTurret);
-    superStructure = new SuperStructure(index, intake, feeder, shooter, hood, pivot);
+    superStructure = new SuperStructure(index, intake, shooter, hood, pivot);
 
     // Set up auto routines
     autos = new AutoRoutines(drive, superStructure);

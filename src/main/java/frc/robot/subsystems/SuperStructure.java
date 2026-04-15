@@ -12,7 +12,6 @@ import frc.robot.subsystems.Shooters.Shooter;
 public class SuperStructure {
   private final Intake intake;
   private final Index index;
-  private final Feeder feeder;
   private final Shooter shooter;
   private final Hood hood;
   private final IntakePivot pivot;
@@ -23,13 +22,11 @@ public class SuperStructure {
   public SuperStructure(
       Index index,
       Intake intake,
-      Feeder feeder,
       Shooter shooter,
       Hood hood,
       IntakePivot pivot) {
     this.intake = intake;
     this.index = index;
-    this.feeder = feeder;
     this.shooter = shooter;
     this.hood = hood;
     this.pivot = pivot;
@@ -50,20 +47,12 @@ public class SuperStructure {
     return index.runIndex(-0.5);
   }
 
-  public Command soleFeeder() {
-    return feeder.runFeeder(-0.3);
-  }
-
   public Command stopIntake() {
     return intake.stopIntake();
   }
 
   public Command stopIndex() {
     return index.stopIndex();
-  }
-
-  public Command stopFeeder() {
-    return feeder.stopFeeder();
   }
 
   public Command reverseIndex() {
@@ -114,7 +103,6 @@ public class SuperStructure {
     return Commands.parallel( // These run immediately
         soleIntake(),
         runShooters5000(),
-        feeder.runFeeder(-0.9),
 
         // This branch waits, then starts feeder/index
         Commands.sequence(new WaitCommand(0), Commands.parallel(index.runIndex(-0.9))));
@@ -127,39 +115,39 @@ public class SuperStructure {
 
         // This branch waits, then starts feeder/index
         Commands.sequence(
-            new WaitCommand(1.5), Commands.parallel(index.runIndex(-0.6), feeder.runFeeder(-0.9))));
+            new WaitCommand(1.5), Commands.parallel(index.runIndex(-0.6))));
   }
 
   public Command weirdMasterCommand() {
     return Commands.sequence(
         setPassing(false),
         Commands.parallel(
-            soleIntake(), index.runIndex(0.3), feeder.runFeeder(0.2), runShooters5000()));
+            soleIntake(), index.runIndex(0.3), runShooters5000()));
   }
 
   public Command strongWeirdMasterCommand() {
     return Commands.sequence(
         setPassing(false),
         Commands.parallel(
-            soleIntake(), index.runIndex(0.6), feeder.runFeeder(0.6), runShooters5000()));
+            soleIntake(), index.runIndex(0.6), runShooters5000()));
   }
 
   public Command shooterlessMasterCommand() {
-    return Commands.parallel(soleIntake(), index.runIndex(-0.9), feeder.runFeeder(-0.9));
+    return Commands.parallel(soleIntake(), index.runIndex(-0.9));
   }
 
   public Command intakelessMasterCommand() {
     return Commands.parallel(
-        intake.stopIntake(), index.runIndex(-0.9), feeder.runFeeder(-0.9), runShooter());
+        intake.stopIntake(), index.runIndex(-0.9), runShooter());
   }
 
   public Command shooterlessWeirdMasterCommand() {
-    return Commands.parallel(soleIntake(), index.runIndex(0.6), feeder.runFeeder(-0.6));
+    return Commands.parallel(soleIntake(), index.runIndex(0.6));
   }
 
   public Command stopMasterCommand() {
     return Commands.parallel(
-        intake.stopIntake(), index.stopIndex(), feeder.stopFeeder(), stopShooters());
+        intake.stopIntake(), index.stopIndex(), stopShooters());
   }
 
   public Command deployPivot() {
