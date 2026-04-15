@@ -43,7 +43,8 @@ public final class Constants {
   }
 
   public static final class IntakeConstants {
-    public static final int kIntakeID = 19;
+    public static final int kIntakeLeaderID = 19;
+    public static final int kIntakeFollowerID = 20;
     public static final double kIntakeGearRatio = 2;
   }
 

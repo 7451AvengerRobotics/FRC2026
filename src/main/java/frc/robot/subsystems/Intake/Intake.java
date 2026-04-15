@@ -7,8 +7,10 @@ import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -18,7 +20,8 @@ import org.littletonrobotics.junction.Logger;
 
 public class Intake extends SubsystemBase {
 
-  private final TalonFX intake = new TalonFX(IntakeConstants.kIntakeID);
+  private final TalonFX intakeLeader = new TalonFX(IntakeConstants.kIntakeLeaderID);
+  private final TalonFX intakeFollower = new TalonFX(IntakeConstants.kIntakeFollowerID);
   private final DutyCycleOut motorDutyCycleOut = new DutyCycleOut(0);
 
   public Intake() {
@@ -37,17 +40,14 @@ public class Intake extends SubsystemBase {
                     .withStatorCurrentLimit(Amps.of(60))
                     .withStatorCurrentLimitEnable(true));
 
-    intake.getConfigurator().apply(cfg);
+    intakeLeader.getConfigurator().apply(cfg);
+    intakeFollower.getConfigurator().apply(cfg);
+
+    intakeFollower.setControl(new Follower(IntakeConstants.kIntakeLeaderID, MotorAlignmentValue.Aligned));
   }
 
   public void setIntakePower(double power) {
-    intake.setControl(motorDutyCycleOut.withOutput(power));
-  }
-
-  public boolean propIntake() {
-    return Math.abs(intake.getVelocity().getValueAsDouble()) < 2
-        && (intake.getStatorCurrent().getValueAsDouble() > 50
-            && intake.getStatorCurrent().getValueAsDouble() < 60);
+    intakeLeader.setControl(motorDutyCycleOut.withOutput(power));
   }
 
   public Command runIntake(double power) {
@@ -66,7 +66,7 @@ public class Intake extends SubsystemBase {
 
   @Override
   public void periodic() {
-    Logger.recordOutput("Intake Voltage", intake.getMotorVoltage().getValueAsDouble());
-    Logger.recordOutput("Intake Current", intake.getStatorCurrent().getValueAsDouble());
+    Logger.recordOutput("Intake Voltage", intakeLeader.getMotorVoltage().getValueAsDouble());
+    Logger.recordOutput("Intake Current", intakeLeader.getStatorCurrent().getValueAsDouble());
   }
 }
