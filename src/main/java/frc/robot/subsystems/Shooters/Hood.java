@@ -15,16 +15,20 @@ import static edu.wpi.first.units.Units.Second;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.ExternalFeedbackConfigs;
+import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXSConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
+import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.hardware.TalonFXS;
 import com.ctre.phoenix6.signals.ExternalFeedbackSensorSourceValue;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorArrangementValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -41,7 +45,7 @@ import org.littletonrobotics.junction.Logger;
  * and supports a side-specific zero offset.
  */
 public class Hood extends SubsystemBase {
-  private final TalonFXS hoodMotor;
+  private final TalonFX hoodMotor;
   private final CANcoder hoodEncoder;
   private final MotionMagicVoltage hoodRequest = new MotionMagicVoltage(0);
   private final TurretSim simTurret;
@@ -51,20 +55,20 @@ public class Hood extends SubsystemBase {
 
     this.simTurret = simTurret;
 
-    hoodMotor = new TalonFXS(motorID);
+    hoodMotor = new TalonFX(motorID);
     hoodEncoder = new CANcoder(encoderID);
 
-    TalonFXSConfiguration cfg =
-        new TalonFXSConfiguration()
+    TalonFXConfiguration cfg =
+        new TalonFXConfiguration()
             .withMotorOutput(
                 new MotorOutputConfigs()
                     .withInverted(InvertedValue.CounterClockwise_Positive)
                     .withNeutralMode(NeutralModeValue.Brake))
-            .withExternalFeedback(
-                new ExternalFeedbackConfigs()
+            .withFeedback(
+                new FeedbackConfigs()
                     .withFeedbackRemoteSensorID(encoderID)
-                    .withExternalFeedbackSensorSource(
-                        ExternalFeedbackSensorSourceValue.RemoteCANcoder))
+                    .withFeedbackSensorSource(
+                        FeedbackSensorSourceValue.RemoteCANcoder))
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
                     .withStatorCurrentLimit(Amps.of(60))
