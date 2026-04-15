@@ -61,7 +61,7 @@ public class IntakePivot extends SubsystemBase {
     pivotLeader.getConfigurator().apply(cfg);
     pivotFollower.getConfigurator().apply(cfg);
 
-    pivotFollower.setControl(new Follower(IntakeConstants.kIntakeLeaderID, MotorAlignmentValue.Opposed));
+    pivotFollower.setControl(new Follower(IntakePivotConstants.kPivotLeaderID, MotorAlignmentValue.Opposed));
 
     pivotLeader.getConfigurator().setPosition(0);
   }

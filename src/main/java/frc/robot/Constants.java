@@ -55,11 +55,6 @@ public final class Constants {
     public static final double kIndexGearRatio = 1.0;
   }
 
-  public static final class FeederConstants {
-    public static final int kFeederID = 41;
-    public static final double kFeederGearRatio = 1.0;
-  }
-
   public static final class ShooterConstants {
     public static final int kShooterLeaderID = 50;
     public static final int kShooterFollowerID = 51;

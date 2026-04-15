@@ -65,8 +65,8 @@ public class SuperStructure {
     return hood.stop();
   }
 
-  public Command runShooters5000() {
-    return shooter.runShooter5000();
+  public Command runShooters4000() {
+    return shooter.runShooter4000();
   }
 
   public Command runShooters3000() {
@@ -80,7 +80,7 @@ public class SuperStructure {
   public Command masterCommand() {
     return Commands.parallel( // These run immediately
         soleIntake(),
-        runShooters5000(),
+        runShooters4000(),
 
         // This branch waits, then starts feeder/index
         Commands.sequence(new WaitCommand(0), Commands.parallel(index.runIndex(-0.9))));
@@ -89,7 +89,7 @@ public class SuperStructure {
   public Command startupMasterCommand() {
     return Commands.parallel( // These run immediately
         soleIntake(),
-        runShooters5000(),
+        runShooters4000(),
 
         // This branch waits, then starts feeder/index
         Commands.sequence(
@@ -100,14 +100,14 @@ public class SuperStructure {
     return Commands.parallel(
       soleIntake(), 
       index.runIndex(0.3), 
-      runShooters5000());
+      runShooters4000());
   }
 
   public Command strongWeirdMasterCommand() {
     return Commands.parallel(
       soleIntake(), 
       index.runIndex(0.6), 
-      runShooters5000());
+      runShooters4000());
   }
 
   public Command shooterlessMasterCommand() {
@@ -121,7 +121,7 @@ public class SuperStructure {
     return Commands.parallel(
         intake.stopIntake(), 
         index.runIndex(-0.9), 
-        runShooters5000());
+        runShooters4000());
   }
 
   public Command shooterlessWeirdMasterCommand() {

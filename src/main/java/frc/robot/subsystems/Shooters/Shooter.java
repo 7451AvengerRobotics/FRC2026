@@ -85,17 +85,10 @@ public class Shooter extends SubsystemBase {
         });
   }
 
-  public Command runShooter(double velOffset) {
+  public Command runShooter4000() {
     return run(
         () -> {
-          
-        });
-  }
-
-  public Command runShooter5000() {
-    return run(
-        () -> {
-          setVel(5000);
+          setVel(4000);
         });
   }
 

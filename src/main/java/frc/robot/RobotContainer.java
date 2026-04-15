@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import frc.robot.Constants.HoodConstants;
-import frc.robot.Constants.ShooterConstants;
 import frc.robot.commands.AutoRoutines;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
@@ -139,7 +138,7 @@ public class RobotContainer {
     // Other subsystems
     simTurret = new TurretSim(drive, new Transform3d(-0.17, 0, 0.39, new Rotation3d()));
     shooter = new Shooter(simTurret, drive);
-    hood = new Hood(HoodConstants.kHoodMotorID, HoodConstants.kHoodEncoderID, simTurret);
+    hood = new Hood(simTurret);
     superStructure = new SuperStructure(index, intake, shooter, hood, pivot);
 
     // Set up auto routines
