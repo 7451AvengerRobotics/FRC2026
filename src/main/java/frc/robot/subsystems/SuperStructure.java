@@ -16,12 +16,7 @@ public class SuperStructure {
   private final Hood hood;
   private final IntakePivot pivot;
 
-  public SuperStructure(
-      Index index,
-      Intake intake,
-      Shooter shooter,
-      Hood hood,
-      IntakePivot pivot) {
+  public SuperStructure(Index index, Intake intake, Shooter shooter, Hood hood, IntakePivot pivot) {
     this.intake = intake;
     this.index = index;
     this.shooter = shooter;
@@ -80,10 +75,10 @@ public class SuperStructure {
   public Command masterCommand() {
     return Commands.parallel( // These run immediately
         soleIntake(),
-        runShooters4000(),
+        shooter.runDutyCycle(0.3),
 
         // This branch waits, then starts feeder/index
-        Commands.sequence(new WaitCommand(0), Commands.parallel(index.runIndex(-0.9))));
+        Commands.sequence(new WaitCommand(0), Commands.parallel(index.runIndex(0.8))));
   }
 
   public Command startupMasterCommand() {
@@ -92,47 +87,31 @@ public class SuperStructure {
         runShooters4000(),
 
         // This branch waits, then starts feeder/index
-        Commands.sequence(
-            new WaitCommand(1.5), Commands.parallel(index.runIndex(-0.6))));
+        Commands.sequence(new WaitCommand(1.5), Commands.parallel(index.runIndex(-0.6))));
   }
 
   public Command weirdMasterCommand() {
-    return Commands.parallel(
-      soleIntake(), 
-      index.runIndex(0.3), 
-      runShooters4000());
+    return Commands.parallel(soleIntake(), index.runIndex(0.3), runShooters4000());
   }
 
   public Command strongWeirdMasterCommand() {
-    return Commands.parallel(
-      soleIntake(), 
-      index.runIndex(0.6), 
-      runShooters4000());
+    return Commands.parallel(soleIntake(), index.runIndex(0.6), runShooters4000());
   }
 
   public Command shooterlessMasterCommand() {
-    return Commands.parallel(
-      soleIntake(), 
-      index.runIndex(-0.9),
-      shooter.stopShooter());
+    return Commands.parallel(soleIntake(), index.runIndex(-0.9), shooter.stopShooter());
   }
 
   public Command intakelessMasterCommand() {
-    return Commands.parallel(
-        intake.stopIntake(), 
-        index.runIndex(-0.9), 
-        runShooters4000());
+    return Commands.parallel(intake.stopIntake(), index.runIndex(0.8), runShooters4000());
   }
 
   public Command shooterlessWeirdMasterCommand() {
-    return Commands.parallel(
-      soleIntake(), 
-      index.runIndex(0.6));
+    return Commands.parallel(soleIntake(), index.runIndex(0.6));
   }
 
   public Command stopMasterCommand() {
-    return Commands.parallel(
-        intake.stopIntake(), index.stopIndex(), stopShooters());
+    return Commands.parallel(intake.stopIntake(), index.stopIndex(), stopShooters());
   }
 
   public Command deployPivot() {

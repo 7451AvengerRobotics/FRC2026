@@ -62,8 +62,7 @@ public class Hood extends SubsystemBase {
             .withFeedback(
                 new FeedbackConfigs()
                     .withFeedbackRemoteSensorID(HoodConstants.kHoodEncoderID)
-                    .withFeedbackSensorSource(
-                        FeedbackSensorSourceValue.RemoteCANcoder))
+                    .withFeedbackSensorSource(FeedbackSensorSourceValue.RemoteCANcoder))
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
                     .withStatorCurrentLimit(Amps.of(60))
@@ -143,7 +142,11 @@ public class Hood extends SubsystemBase {
     return run(
         () -> {
           double launchPitchRad = simTurret.getMovingPitch();
-          setAngleRad(MathUtil.clamp(launchPitchRad, Math.toRadians(HoodConstants.kInitialHoodAnglePosition), Math.toRadians(HoodConstants.kMaxHoodAnglePosition)));
+          setAngleRad(
+              MathUtil.clamp(
+                  launchPitchRad,
+                  Math.toRadians(HoodConstants.kInitialHoodAnglePosition),
+                  Math.toRadians(HoodConstants.kMaxHoodAnglePosition)));
         });
   }
 
@@ -151,7 +154,11 @@ public class Hood extends SubsystemBase {
     return run(
         () -> {
           double launchPitchRad = simTurret.getPassingPitch();
-          setAngleRad(MathUtil.clamp(launchPitchRad, Math.toRadians(HoodConstants.kInitialHoodAnglePosition), Math.toRadians(HoodConstants.kMaxHoodAnglePosition)));
+          setAngleRad(
+              MathUtil.clamp(
+                  launchPitchRad,
+                  Math.toRadians(HoodConstants.kInitialHoodAnglePosition),
+                  Math.toRadians(HoodConstants.kMaxHoodAnglePosition)));
         });
   }
 

@@ -31,8 +31,8 @@ public final class Constants {
   }
 
   public static final class IntakePivotConstants {
-    public static final int kPivotLeaderID = 22;
-    public static final int kPivotFollowerID = 23;
+    public static final int kPivotLeaderID = 10;
+    public static final int kPivotFollowerID = 11;
     public static final double kIntakeGearRatio = 4;
     public static final double kP = 2;
     public static final double kI = 0.0;
@@ -44,20 +44,21 @@ public final class Constants {
   }
 
   public static final class IntakeConstants {
-    public static final int kIntakeLeaderID = 19;
-    public static final int kIntakeFollowerID = 20;
+    public static final int kIntakeLeaderID = 21;
+    public static final int kIntakeFollowerID = 22;
     public static final double kIntakeGearRatio = 2;
   }
 
   public static final class IndexConstants {
-    public static final int kIndexLeaderID = 16;
-    public static final int kIndexFollowerID = 17;
+    public static final int kIndexLeaderID = 30;
+    public static final int kIndexFollowerID = 31;
     public static final double kIndexGearRatio = 1.0;
   }
 
   public static final class ShooterConstants {
     public static final int kShooterLeaderID = 50;
     public static final int kShooterFollowerID = 51;
+    public static final int kShooterMiniID = 52;
     public static final double kShooterGearRatio = 1.0;
     public static final double kS = 0;
     public static final double kP = 0.0075 / 100 * 0.08;
@@ -70,9 +71,10 @@ public final class Constants {
   public static final class HoodConstants {
     public static final double kInitialHoodEncoderPosition = 0.68131410253;
     public static final double kHoodGearRatio = 16.73076923;
-    public static final double kInitialHoodAnglePosition = kInitialHoodEncoderPosition / kHoodGearRatio * 360;
+    public static final double kInitialHoodAnglePosition =
+        kInitialHoodEncoderPosition / kHoodGearRatio * 360;
     public static final double kMaxHoodAnglePosition = 47;
-    public static final int kHoodMotorID = 29;
+    public static final int kHoodMotorID = 40;
     public static final int kHoodEncoderID = 0;
     public static final double kP = 6;
     public static final double kI = 0.0;

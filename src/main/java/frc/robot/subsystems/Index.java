@@ -3,7 +3,6 @@ package frc.robot.subsystems;
 import static edu.wpi.first.units.Units.Amps;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
-import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
@@ -38,7 +37,8 @@ public class Index extends SubsystemBase {
     indexLeader.getConfigurator().apply(cfg);
     indexFollower.getConfigurator().apply(cfg);
 
-    indexFollower.setControl(new Follower(IndexConstants.kIndexLeaderID, MotorAlignmentValue.Aligned));
+    indexFollower.setControl(
+        new Follower(IndexConstants.kIndexLeaderID, MotorAlignmentValue.Opposed));
   }
 
   public void run(double speed) {

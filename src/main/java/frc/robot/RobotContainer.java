@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
-import frc.robot.Constants.HoodConstants;
 import frc.robot.commands.AutoRoutines;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
@@ -185,7 +184,7 @@ public class RobotContainer {
     controller.povRight().onTrue(superStructure.resetHoods());
 
     manip.circle().onTrue(superStructure.stopMasterCommand());
-    manip.cross().onTrue(superStructure.masterCommand());
+    manip.cross().onTrue(shooter.runDutyCycle(0.3));
     manip.triangle().onTrue(superStructure.strongWeirdMasterCommand());
 
     manip.L1().onTrue(superStructure.jiggle()).onFalse(superStructure.stopJiggle());
@@ -212,12 +211,6 @@ public class RobotContainer {
     // autoChooser.addOption(
     //     "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
-    // Depot Side
-    autoChooser.addOption("DF", autos.DF());
-    autoChooser.addOption("DN", autos.DN());
-    autoChooser.addOption("DF_D2", autos.DF_D2());
-    autoChooser.addOption("DN_D2", autos.DN_D2());
-
     autoChooser.addOption("Hub to Shoot", autos.H_to_S());
 
     // Swerve Align Depot
@@ -225,12 +218,6 @@ public class RobotContainer {
     autoChooser.addOption("DN_Sw", autos.DN_Sw());
     autoChooser.addOption("DF_D2_Sw", autos.DF_D2_Sw());
     autoChooser.addOption("DN_D2_Sw", autos.DN_D2_Sw());
-
-    // Source Side
-    autoChooser.addOption("SF", autos.SF());
-    autoChooser.addOption("SN", autos.SN());
-    autoChooser.addOption("SF_S2", autos.SF_S2());
-    autoChooser.addOption("SN_S2", autos.SN_S2());
 
     // Swerve Align Source
     autoChooser.addOption("SF_Sw", autos.SF_Sw());

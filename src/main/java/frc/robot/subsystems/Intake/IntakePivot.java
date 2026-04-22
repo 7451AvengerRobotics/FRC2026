@@ -20,7 +20,6 @@ import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.IntakePivotConstants;
 import org.littletonrobotics.junction.Logger;
 
@@ -61,7 +60,8 @@ public class IntakePivot extends SubsystemBase {
     pivotLeader.getConfigurator().apply(cfg);
     pivotFollower.getConfigurator().apply(cfg);
 
-    pivotFollower.setControl(new Follower(IntakePivotConstants.kPivotLeaderID, MotorAlignmentValue.Opposed));
+    pivotFollower.setControl(
+        new Follower(IntakePivotConstants.kPivotLeaderID, MotorAlignmentValue.Opposed));
 
     pivotLeader.getConfigurator().setPosition(0);
   }
@@ -87,7 +87,7 @@ public class IntakePivot extends SubsystemBase {
   }
 
   public Command jiggle() {
-    return runPivot(-0.15);
+    return runPivot(0.15);
   }
 
   public Command stopPivot() {
@@ -100,7 +100,7 @@ public class IntakePivot extends SubsystemBase {
 
   public enum PivotPosition {
     STOW(0),
-    DEPLOYED(4.2);
+    DEPLOYED(-5.235);
 
     public final double rotations;
 
@@ -113,5 +113,6 @@ public class IntakePivot extends SubsystemBase {
   public void periodic() {
     Logger.recordOutput("Pivot Voltage", pivotLeader.getMotorVoltage().getValueAsDouble());
     Logger.recordOutput("Pivot Current", pivotLeader.getStatorCurrent().getValueAsDouble());
+    Logger.recordOutput("Pivot Position", pivotLeader.getPosition().getValueAsDouble());
   }
 }

@@ -1,5 +1,7 @@
 package frc.robot.subsystems.Shooters;
 
+import static edu.wpi.first.units.Units.Amps;
+
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -15,17 +17,14 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.subsystems.SimFiles.TurretSim;
 import frc.robot.subsystems.drive.Drive;
-
-import static edu.wpi.first.units.Units.Amps;
-
 import org.littletonrobotics.junction.Logger;
 
 public class Shooter extends SubsystemBase {
 
   private final TalonFX shooterLeader;
   private final TalonFX shooterFollower;
-  private final VelocityTorqueCurrentFOC velocityRequest =
-      new VelocityTorqueCurrentFOC(0);
+  private final TalonFX shooterMini;
+  private final VelocityTorqueCurrentFOC velocityRequest = new VelocityTorqueCurrentFOC(0);
   private TurretSim simTurret;
   private Drive drive;
 
@@ -36,6 +35,7 @@ public class Shooter extends SubsystemBase {
 
     shooterLeader = new TalonFX(ShooterConstants.kShooterLeaderID);
     shooterFollower = new TalonFX(ShooterConstants.kShooterFollowerID);
+    shooterMini = new TalonFX(ShooterConstants.kShooterMiniID);
 
     TalonFXConfiguration cfg =
         new TalonFXConfiguration()
@@ -59,12 +59,15 @@ public class Shooter extends SubsystemBase {
     shooterLeader.getConfigurator().apply(cfg);
     shooterFollower.getConfigurator().apply(cfg);
 
-    shooterFollower.setControl(new Follower(ShooterConstants.kShooterLeaderID, MotorAlignmentValue.Aligned));
+    shooterFollower.setControl(
+        new Follower(ShooterConstants.kShooterLeaderID, MotorAlignmentValue.Opposed));
+    shooterMini.setControl(
+        new Follower(ShooterConstants.kShooterLeaderID, MotorAlignmentValue.Aligned));
   }
 
   @Override
   public void periodic() {
-    Logger.recordOutput("Velocity in RPM", shooterLeader.getVelocity().getValueAsDouble());
+    Logger.recordOutput("Velocity in RPM", shooterLeader.getVelocity().getValueAsDouble() * 60);
     Logger.recordOutput("Shooter Voltage", shooterLeader.getStatorCurrent().getValueAsDouble());
     Logger.recordOutput("Shooter Current", shooterLeader.getMotorVoltage().getValueAsDouble());
   }
@@ -73,9 +76,15 @@ public class Shooter extends SubsystemBase {
     shooterLeader.set(power);
   }
 
+  public Command runDutyCycle(double power) {
+    return run(
+        () -> {
+          this.run(power);
+        });
+  }
+
   public void setVel(double rpm) {
-    shooterLeader.setControl(
-        velocityRequest.withVelocity(rpm / 60));
+    shooterLeader.setControl(velocityRequest.withVelocity(rpm / 60));
   }
 
   public Command setVelCommand(double rpm) {
