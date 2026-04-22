@@ -123,11 +123,13 @@ public class AutoRoutines {
   }
 
   public Command DF_D2_Sw() {
-    return Commands.sequence(DF_Sw().withTimeout(15), superStruc.resetHoods().withTimeout(1), D2_Sw());
+    return Commands.sequence(
+        DF_Sw().withTimeout(15), superStruc.resetHoods().withTimeout(1), D2_Sw());
   }
 
   public Command DN_D2_Sw() {
-    return Commands.sequence(DN_Sw().withTimeout(15), superStruc.resetHoods().withTimeout(1), D2_Sw());
+    return Commands.sequence(
+        DN_Sw().withTimeout(15), superStruc.resetHoods().withTimeout(1), D2_Sw());
   }
 
   // Source Side Autons
@@ -190,15 +192,15 @@ public class AutoRoutines {
   }
 
   public Command SF_S2_Sw() {
-    return Commands.sequence(SF_Sw().withTimeout(14), superStruc.resetHoods().withTimeout(1), S2_Sw());
+    return Commands.sequence(
+        SF_Sw().withTimeout(14), superStruc.resetHoods().withTimeout(1), S2_Sw());
   }
 
   public Command H_to_S() {
-    return Commands.parallel(
-        drive.followPPPathCommand("H_to_S").withTimeout(1.6),
+    return Commands.sequence(
+        drive.followPPPathCommand("H_to_S").withTimeout(3),
         Commands.run(() -> drive.runVelocity(new ChassisSpeeds(0, 0, 0))).withTimeout(0.5),
-        Commands.sequence(new WaitCommand(1), superStruc.masterCommand()),
-        superStruc.trackHub());
+        Commands.parallel(superStruc.masterCommand(), superStruc.trackHub()));
   }
 
   public Command SN_Sw() {
@@ -213,7 +215,8 @@ public class AutoRoutines {
   }
 
   public Command SN_S2_Sw() {
-    return Commands.sequence(SN_Sw().withTimeout(18), superStruc.resetHoods().withTimeout(1), S2_Sw());
+    return Commands.sequence(
+        SN_Sw().withTimeout(18), superStruc.resetHoods().withTimeout(1), S2_Sw());
   }
 
   // Bump Start Autons
