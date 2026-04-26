@@ -19,7 +19,8 @@ public class SuperStructure {
   private final Hood hood;
   private final IntakePivot pivot;
 
-  public SuperStructure(Drive drive, Index index, Intake intake, Shooter shooter, Hood hood, IntakePivot pivot) {
+  public SuperStructure(
+      Drive drive, Index index, Intake intake, Shooter shooter, Hood hood, IntakePivot pivot) {
     this.drive = drive;
     this.intake = intake;
     this.index = index;
@@ -156,13 +157,12 @@ public class SuperStructure {
 
   public Command shootBalls() {
     return Commands.sequence(
-        drive.alignToHub(),
-        Commands.parallel(soleIndex(), runShooters3000()));
+        drive.alignToHub(), Commands.parallel(soleIndex(), runShooters3000(), soleIntake()));
   }
 
   public Command noShootBalls() {
     return Commands.sequence(
-      Commands.runOnce(() -> drive.runVelocity(new ChassisSpeeds(0, 0, 0))), 
-      Commands.parallel(stopIndex()));
+        Commands.runOnce(() -> drive.runVelocity(new ChassisSpeeds(0, 0, 0))),
+        Commands.parallel(stopIndex()));
   }
 }

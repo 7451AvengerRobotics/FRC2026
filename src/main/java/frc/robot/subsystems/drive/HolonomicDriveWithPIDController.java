@@ -28,7 +28,8 @@ public class HolonomicDriveWithPIDController {
 
     this.rotationController = rotationController;
     this.rotationController.enableContinuousInput(-Math.PI, Math.PI);
-    this.rotationController.setTolerance(poseTolerance.getRotation().getRadians(), poseTolerance.getRotation().getRadians() * 1.5);
+    this.rotationController.setTolerance(
+        poseTolerance.getRotation().getRadians(), poseTolerance.getRotation().getRadians() * 1.5);
 
     this.scale = scale;
     this.rotationScale = rotationScale;

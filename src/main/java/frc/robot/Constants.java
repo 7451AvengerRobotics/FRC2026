@@ -34,7 +34,7 @@ public final class Constants {
     public static final int kPivotLeaderID = 10;
     public static final int kPivotFollowerID = 11;
     public static final double kIntakeGearRatio = 50;
-    public static final double kInitialPivotPosition = 0.7;
+    public static final double kInitialPivotPosition = 0.62;
     public static final double kP = 4.0;
     public static final double kI = 0.0;
     public static final double kD = 0.0;

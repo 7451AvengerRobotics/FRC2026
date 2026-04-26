@@ -50,8 +50,8 @@ public class Hood extends SubsystemBase {
 
     this.simTurret = simTurret;
 
-    hoodMotor = new TalonFX(35);
-    hoodEncoder = new CANcoder(36);
+    hoodMotor = new TalonFX(40);
+    hoodEncoder = new CANcoder(0);
 
     TalonFXConfiguration cfg =
         new TalonFXConfiguration()
@@ -120,14 +120,14 @@ public class Hood extends SubsystemBase {
   public Command moveUp() {
     return run(
         () -> {
-          hoodMotor.setControl(motorDutyCycleOut.withOutput(0.025));
+          hoodMotor.setControl(motorDutyCycleOut.withOutput(0.05));
         });
   }
 
   public Command moveDown() {
     return run(
         () -> {
-          hoodMotor.setControl(motorDutyCycleOut.withOutput(-0.025));
+          hoodMotor.setControl(motorDutyCycleOut.withOutput(-0.05));
         });
   }
 

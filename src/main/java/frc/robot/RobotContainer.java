@@ -9,7 +9,6 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -168,12 +167,15 @@ public class RobotContainer {
             () -> -controller.getLeftX(),
             () -> -controller.getRightX()));
 
-
     controller.L1().whileTrue(superStructure.intakeBalls()).onFalse(superStructure.noIntakeBalls());
     controller.R1().whileTrue(superStructure.shootBalls()).onFalse(superStructure.noShootBalls());
     // controller.triangle().onTrue(superStructure.weirdMasterCommand());
+    controller.cross().onTrue(superStructure.masterCommand());
     controller.circle().onTrue(superStructure.stopMasterCommand());
-    controller.L2().whileTrue(superStructure.intakelessMasterCommand()).onFalse(superStructure.noShootBalls());
+    controller
+        .L2()
+        .whileTrue(superStructure.masterCommand())
+        .onFalse(superStructure.noShootBalls());
     controller.square().onTrue(superStructure.deployPivot());
 
     // controller.L1().onTrue(shooter.setVelCommand(2500));
@@ -185,15 +187,15 @@ public class RobotContainer {
     //     .whileTrue(drive.alignToHub(0))
     //     .onFalse(Commands.run(() -> drive.runVelocity(new ChassisSpeeds(0, 0, 0))));
 
-    // controller
-    //     .povLeft()
-    //     .whileTrue(drive.alignForTrench())
-    //     .onFalse(Commands.run(() -> drive.runVelocity(new ChassisSpeeds(0, 0, 0))));
+    controller
+        .povLeft()
+        .whileTrue(drive.alignForTrench())
+        .onFalse(Commands.run(() -> drive.runVelocity(new ChassisSpeeds(0, 0, 0))));
     // // controller.povDown().whileTrue(drive.moveBackward());
     // // controller.povUp().whileTrue(drive.moveForward());
-    // controller.povUp().whileTrue(hood.moveUp()).whileFalse(hood.stop());
-    // controller.povDown().whileTrue(hood.moveDown()).whileFalse(hood.stop());
-    // controller.povRight().onTrue(pivot.jiggle2());
+    controller.povUp().whileTrue(hood.moveUp()).whileFalse(hood.stop());
+    controller.povDown().whileTrue(hood.moveDown()).whileFalse(hood.stop());
+    controller.povRight().onTrue(pivot.stopPivot());
 
     // manip.circle().onTrue(superStructure.stopMasterCommand());
     // manip.cross().onTrue(shooter.runDutyCycle(0.5));

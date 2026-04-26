@@ -103,7 +103,7 @@ public class IntakePivot extends SubsystemBase {
   }
 
   public Command toPosition(double rotations) {
-    return setIntakePivotAngle(rotations);
+    return setIntakePivotAngle(rotations).until(() -> nearSetpoint(rotations));
   }
 
   public enum PivotPosition {

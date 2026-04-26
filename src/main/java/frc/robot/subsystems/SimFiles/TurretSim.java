@@ -94,6 +94,7 @@ public class TurretSim extends SubsystemBase {
 
     Logger.recordOutput(
         "GamePieces/Fuel_", activeFuel.stream().map(FuelSim::getPose).toArray(Pose3d[]::new));
+    Logger.recordOutput("Xf", this.getXf(0, 0));
   }
 
   public double calcYaw() {
