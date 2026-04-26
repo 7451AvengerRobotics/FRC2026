@@ -28,6 +28,10 @@ public class SuperStructure {
     return intake.runIntake(-0.8);
   }
 
+  public Command reverseIntake() {
+    return intake.runIntake(0.8);
+  }
+
   public Command soleIndex() {
     return index.runIndex(-0.5);
   }
