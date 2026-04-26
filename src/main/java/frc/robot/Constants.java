@@ -33,14 +33,15 @@ public final class Constants {
   public static final class IntakePivotConstants {
     public static final int kPivotLeaderID = 10;
     public static final int kPivotFollowerID = 11;
-    public static final double kIntakeGearRatio = 4;
-    public static final double kP = 2;
+    public static final double kIntakeGearRatio = 50;
+    public static final double kInitialPivotPosition = 0.7;
+    public static final double kP = 4.0;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
     public static final double kS = 0.0;
     public static final double kV = 0.0;
     public static final double kA = 0.0;
-    public static final double kG = 0.0;
+    public static final double kG = 2;
   }
 
   public static final class IntakeConstants {
@@ -61,26 +62,26 @@ public final class Constants {
     public static final int kShooterMiniID = 52;
     public static final double kShooterGearRatio = 1.0;
     public static final double kS = 0;
-    public static final double kP = 0.0075 / 100 * 0.08;
-    public static final double kD = 0.0075 / 100 * 2;
-    public static final double kI = 0.0075 / 100 * 4;
-    public static final double kV = 0.0022;
+    public static final double kP = 0.5;
+    public static final double kD = 0.0165;
+    public static final double kI = 0.0;
+    public static final double kV = 0.125;
     public static final double kA = 0;
   }
 
   public static final class HoodConstants {
-    public static final double kInitialHoodEncoderPosition = 0.68131410253;
-    public static final double kHoodGearRatio = 16.73076923;
+    public static final double kInitialHoodEncoderPosition = 0.67905;
+    public static final double kHoodGearRatio = 16.2;
     public static final double kInitialHoodAnglePosition =
         kInitialHoodEncoderPosition / kHoodGearRatio * 360;
-    public static final double kMaxHoodAnglePosition = 47;
+    public static final double kMaxHoodAnglePosition = 55;
     public static final int kHoodMotorID = 40;
     public static final int kHoodEncoderID = 0;
-    public static final double kP = 6;
+    public static final double kP = 10;
     public static final double kI = 0.0;
-    public static final double kD = 0.1;
-    public static final double kS = 0.31;
-    public static final double kV = 0.55;
+    public static final double kD = 0.0;
+    public static final double kS = 0.6;
+    public static final double kV = 0.0;
     public static final double kA = 0.02;
     public static final double kG = 0.0;
   }

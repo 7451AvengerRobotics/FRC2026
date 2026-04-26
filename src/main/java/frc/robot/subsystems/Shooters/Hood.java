@@ -50,8 +50,8 @@ public class Hood extends SubsystemBase {
 
     this.simTurret = simTurret;
 
-    hoodMotor = new TalonFX(HoodConstants.kHoodMotorID);
-    hoodEncoder = new CANcoder(HoodConstants.kHoodEncoderID);
+    hoodMotor = new TalonFX(35);
+    hoodEncoder = new CANcoder(36);
 
     TalonFXConfiguration cfg =
         new TalonFXConfiguration()
@@ -69,8 +69,8 @@ public class Hood extends SubsystemBase {
                     .withStatorCurrentLimitEnable(true))
             .withMotionMagic(
                 new MotionMagicConfigs()
-                    .withMotionMagicCruiseVelocity(RotationsPerSecond.of(120))
-                    .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(75))
+                    .withMotionMagicCruiseVelocity(RotationsPerSecond.of(200))
+                    .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(100))
                     .withMotionMagicJerk(RotationsPerSecondPerSecond.per(Second).of(100)))
             .withSlot0(
                 new Slot0Configs()
@@ -86,7 +86,7 @@ public class Hood extends SubsystemBase {
         new CANcoderConfiguration()
             .withMagnetSensor(
                 new MagnetSensorConfigs()
-                    .withSensorDirection(SensorDirectionValue.Clockwise_Positive));
+                    .withSensorDirection(SensorDirectionValue.CounterClockwise_Positive));
 
     hoodEncoder.setPosition(HoodConstants.kInitialHoodEncoderPosition);
 
@@ -174,6 +174,7 @@ public class Hood extends SubsystemBase {
   public void periodic() {
     double angleRad = getAngleRad();
     Logger.recordOutput("Hood/AngleDeg", Math.toDegrees(angleRad));
+    Logger.recordOutput("Hood/EncoderCount", hoodMotor.getPosition().getValueAsDouble());
     Logger.recordOutput("Hood/SuggestedAngleDeg", Math.toDegrees(simTurret.getMovingPitch()));
     Logger.recordOutput("hood Voltage", hoodMotor.getMotorVoltage().getValueAsDouble());
     Logger.recordOutput("hood Current", hoodMotor.getStatorCurrent().getValueAsDouble());

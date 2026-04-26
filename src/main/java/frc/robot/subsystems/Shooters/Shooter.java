@@ -7,7 +7,7 @@ import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
-import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
@@ -24,7 +24,7 @@ public class Shooter extends SubsystemBase {
   private final TalonFX shooterLeader;
   private final TalonFX shooterFollower;
   private final TalonFX shooterMini;
-  private final VelocityTorqueCurrentFOC velocityRequest = new VelocityTorqueCurrentFOC(0);
+  private final VelocityVoltage velocityRequest = new VelocityVoltage(0);
   private TurretSim simTurret;
   private Drive drive;
 
@@ -42,7 +42,7 @@ public class Shooter extends SubsystemBase {
             .withMotorOutput(
                 new MotorOutputConfigs()
                     .withInverted(InvertedValue.CounterClockwise_Positive)
-                    .withNeutralMode(NeutralModeValue.Brake))
+                    .withNeutralMode(NeutralModeValue.Coast))
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
                     .withStatorCurrentLimit(Amps.of(60))
@@ -61,8 +61,8 @@ public class Shooter extends SubsystemBase {
 
     shooterFollower.setControl(
         new Follower(ShooterConstants.kShooterLeaderID, MotorAlignmentValue.Opposed));
-    shooterMini.setControl(
-        new Follower(ShooterConstants.kShooterLeaderID, MotorAlignmentValue.Aligned));
+    // shooterMini.setControl(
+    //     new Follower(ShooterConstants.kShooterLeaderID, MotorAlignmentValue.Aligned));
   }
 
   @Override
@@ -70,6 +70,8 @@ public class Shooter extends SubsystemBase {
     Logger.recordOutput("Velocity in RPM", shooterLeader.getVelocity().getValueAsDouble() * 60);
     Logger.recordOutput("Shooter Voltage", shooterLeader.getStatorCurrent().getValueAsDouble());
     Logger.recordOutput("Shooter Current", shooterLeader.getMotorVoltage().getValueAsDouble());
+    Logger.recordOutput("Mini Voltage", shooterMini.getStatorCurrent().getValueAsDouble());
+    Logger.recordOutput("Mini Current", shooterMini.getMotorVoltage().getValueAsDouble());
   }
 
   public void run(double power) {

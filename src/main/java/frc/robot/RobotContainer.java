@@ -169,7 +169,10 @@ public class RobotContainer {
     controller.cross().toggleOnTrue(superStructure.masterCommand());
     controller.square().onTrue(superStructure.deployPivot());
 
-    controller.L1().toggleOnTrue(hood.trackHub());
+    controller.L1().onTrue(shooter.setVelCommand(2500));
+    // controller.R1().onTrue(pivot.stopPivot());
+
+    // controller.L1().toggleOnTrue(hood.trackHub());
     controller
         .R1()
         .whileTrue(drive.alignToHub(0))
@@ -179,12 +182,14 @@ public class RobotContainer {
         .povLeft()
         .whileTrue(drive.alignForTrench())
         .onFalse(Commands.run(() -> drive.runVelocity(new ChassisSpeeds(0, 0, 0))));
-    controller.povDown().whileTrue(drive.moveBackward());
-    controller.povUp().whileTrue(drive.moveForward());
-    controller.povRight().onTrue(superStructure.resetHoods());
+    // controller.povDown().whileTrue(drive.moveBackward());
+    // controller.povUp().whileTrue(drive.moveForward());
+    controller.povUp().whileTrue(hood.moveUp()).whileFalse(hood.stop());
+    controller.povDown().whileTrue(hood.moveDown()).whileFalse(hood.stop());
+    controller.povRight().onTrue(pivot.jiggle2());
 
     manip.circle().onTrue(superStructure.stopMasterCommand());
-    manip.cross().onTrue(shooter.runDutyCycle(0.3));
+    manip.cross().onTrue(shooter.runDutyCycle(0.5));
     manip.triangle().onTrue(superStructure.strongWeirdMasterCommand());
 
     manip.L1().onTrue(superStructure.jiggle()).onFalse(superStructure.stopJiggle());

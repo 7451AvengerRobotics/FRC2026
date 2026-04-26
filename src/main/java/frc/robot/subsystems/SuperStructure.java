@@ -75,7 +75,7 @@ public class SuperStructure {
   public Command masterCommand() {
     return Commands.parallel( // These run immediately
         soleIntake(),
-        shooter.runDutyCycle(0.3),
+        shooter.setVelCommand(3000),
 
         // This branch waits, then starts feeder/index
         Commands.sequence(new WaitCommand(0), Commands.parallel(index.runIndex(0.8))));
@@ -91,7 +91,7 @@ public class SuperStructure {
   }
 
   public Command weirdMasterCommand() {
-    return Commands.parallel(soleIntake(), index.runIndex(0.3), runShooters4000());
+    return Commands.parallel(soleIntake(), index.runIndex(-0.3), shooter.setVelCommand(3000));
   }
 
   public Command strongWeirdMasterCommand() {
@@ -103,7 +103,7 @@ public class SuperStructure {
   }
 
   public Command intakelessMasterCommand() {
-    return Commands.parallel(intake.stopIntake(), index.runIndex(0.8), runShooters4000());
+    return Commands.parallel(intake.stopIntake(), index.runIndex(0.8), shooter.setVelCommand(4000));
   }
 
   public Command shooterlessWeirdMasterCommand() {

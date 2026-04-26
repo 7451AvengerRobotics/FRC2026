@@ -15,10 +15,12 @@ import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.IntakePivotConstants;
 import org.littletonrobotics.junction.Logger;
@@ -55,7 +57,8 @@ public class IntakePivot extends SubsystemBase {
                     .withKG(IntakePivotConstants.kG)
                     .withKS(IntakePivotConstants.kS)
                     .withKV(IntakePivotConstants.kV)
-                    .withKA(IntakePivotConstants.kA));
+                    .withKA(IntakePivotConstants.kA)
+                    .withGravityType(GravityTypeValue.Arm_Cosine));
 
     pivotLeader.getConfigurator().apply(cfg);
     pivotFollower.getConfigurator().apply(cfg);
@@ -63,7 +66,7 @@ public class IntakePivot extends SubsystemBase {
     pivotFollower.setControl(
         new Follower(IntakePivotConstants.kPivotLeaderID, MotorAlignmentValue.Opposed));
 
-    pivotLeader.getConfigurator().setPosition(0);
+    pivotLeader.getConfigurator().setPosition(IntakePivotConstants.kInitialPivotPosition);
   }
 
   public void pivotIntake(double rotations) {
@@ -90,17 +93,22 @@ public class IntakePivot extends SubsystemBase {
     return runPivot(0.15);
   }
 
+  public Command jiggle2() {
+    return Commands.sequence(runPivot(0.15).withTimeout(1), toPosition(0).withTimeout(1))
+        .repeatedly();
+  }
+
   public Command stopPivot() {
     return runPivot(0);
   }
 
   public Command toPosition(double rotations) {
-    return setIntakePivotAngle(rotations).until(() -> nearSetpoint(rotations));
+    return setIntakePivotAngle(rotations);
   }
 
   public enum PivotPosition {
-    STOW(0),
-    DEPLOYED(-5.235);
+    STOW(IntakePivotConstants.kInitialPivotPosition),
+    DEPLOYED(0);
 
     public final double rotations;
 
