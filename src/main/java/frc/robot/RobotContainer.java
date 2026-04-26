@@ -138,7 +138,7 @@ public class RobotContainer {
     simTurret = new TurretSim(drive, new Transform3d(-0.17, 0, 0.39, new Rotation3d()));
     shooter = new Shooter(simTurret, drive);
     hood = new Hood(simTurret);
-    superStructure = new SuperStructure(index, intake, shooter, hood, pivot);
+    superStructure = new SuperStructure(drive, index, intake, shooter, hood, pivot);
 
     // Set up auto routines
     autos = new AutoRoutines(drive, superStructure);
@@ -164,39 +164,42 @@ public class RobotContainer {
             () -> -controller.getLeftX(),
             () -> -controller.getRightX()));
 
-    controller.triangle().onTrue(superStructure.weirdMasterCommand());
+
+    controller.L1().whileTrue(superStructure.intakeBalls()).onFalse(superStructure.noIntakeBalls());
+    controller.R1().whileTrue(superStructure.shootBalls()).onFalse(superStructure.noShootBalls());
+    // controller.triangle().onTrue(superStructure.weirdMasterCommand());
     controller.circle().onTrue(superStructure.stopMasterCommand());
-    controller.cross().toggleOnTrue(superStructure.masterCommand());
+    controller.L2().whileTrue(superStructure.intakelessMasterCommand()).onFalse(superStructure.noShootBalls());
     controller.square().onTrue(superStructure.deployPivot());
 
-    controller.L1().onTrue(shooter.setVelCommand(2500));
-    // controller.R1().onTrue(pivot.stopPivot());
+    // controller.L1().onTrue(shooter.setVelCommand(2500));
+    // // controller.R1().onTrue(pivot.stopPivot());
 
-    // controller.L1().toggleOnTrue(hood.trackHub());
-    controller
-        .R1()
-        .whileTrue(drive.alignToHub(0))
-        .onFalse(Commands.run(() -> drive.runVelocity(new ChassisSpeeds(0, 0, 0))));
+    // // controller.L1().toggleOnTrue(hood.trackHub());
+    // controller
+    //     .R1()
+    //     .whileTrue(drive.alignToHub(0))
+    //     .onFalse(Commands.run(() -> drive.runVelocity(new ChassisSpeeds(0, 0, 0))));
 
-    controller
-        .povLeft()
-        .whileTrue(drive.alignForTrench())
-        .onFalse(Commands.run(() -> drive.runVelocity(new ChassisSpeeds(0, 0, 0))));
-    // controller.povDown().whileTrue(drive.moveBackward());
-    // controller.povUp().whileTrue(drive.moveForward());
-    controller.povUp().whileTrue(hood.moveUp()).whileFalse(hood.stop());
-    controller.povDown().whileTrue(hood.moveDown()).whileFalse(hood.stop());
-    controller.povRight().onTrue(pivot.jiggle2());
+    // controller
+    //     .povLeft()
+    //     .whileTrue(drive.alignForTrench())
+    //     .onFalse(Commands.run(() -> drive.runVelocity(new ChassisSpeeds(0, 0, 0))));
+    // // controller.povDown().whileTrue(drive.moveBackward());
+    // // controller.povUp().whileTrue(drive.moveForward());
+    // controller.povUp().whileTrue(hood.moveUp()).whileFalse(hood.stop());
+    // controller.povDown().whileTrue(hood.moveDown()).whileFalse(hood.stop());
+    // controller.povRight().onTrue(pivot.jiggle2());
 
-    manip.circle().onTrue(superStructure.stopMasterCommand());
-    manip.cross().onTrue(shooter.runDutyCycle(0.5));
-    manip.triangle().onTrue(superStructure.strongWeirdMasterCommand());
+    // manip.circle().onTrue(superStructure.stopMasterCommand());
+    // manip.cross().onTrue(shooter.runDutyCycle(0.5));
+    // manip.triangle().onTrue(superStructure.strongWeirdMasterCommand());
 
-    manip.L1().onTrue(superStructure.jiggle()).onFalse(superStructure.stopJiggle());
-    manip.R1().onTrue(pivot.runPivot(0));
+    // manip.L1().onTrue(superStructure.jiggle()).onFalse(superStructure.stopJiggle());
+    // manip.R1().onTrue(pivot.runPivot(0));
 
-    manip.povUp().whileTrue(superStructure.hoodsUp()).onFalse(superStructure.stopHood());
-    manip.povDown().whileTrue(superStructure.hoodsDown()).onFalse(superStructure.stopHood());
+    // manip.povUp().whileTrue(superStructure.hoodsUp()).onFalse(superStructure.stopHood());
+    // manip.povDown().whileTrue(superStructure.hoodsDown()).onFalse(superStructure.stopHood());
   }
 
   public void configureAutos() {

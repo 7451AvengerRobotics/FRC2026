@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -8,15 +9,18 @@ import frc.robot.subsystems.Intake.IntakePivot;
 import frc.robot.subsystems.Intake.IntakePivot.PivotPosition;
 import frc.robot.subsystems.Shooters.Hood;
 import frc.robot.subsystems.Shooters.Shooter;
+import frc.robot.subsystems.drive.Drive;
 
 public class SuperStructure {
+  private final Drive drive;
   private final Intake intake;
   private final Index index;
   private final Shooter shooter;
   private final Hood hood;
   private final IntakePivot pivot;
 
-  public SuperStructure(Index index, Intake intake, Shooter shooter, Hood hood, IntakePivot pivot) {
+  public SuperStructure(Drive drive, Index index, Intake intake, Shooter shooter, Hood hood, IntakePivot pivot) {
+    this.drive = drive;
     this.intake = intake;
     this.index = index;
     this.shooter = shooter;
@@ -29,7 +33,7 @@ public class SuperStructure {
   }
 
   public Command soleIndex() {
-    return index.runIndex(-0.5);
+    return index.runIndex(0.8);
   }
 
   public Command stopIntake() {
@@ -41,7 +45,7 @@ public class SuperStructure {
   }
 
   public Command reverseIndex() {
-    return index.runIndex(0.3);
+    return index.runIndex(-0.3);
   }
 
   public Command setHoods() {
@@ -103,7 +107,7 @@ public class SuperStructure {
   }
 
   public Command intakelessMasterCommand() {
-    return Commands.parallel(intake.stopIntake(), index.runIndex(0.8), shooter.setVelCommand(4000));
+    return Commands.parallel(intake.stopIntake(), index.runIndex(0.8), runShooters3000());
   }
 
   public Command shooterlessWeirdMasterCommand() {
@@ -140,5 +144,25 @@ public class SuperStructure {
 
   public Command trackHub() {
     return hood.trackHub();
+  }
+
+  public Command intakeBalls() {
+    return Commands.parallel(soleIntake(), reverseIndex(), runShooters3000());
+  }
+
+  public Command noIntakeBalls() {
+    return Commands.parallel(stopIntake(), stopIndex(), runShooters3000());
+  }
+
+  public Command shootBalls() {
+    return Commands.sequence(
+        drive.alignToHub(),
+        Commands.parallel(soleIndex(), runShooters3000()));
+  }
+
+  public Command noShootBalls() {
+    return Commands.sequence(
+      Commands.runOnce(() -> drive.runVelocity(new ChassisSpeeds(0, 0, 0))), 
+      Commands.parallel(stopIndex()));
   }
 }
