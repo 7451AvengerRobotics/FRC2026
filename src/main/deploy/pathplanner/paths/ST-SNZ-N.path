@@ -3,12 +3,12 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.590704545454545,
+        "x": 4.45,
         "y": 0.6
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.15375337377728,
+        "x": 6.013048828322735,
         "y": 0.5999999999999996
       },
       "isLocked": false,
@@ -62,10 +62,6 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 1.0,
-      "rotationDegrees": 180.0
-    },
-    {
       "waypointRelativePos": 1.8048128342245982,
       "rotationDegrees": 90.0
     }
@@ -86,7 +82,14 @@
     }
   ],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "DeployPivot",
+      "waypointRelativePos": 1.15,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 3.0,
@@ -103,7 +106,7 @@
   "folder": "SourceSide",
   "idealStartingState": {
     "velocity": 0.0,
-    "rotation": 180.0
+    "rotation": 90.0
   },
   "useDefaultConstraints": true
 }

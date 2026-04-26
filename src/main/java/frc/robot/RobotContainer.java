@@ -8,6 +8,8 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -143,6 +145,8 @@ public class RobotContainer {
     // Set up auto routines
     autos = new AutoRoutines(drive, superStructure);
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+
+    NamedCommands.registerCommand("DeployPivot", superStructure.deployPivot().withTimeout(2.5));
 
     // Configure the bindings
     configureButtonBindings();
