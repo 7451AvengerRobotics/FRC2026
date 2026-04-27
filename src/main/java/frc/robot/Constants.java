@@ -8,6 +8,7 @@
 package frc.robot;
 
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 
 /**
@@ -77,18 +78,22 @@ public final class Constants {
     public static final double kMaxHoodAnglePosition = 55;
     public static final int kHoodMotorID = 40;
     public static final int kHoodEncoderID = 0;
-    public static final double kP = 10;
+    public static final double kP = 30;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
-    public static final double kS = 0.6;
-    public static final double kV = 0.0;
-    public static final double kA = 0.02;
+    public static final double kS = 0.3;
+    public static final double kV = 0.8;
+    public static final double kA = 0.032;
     public static final double kG = 0.0;
   }
 
   public static final class TargetConstants {
     public static final Translation2d hub =
-        new Translation2d(Robot.IsRedAlliance.getAsBoolean() ? 11.915 : 16.54 - 11.915, 4.035);
+        new Translation2d(
+            DriverStation.getAlliance().get() == DriverStation.Alliance.Red
+                ? 11.915
+                : 16.54 - 11.915,
+            4.035);
     public static final Translation2d pass1 =
         new Translation2d(
             !Robot.IsRedAlliance.getAsBoolean() ? 2.54 : 16.54 - 2.54,

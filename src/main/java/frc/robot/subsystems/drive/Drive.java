@@ -140,7 +140,7 @@ public class Drive extends SubsystemBase {
     this.holonomicDriveWithPIDControllerStrong =
         new HolonomicDriveWithPIDController(
             new PIDController(4, 0, 0),
-            new PIDController(7, 0, 0),
+            new PIDController(5.5, 0, 0),
             headingControllerStrong,
             0.5,
             new Pose2d(0.04, 0.04, Rotation2d.fromDegrees(2)),

@@ -12,7 +12,7 @@ public class ShotCalc {
   double g = 9.81;
   double yf = Constants.TargetConstants.yf;
   double H = 2.5;
-  double shotOffset = -0.35;
+  double shotOffset = 0;
   public double pitch = Math.toRadians(60);
   Transform3d turretOffset = new Transform3d();
   InterpolatingDoubleTreeMap angleLerp = new InterpolatingDoubleTreeMap();
@@ -95,7 +95,7 @@ public class ShotCalc {
     // double vx = g * xf / (voy + Math.sqrt(Math.pow(voy, 2) - 2 * g * yf));
     // return Math.atan(voy / vx);
     // return HoodConstants.angleLerp.get(xf);
-    return angleLerp.get(xf);
+    return Math.PI / 2 - angleLerp.get(xf);
   }
 
   public double getVelocity8(ChassisSpeeds vr, double xf) {

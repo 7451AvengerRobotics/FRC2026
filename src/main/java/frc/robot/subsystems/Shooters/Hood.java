@@ -30,6 +30,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.HoodConstants;
 import frc.robot.subsystems.SimFiles.TurretSim;
@@ -114,7 +115,7 @@ public class Hood extends SubsystemBase {
   }
 
   public Command toAngleDegrees(double angleDeg) {
-    return runOnce(() -> setAngleDegrees(angleDeg));
+    return run(() -> setAngleDegrees(angleDeg));
   }
 
   public Command moveUp() {
@@ -139,7 +140,7 @@ public class Hood extends SubsystemBase {
   }
 
   public Command trackHub() {
-    return run(
+    return Commands.run(
         () -> {
           double launchPitchRad = simTurret.getMovingPitch();
           setAngleRad(

@@ -113,10 +113,15 @@ public class AutoRoutines {
 
   public Command DN_Sw() {
     return Commands.sequence(
-        superStruc.deployPivot().withTimeout(2.5),
-        superStruc.stopPivot().withTimeout(0.1),
         Commands.deadline(
-            drive.followPPPathCommand("DT-DNZ-N").withTimeout(5), superStruc.weirdMasterCommand()),
+            drive.followPPPathCommand("DT-DNZ-N").withTimeout(5),
+            Commands.sequence(
+                new WaitCommand(0.75),
+                Commands.parallel(
+                    Commands.sequence(
+                        superStruc.deployPivot().withTimeout(2.5),
+                        superStruc.stopPivot().withTimeout(0.1)),
+                    Commands.sequence(new WaitCommand(0.75), superStruc.weirdMasterCommand())))),
         drive.driveToDepotReturn().withTimeout(1),
         drive.followPPPathCommand("DNZ-DB").withTimeout(3),
         scoreWithDriveAlign());
@@ -200,7 +205,10 @@ public class AutoRoutines {
     return Commands.sequence(
         drive.followPPPathCommand("H_to_S").withTimeout(3),
         Commands.run(() -> drive.runVelocity(new ChassisSpeeds(0, 0, 0))).withTimeout(0.5),
-        Commands.parallel(superStruc.masterCommand(), superStruc.trackHub()));
+        Commands.parallel(
+            superStruc.masterCommand()
+            // , superStruc.trackHub()
+            ));
   }
 
   public Command SN_Sw() {
@@ -278,22 +286,13 @@ public class AutoRoutines {
         // Commands.repeatingSequence(
         //     superStruc.masterCommand().withTimeout(3),
         //     superStruc.weirdMasterCommand().withTimeout(1))
-        Commands.parallel(
-            Commands.repeatingSequence(
-                superStruc.masterCommand().withTimeout(3),
-                superStruc.weirdMasterCommand().withTimeout(1.5)),
-            Commands.sequence(
-                new WaitCommand(5),
-                Commands.sequence(
-                    superStruc.jiggle().withTimeout(1),
-                    superStruc.deployPivot().withTimeout(2.5)))));
+        superStruc.masterCommand().withTimeout(3));
   }
 
   public Command score() {
-    return Commands.parallel(
+    return Commands.sequence(
         Commands.run(() -> drive.runVelocity(new ChassisSpeeds(0, 0, 0))).withTimeout(0.5),
-        Commands.sequence(new WaitCommand(1), superStruc.masterCommand()),
-        superStruc.trackHub());
+        Commands.sequence(new WaitCommand(1), superStruc.masterCommand()));
   }
 
   public Command singleAuto() {

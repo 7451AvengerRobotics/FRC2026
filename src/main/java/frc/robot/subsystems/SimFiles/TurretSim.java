@@ -53,7 +53,7 @@ public class TurretSim extends SubsystemBase {
         new Translation2d(
             // Commented is red code
             // 16.54 -
-            drive.applyX(TargetConstants.hub.getX()), TargetConstants.hub.getY());
+            (TargetConstants.hub.getX()), TargetConstants.hub.getY());
   }
 
   public void setTarget(Translation2d newTarget) {
@@ -188,15 +188,16 @@ public class TurretSim extends SubsystemBase {
   }
 
   public double getRequiredPitch() {
-    double v0 = shotCalc.newGetVelocity(xf);
-    double pitch0 = shotCalc.newGetPitch(xf);
+    // double v0 = shotCalc.newGetVelocity(xf);
+    // double pitch0 = shotCalc.newGetPitch(xf);
 
-    double time = calcShotTime(xf, v0, pitch0);
-    double adjustedXf = getXf(-vxr * time, -vyr * time);
+    // double time = calcShotTime(xf, v0, pitch0);
+    // double adjustedXf = getXf(-vxr * time, -vyr * time);
 
-    double pitchf = shotCalc.newGetPitch(adjustedXf);
+    // double pitchf = shotCalc.newGetPitch(adjustedXf);
 
-    return pitchf;
+    // return pitchf;
+    return shotCalc.newGetPitch(xf);
   }
 
   public double getMovingPitch() {
@@ -323,7 +324,7 @@ public class TurretSim extends SubsystemBase {
   public double getXf(double xOffset, double yOffset) {
     xf =
         Math.sqrt(
-            Math.pow((drive.applyX(target.getX()) - turretPositionPose2d.getX() + xOffset), 2)
+            Math.pow(target.getX() - turretPositionPose2d.getX() + xOffset, 2)
                 + Math.pow((target.getY() - turretPositionPose2d.getY() + yOffset), 2));
 
     return xf;

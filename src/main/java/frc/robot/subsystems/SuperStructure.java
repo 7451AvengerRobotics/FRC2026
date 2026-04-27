@@ -38,7 +38,7 @@ public class SuperStructure {
   }
 
   public Command soleIndex() {
-    return index.runIndex(0.8);
+    return index.runIndex(1.0);
   }
 
   public Command stopIntake() {
@@ -85,7 +85,7 @@ public class SuperStructure {
     return Commands.parallel( // These run immediately
         soleIntake(),
         shooter.setVelCommand(3000),
-
+        hood.trackHub(),
         // This branch waits, then starts feeder/index
         Commands.sequence(new WaitCommand(0), Commands.parallel(index.runIndex(0.8))));
   }
@@ -120,7 +120,7 @@ public class SuperStructure {
   }
 
   public Command stopMasterCommand() {
-    return Commands.parallel(intake.stopIntake(), index.stopIndex(), stopShooters());
+    return Commands.parallel(intake.stopIntake(), index.stopIndex(), stopShooters(), hood.stop());
   }
 
   public Command deployPivot() {
@@ -161,12 +161,17 @@ public class SuperStructure {
 
   public Command shootBalls() {
     return Commands.sequence(
-        drive.alignToHub(), Commands.parallel(soleIndex(), runShooters3000(), soleIntake()));
+        Commands.parallel(drive.alignToHub(), hood.trackHub()),
+        Commands.parallel(soleIndex(), runShooters3000(), soleIntake()));
   }
 
   public Command noShootBalls() {
     return Commands.sequence(
         Commands.runOnce(() -> drive.runVelocity(new ChassisSpeeds(0, 0, 0))),
         Commands.parallel(stopIndex()));
+  }
+
+  public Command restingRun() {
+    return Commands.parallel(stopIntake(), stopIndex(), runShooters3000());
   }
 }

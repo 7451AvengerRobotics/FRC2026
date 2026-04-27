@@ -31,7 +31,7 @@ public class Index extends SubsystemBase {
                     .withNeutralMode(NeutralModeValue.Coast))
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
-                    .withStatorCurrentLimit(Amps.of(50))
+                    .withStatorCurrentLimit(Amps.of(130))
                     .withStatorCurrentLimitEnable(true));
 
     indexLeader.getConfigurator().apply(cfg);
