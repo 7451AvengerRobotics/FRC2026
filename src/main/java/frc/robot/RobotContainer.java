@@ -198,13 +198,18 @@ public class RobotContainer {
     manip.povRight().onTrue(pivot.stopPivot());
     manip.povLeft().onTrue(superStructure.stopMasterCommand());
 
-    // manip.circle().onTrue(superStructure.stopMasterCommand());
-    // manip.cross().onTrue(shooter.runDutyCycle(0.5));
-    // manip.triangle().onTrue(superStructure.strongWeirdMasterCommand());
-
     manip.L1().whileTrue(pivot.jiggle2()).onFalse(superStructure.stopJiggle());
     manip.circle().whileTrue(hood.resetHood());
     manip.cross().toggleOnTrue(hood.trackHub());
+    manip.R1().toggleOnTrue(hood.trackWrongHub());
+
+    // Switch to X pattern when X button is pressed
+    manip.square().onTrue(Commands.runOnce(drive::stopWithX, drive));
+    manip
+        .triangle()
+        .whileTrue(superStructure.reverseOutput())
+        .onFalse(superStructure.noIntakeBalls());
+
     // manip.R1().onTrue(pivot.runPivot(0));
 
     // manip.povUp().whileTrue(superStructure.hoodsUp()).onFalse(superStructure.stopHood());
@@ -228,7 +233,7 @@ public class RobotContainer {
     // autoChooser.addOption(
     //     "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
-    autoChooser.addOption("Hub to Shoot", autos.H_to_S());
+    // autoChooser.addOption("Hub to Shoot", autos.H_to_S());
 
     // Swerve Align Depot
     autoChooser.addOption("DF_Sw", autos.DF_Sw());

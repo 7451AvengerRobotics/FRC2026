@@ -33,6 +33,7 @@ public class TurretSim extends SubsystemBase {
   private Translation2d target;
   double yf = 1.329;
   double xf;
+  double wrongXf;
   double passingXf;
   double g = 9.8;
   double a = -g;
@@ -77,6 +78,7 @@ public class TurretSim extends SubsystemBase {
     vyr = Math.abs(Vr.vyMetersPerSecond) < 0.01 ? 0 : Vr.vyMetersPerSecond;
 
     xf = this.getXf(0, 0);
+    wrongXf = this.getWrongXf(0, 0);
     passingXf = this.getPassingXf(0, 0);
 
     Logger.recordOutput("Vr_", Math.hypot(vxr, vyr));
@@ -328,6 +330,15 @@ public class TurretSim extends SubsystemBase {
                 + Math.pow((target.getY() - turretPositionPose2d.getY() + yOffset), 2));
 
     return xf;
+  }
+
+  public double getWrongXf(double xOffset, double yOffset) {
+    wrongXf =
+        Math.sqrt(
+            Math.pow(16.54 - target.getX() - turretPositionPose2d.getX() + xOffset, 2)
+                + Math.pow((target.getY() - turretPositionPose2d.getY() + yOffset), 2));
+
+    return wrongXf;
   }
 
   public double getPassingXf(double xOffset, double yOffset) {

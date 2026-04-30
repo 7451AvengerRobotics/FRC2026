@@ -159,6 +159,10 @@ public class SuperStructure {
     return Commands.parallel(stopIntake(), stopIndex(), runShooters3000());
   }
 
+  public Command reverseOutput() {
+    return Commands.parallel(reverseIndex(), reverseIntake());
+  }
+
   public Command shootBalls() {
     return Commands.sequence(
         Commands.parallel(drive.alignToHub(), hood.trackHub()),

@@ -138,6 +138,8 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
+
+    // RobotController.setBrownoutVoltage(6);
   }
 
   /** This function is called periodically during operator control. */

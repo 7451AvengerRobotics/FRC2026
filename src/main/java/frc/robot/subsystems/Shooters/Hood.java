@@ -151,6 +151,18 @@ public class Hood extends SubsystemBase {
         });
   }
 
+  public Command trackWrongHub() {
+    return Commands.run(
+        () -> {
+          double launchPitchRad = simTurret.getMovingPitch();
+          setAngleRad(
+              MathUtil.clamp(
+                  launchPitchRad,
+                  Math.toRadians(HoodConstants.kInitialHoodAnglePosition),
+                  Math.toRadians(HoodConstants.kMaxHoodAnglePosition)));
+        });
+  }
+
   public Command pass() {
     return run(
         () -> {
