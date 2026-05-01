@@ -60,10 +60,10 @@ public class Hood extends SubsystemBase {
                 new MotorOutputConfigs()
                     .withInverted(InvertedValue.CounterClockwise_Positive)
                     .withNeutralMode(NeutralModeValue.Brake))
-            .withFeedback(
-                new FeedbackConfigs()
-                    .withFeedbackRemoteSensorID(HoodConstants.kHoodEncoderID)
-                    .withFeedbackSensorSource(FeedbackSensorSourceValue.RemoteCANcoder))
+            // .withFeedback(
+            //     new FeedbackConfigs()
+            //         .withFeedbackRemoteSensorID(HoodConstants.kHoodEncoderID)
+            //         .withFeedbackSensorSource(FeedbackSensorSourceValue.RemoteCANcoder))
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
                     .withStatorCurrentLimit(Amps.of(60))

@@ -3,12 +3,12 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.0,
+        "x": 4.45,
         "y": 7.4
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.563048828322735,
+        "x": 6.013048828322735,
         "y": 7.4
       },
       "isLocked": false,
@@ -62,10 +62,6 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 1.2032085561497328,
-      "rotationDegrees": 180.0
-    },
-    {
       "waypointRelativePos": 1.8048128342245982,
       "rotationDegrees": -90.0
     }
@@ -93,7 +89,7 @@
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
-    "unlimited": true
+    "unlimited": false
   },
   "goalEndState": {
     "velocity": 0.5,
@@ -103,7 +99,7 @@
   "folder": "DepotSide",
   "idealStartingState": {
     "velocity": 0.0,
-    "rotation": 180.0
+    "rotation": -90.0
   },
   "useDefaultConstraints": false
 }
