@@ -65,7 +65,7 @@ public class AutoRoutines {
 
   public Command D2() {
     return Commands.sequence(
-        superStruc.resetHoods().withTimeout(1),
+        superStruc.resetHood().withTimeout(1),
         drive.driveToDX2Start().withTimeout(1),
         Commands.deadline(
             drive.followPPPathCommand("DT-DNZ-2").withTimeout(12), superStruc.weirdMasterCommand()),
@@ -142,17 +142,17 @@ public class AutoRoutines {
 
   public Command DF_D2_Sw() {
     return Commands.sequence(
-        DF_Sw().withTimeout(15), superStruc.resetHoods().withTimeout(1), D2_Sw());
+        DF_Sw().withTimeout(15), superStruc.resetHood().withTimeout(1), D2_Sw());
   }
 
   public Command DN_D2_Sw() {
     return Commands.sequence(
-        DN_Sw().withTimeout(15), superStruc.resetHoods().withTimeout(1), D2_Sw());
+        DN_Sw().withTimeout(15), superStruc.resetHood().withTimeout(1), D2_Sw());
   }
 
   public Command D2_D2_Sw() {
     return Commands.sequence(
-        D2_Sw().withTimeout(10), superStruc.resetHoods().withTimeout(1), D2_Sw());
+        D2_Sw().withTimeout(10), superStruc.resetHood().withTimeout(1), D2_Sw());
   }
 
   // Source Side Autons
@@ -237,12 +237,12 @@ public class AutoRoutines {
 
   public Command SF_S2_Sw() {
     return Commands.sequence(
-        SF_Sw().withTimeout(15), superStruc.resetHoods().withTimeout(1), S2_Sw());
+        SF_Sw().withTimeout(15), superStruc.resetHood().withTimeout(1), S2_Sw());
   }
 
   public Command SN_S2_Sw() {
     return Commands.sequence(
-        SN_Sw().withTimeout(15), superStruc.resetHoods().withTimeout(1), S2_Sw());
+        SN_Sw().withTimeout(15), superStruc.resetHood().withTimeout(1), S2_Sw());
   }
 
   // Bump Start Autons
@@ -299,7 +299,7 @@ public class AutoRoutines {
 
   public Command scoreWithDriveAlign() {
     return Commands.sequence(
-        Commands.parallel(drive.alignToHub(), superStruc.trackHub()).withTimeout(2),
+        Commands.parallel(drive.alignToHub(), superStruc.trackHoods()).withTimeout(2),
         Commands.run(() -> drive.runVelocity(new ChassisSpeeds(0, 0, 0))).withTimeout(0.5),
         // Commands.repeatingSequence(
         //     superStruc.masterCommand().withTimeout(3),
@@ -319,6 +319,6 @@ public class AutoRoutines {
         superStruc.deployPivot().withTimeout(1),
         drive.alignToHub().withTimeout(2),
         Commands.run(() -> drive.runVelocity(new ChassisSpeeds(0, 0, 0))).withTimeout(0.5),
-        superStruc.startupMasterCommand().withTimeout(6));
+        superStruc.masterCommand().withTimeout(6));
   }
 }

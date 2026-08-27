@@ -144,8 +144,6 @@ public class RobotContainer {
     autos = new AutoRoutines(drive, superStructure);
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
-    // NamedCommands.registerCommand("DeployPivot", superStructure.deployPivot().withTimeout(2.5));
-
     // Configure the bindings
     configureButtonBindings();
     configureAutos();
@@ -166,22 +164,11 @@ public class RobotContainer {
             () -> -controller.getLeftX(),
             () -> -controller.getRightX()));
 
-    // controller.L1().whileTrue(superStructure.intakeBalls()).onFalse(superStructure.noIntakeBalls());
-    // controller.R1().whileTrue(superStructure.shootBalls()).onFalse(superStructure.noShootBalls());
-    // controller.triangle().onTrue(superStructure.weirdMasterCommand());
     controller.cross().toggleOnTrue(superStructure.masterCommand());
     controller.circle().onTrue(superStructure.restingRun());
     controller.triangle().onTrue(superStructure.weirdMasterCommand());
     controller.square().onTrue(superStructure.deployPivot());
-
-    // controller
-    //     .L2()
-    //     .whileTrue(superStructure.masterCommand())
-    //     .onFalse(superStructure.noShootBalls());
-    // controller.L1().onTrue(shooter.setVelCommand(2500));
-    // // controller.R1().onTrue(pivot.stopPivot());
-
-    // // controller.L1().toggleOnTrue(hood.trackHub());
+    
     controller
         .R1()
         .whileTrue(
@@ -190,31 +177,22 @@ public class RobotContainer {
                 hood.trackHub(),
                 Commands.sequence(Commands.waitSeconds(0.5), superStructure.masterCommand())))
         .onFalse(Commands.run(() -> drive.runVelocity(new ChassisSpeeds(0, 0, 0))));
+    
+    manip.circle().whileTrue(hood.resetHood());
+    manip.cross().toggleOnTrue(hood.trackHub());
+    manip.square().onTrue(Commands.runOnce(drive::stopWithX, drive));
+    manip
+        .triangle()
+        .whileTrue(superStructure.reverseOutput())
+        .onFalse(superStructure.restingRun());
 
-    controller.L1().toggleOnTrue(superStructure.weirdMasterCommand());
-    // // controller.povDown().whileTrue(drive.moveBackward());
-    // // controller.povUp().whileTrue(drive.moveForward());
     manip.povUp().whileTrue(hood.moveUp()).onFalse(hood.stop());
     manip.povDown().whileTrue(hood.moveDown()).onFalse(hood.stop());
     manip.povRight().onTrue(pivot.stopPivot());
     manip.povLeft().onTrue(superStructure.stopMasterCommand());
 
-    manip.L1().whileTrue(pivot.jiggle2()).onFalse(superStructure.stopJiggle());
-    manip.circle().whileTrue(hood.resetHood());
-    manip.cross().toggleOnTrue(hood.trackHub());
+    manip.L1().whileTrue(pivot.jiggle2()).onFalse(superStructure.deployPivot());
     manip.R1().toggleOnTrue(hood.trackWrongHub());
-
-    // Switch to X pattern when X button is pressed
-    manip.square().onTrue(Commands.runOnce(drive::stopWithX, drive));
-    manip
-        .triangle()
-        .whileTrue(superStructure.reverseOutput())
-        .onFalse(superStructure.noIntakeBalls());
-
-    // manip.R1().onTrue(pivot.runPivot(0));
-
-    // manip.povUp().whileTrue(superStructure.hoodsUp()).onFalse(superStructure.stopHood());
-    // manip.povDown().whileTrue(superStructure.hoodsDown()).onFalse(superStructure.stopHood());
   }
 
   public void configureAutos() {
@@ -233,8 +211,6 @@ public class RobotContainer {
     //     "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
     // autoChooser.addOption(
     //     "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-
-    // autoChooser.addOption("Hub to Shoot", autos.H_to_S());
 
     // Swerve Align Depot
     autoChooser.addOption("DF_Sw", autos.DF_Sw());

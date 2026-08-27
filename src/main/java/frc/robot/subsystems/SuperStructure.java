@@ -20,7 +20,13 @@ public class SuperStructure {
   private final IntakePivot pivot;
 
   public SuperStructure(
-      Drive drive, Index index, Intake intake, Shooter shooter, Hood hood, IntakePivot pivot) {
+    Drive drive, 
+    Index index, 
+    Intake intake, 
+    Shooter shooter, 
+    Hood hood, 
+    IntakePivot pivot) {
+
     this.drive = drive;
     this.intake = intake;
     this.index = index;
@@ -29,20 +35,22 @@ public class SuperStructure {
     this.pivot = pivot;
   }
 
+  //Intake Commands
   public Command soleIntake() {
     return intake.runIntake(-0.8);
+  }
+
+  public Command stopIntake() {
+    return intake.stopIntake();
   }
 
   public Command reverseIntake() {
     return intake.runIntake(0.8);
   }
 
+  //Index Commands
   public Command soleIndex() {
-    return index.runIndex(1.0);
-  }
-
-  public Command stopIntake() {
-    return intake.stopIntake();
+    return index.runIndex(0.8);
   }
 
   public Command stopIndex() {
@@ -53,6 +61,7 @@ public class SuperStructure {
     return index.runIndex(-0.3);
   }
 
+  //Hood Commands
   public Command setHoods() {
     return hood.trackHub();
   }
@@ -69,62 +78,74 @@ public class SuperStructure {
     return hood.stop();
   }
 
-  public Command runShooters4000() {
-    return shooter.runShooter4000();
+  public Command runShooter4000() {
+    return shooter.runShooter(4000);
   }
 
-  public Command runShooters3000() {
-    return shooter.runShooter3000();
+  public Command runShooter3000() {
+    return shooter.runShooter(3000);
   }
 
-  public Command stopShooters() {
+  public Command stopShooter() {
     return shooter.stopShooter();
   }
 
   public Command masterCommand() {
     return Commands.parallel( // These run immediately
-        soleIntake(),
-        shooter.setVelCommand(3000),
-        // hood.trackHub(),
-        // This branch waits, then starts feeder/index
-        Commands.sequence(new WaitCommand(0), Commands.parallel(index.runIndex(0.8))));
-  }
-
-  public Command startupMasterCommand() {
-    return Commands.parallel( // These run immediately
-        soleIntake(),
-        runShooters4000(),
-
-        // This branch waits, then starts feeder/index
-        Commands.sequence(new WaitCommand(1.5), Commands.parallel(index.runIndex(-0.6))));
+      soleIntake(),
+      soleIndex(),
+      runShooter3000());
   }
 
   public Command weirdMasterCommand() {
-    return Commands.parallel(soleIntake(), index.runIndex(-0.3), shooter.setVelCommand(3000));
-  }
-
-  public Command strongWeirdMasterCommand() {
-    return Commands.parallel(soleIntake(), index.runIndex(0.6), runShooters4000());
+    return Commands.parallel(
+      soleIntake(), 
+      reverseIndex(), 
+      runShooter3000());
   }
 
   public Command shooterlessMasterCommand() {
-    return Commands.parallel(soleIntake(), index.runIndex(-0.9), shooter.stopShooter());
+    return Commands.parallel(
+      soleIntake(), 
+      soleIndex(), 
+      stopShooter());
   }
 
   public Command intakelessMasterCommand() {
-    return Commands.parallel(intake.stopIntake(), index.runIndex(0.8), runShooters3000());
+    return Commands.parallel(
+      stopIntake(), 
+      soleIndex(), 
+      runShooter3000());
   }
 
   public Command shooterlessWeirdMasterCommand() {
-    return Commands.parallel(soleIntake(), index.runIndex(0.6));
+    return Commands.parallel(
+      soleIntake(), 
+      soleIndex(),
+      stopShooter());
   }
 
   public Command stopMasterCommand() {
-    return Commands.parallel(intake.stopIntake(), index.stopIndex(), stopShooters(), hood.stop());
+    return Commands.parallel(
+      stopIntake(), 
+      stopIndex(), 
+      stopShooter(), 
+      stopHood());
+  }
+
+  public Command botCommand(char intake, char index, char shooter) {
+    return Commands.parallel(
+      intake == 'F' ? soleIntake() : (intake == 'R' ? reverseIntake() : stopIntake()),
+      index == 'F' ? soleIndex() : (index == 'R' ? reverseIndex() : stopIndex()),
+      shooter == 'F' ? runShooter3000() : stopShooter());
   }
 
   public Command deployPivot() {
     return pivot.toPosition(PivotPosition.DEPLOYED.rotations);
+  }
+
+  public Command stowPivot() {
+    return pivot.toPosition(0);
   }
 
   public Command stopPivot() {
@@ -135,47 +156,24 @@ public class SuperStructure {
     return pivot.jiggle();
   }
 
-  public Command stopJiggle() {
-    return deployPivot();
-  }
-
-  public Command stowPivot() {
-    return pivot.toPosition(0);
-  }
-
-  public Command resetHoods() {
+  public Command resetHood() {
     return hood.resetHood();
   }
 
-  public Command trackHub() {
+  public Command trackHoods() {
     return hood.trackHub();
   }
 
-  public Command intakeBalls() {
-    return Commands.parallel(soleIntake(), reverseIndex(), runShooters3000());
-  }
-
-  public Command noIntakeBalls() {
-    return Commands.parallel(stopIntake(), stopIndex(), runShooters3000());
-  }
-
   public Command reverseOutput() {
-    return Commands.parallel(reverseIndex(), reverseIntake());
-  }
-
-  public Command shootBalls() {
-    return Commands.sequence(
-        Commands.parallel(drive.alignToHub(), hood.trackHub()),
-        Commands.parallel(soleIndex(), runShooters3000(), soleIntake()));
-  }
-
-  public Command noShootBalls() {
-    return Commands.sequence(
-        Commands.runOnce(() -> drive.runVelocity(new ChassisSpeeds(0, 0, 0))),
-        Commands.parallel(stopIndex()));
+    return Commands.parallel(
+      reverseIndex(), 
+      reverseIntake());
   }
 
   public Command restingRun() {
-    return Commands.parallel(stopIntake(), stopIndex(), runShooters3000());
+    return Commands.parallel(
+      stopIntake(), 
+      stopIndex(), 
+      runShooter3000());
   }
 }

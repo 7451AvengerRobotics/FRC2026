@@ -23,19 +23,12 @@ public class Shooter extends SubsystemBase {
 
   private final TalonFX shooterLeader;
   private final TalonFX shooterFollower;
-  private final TalonFX shooterMini;
   private final VelocityVoltage velocityRequest = new VelocityVoltage(0);
-  private TurretSim simTurret;
-  private Drive drive;
 
   public Shooter(TurretSim simTurret, Drive drive) {
 
-    this.simTurret = simTurret;
-    this.drive = drive;
-
     shooterLeader = new TalonFX(ShooterConstants.kShooterLeaderID);
     shooterFollower = new TalonFX(ShooterConstants.kShooterFollowerID);
-    shooterMini = new TalonFX(ShooterConstants.kShooterMiniID);
 
     TalonFXConfiguration cfg =
         new TalonFXConfiguration()
@@ -61,17 +54,11 @@ public class Shooter extends SubsystemBase {
 
     shooterFollower.setControl(
         new Follower(ShooterConstants.kShooterLeaderID, MotorAlignmentValue.Opposed));
-    // shooterMini.setControl(
-    //     new Follower(ShooterConstants.kShooterLeaderID, MotorAlignmentValue.Aligned));
   }
 
   @Override
   public void periodic() {
     Logger.recordOutput("Velocity in RPM", shooterLeader.getVelocity().getValueAsDouble() * 60);
-    Logger.recordOutput("Shooter Voltage", shooterLeader.getStatorCurrent().getValueAsDouble());
-    Logger.recordOutput("Shooter Current", shooterLeader.getMotorVoltage().getValueAsDouble());
-    Logger.recordOutput("Mini Voltage", shooterMini.getStatorCurrent().getValueAsDouble());
-    Logger.recordOutput("Mini Current", shooterMini.getMotorVoltage().getValueAsDouble());
   }
 
   public void run(double power) {
@@ -89,31 +76,14 @@ public class Shooter extends SubsystemBase {
     shooterLeader.setControl(velocityRequest.withVelocity(rpm / 60));
   }
 
-  public Command setVelCommand(double rpm) {
+  public Command runShooter(double rpm) {
     return run(
         () -> {
           this.setVel(rpm);
         });
   }
 
-  public Command runShooter4000() {
-    return run(
-        () -> {
-          setVel(4000);
-        });
-  }
-
-  public Command runShooter3000() {
-    return run(
-        () -> {
-          setVel(3000);
-        });
-  }
-
   public Command stopShooter() {
-    return run(
-        () -> {
-          this.run(0);
-        });
+    return runDutyCycle(0);
   }
 }

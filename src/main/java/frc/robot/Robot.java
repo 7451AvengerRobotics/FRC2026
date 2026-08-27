@@ -31,13 +31,13 @@ public class Robot extends LoggedRobot {
 
   public static final BooleanSupplier IsRedAlliance =
       () -> {
-        while (DriverStation.getAlliance().isEmpty()) {
-          try {
-            Thread.sleep(10);
-          } catch (InterruptedException e) {
+        // while (DriverStation.getAlliance().isEmpty()) {
+        //   try {
+        //     Thread.sleep(10);
+        //   } catch (InterruptedException e) {
 
-          }
-        }
+        //   }
+        // }
         final Optional<DriverStation.Alliance> alliance = DriverStation.getAlliance();
         return alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red;
       };

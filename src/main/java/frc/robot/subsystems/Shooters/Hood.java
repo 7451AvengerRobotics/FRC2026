@@ -34,6 +34,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.HoodConstants;
 import frc.robot.subsystems.SimFiles.TurretSim;
+import frc.robot.subsystems.drive.Drive;
+
 import org.littletonrobotics.junction.Logger;
 
 /**
@@ -45,11 +47,13 @@ public class Hood extends SubsystemBase {
   private final CANcoder hoodEncoder;
   private final MotionMagicVoltage hoodRequest = new MotionMagicVoltage(0);
   private final TurretSim simTurret;
+  private final Drive drive;
   private final DutyCycleOut motorDutyCycleOut = new DutyCycleOut(0);
 
-  public Hood(TurretSim simTurret) {
+  public Hood(TurretSim simTurret, Drive drive) {
 
     this.simTurret = simTurret;
+    this.drive = drive;
 
     hoodMotor = new TalonFX(40);
     hoodEncoder = new CANcoder(0);
@@ -110,16 +114,16 @@ public class Hood extends SubsystemBase {
     setAngleRad(Math.toRadians(angleDeg));
   }
 
-  public double getAngleRad() {
-    return hoodMotor.getPosition().getValueAsDouble() * 2 * Math.PI / HoodConstants.kHoodGearRatio;
-  }
-
   public Command toAngleRad(double angleRad) {
     return runOnce(() -> setAngleRad(angleRad));
   }
 
   public Command toAngleDegrees(double angleDeg) {
     return run(() -> setAngleDegrees(angleDeg));
+  }
+
+  public double getAngleRad() {
+    return hoodMotor.getPosition().getValueAsDouble() * 2 * Math.PI / HoodConstants.kHoodGearRatio;
   }
 
   public Command moveUp() {
@@ -146,41 +150,13 @@ public class Hood extends SubsystemBase {
   public Command trackHub() {
     return Commands.run(
         () -> {
-          double launchPitchRad = simTurret.getMovingPitch();
+          double launchPitchRad = simTurret.getRequiredPitch();
           setAngleRad(
               MathUtil.clamp(
                   launchPitchRad,
                   Math.toRadians(HoodConstants.kInitialHoodAnglePosition),
                   Math.toRadians(HoodConstants.kMaxHoodAnglePosition)));
         });
-  }
-
-  public Command trackWrongHub() {
-    return Commands.run(
-        () -> {
-          double launchPitchRad = simTurret.getMovingPitch();
-          setAngleRad(
-              MathUtil.clamp(
-                  launchPitchRad,
-                  Math.toRadians(HoodConstants.kInitialHoodAnglePosition),
-                  Math.toRadians(HoodConstants.kMaxHoodAnglePosition)));
-        });
-  }
-
-  public Command pass() {
-    return run(
-        () -> {
-          double launchPitchRad = simTurret.getPassingPitch();
-          setAngleRad(
-              MathUtil.clamp(
-                  launchPitchRad,
-                  Math.toRadians(HoodConstants.kInitialHoodAnglePosition),
-                  Math.toRadians(HoodConstants.kMaxHoodAnglePosition)));
-        });
-  }
-
-  public Command stopHood() {
-    return run(() -> hoodMotor.set(0));
   }
 
   public Command resetHood() {
@@ -189,11 +165,7 @@ public class Hood extends SubsystemBase {
 
   @Override
   public void periodic() {
-    double angleRad = getAngleRad();
-    Logger.recordOutput("Hood/AngleDeg", Math.toDegrees(angleRad));
+    Logger.recordOutput("Hood/AngleDeg", Math.toDegrees(getAngleRad()));
     Logger.recordOutput("Hood/EncoderCount", hoodMotor.getPosition().getValueAsDouble());
-    Logger.recordOutput("Hood/SuggestedAngleDeg", Math.toDegrees(simTurret.getMovingPitch()));
-    Logger.recordOutput("hood Voltage", hoodMotor.getMotorVoltage().getValueAsDouble());
-    Logger.recordOutput("hood Current", hoodMotor.getStatorCurrent().getValueAsDouble());
   }
 }
