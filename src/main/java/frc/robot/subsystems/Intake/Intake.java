@@ -53,7 +53,7 @@ public class Intake extends SubsystemBase {
   }
 
   public Command stopIntake() {
-    return run(
+    return runOnce(
         () -> {
           this.setIntakePower(0);
         });

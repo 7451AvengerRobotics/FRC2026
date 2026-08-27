@@ -85,7 +85,7 @@ public class SuperStructure {
     return Commands.parallel( // These run immediately
         soleIntake(),
         shooter.setVelCommand(3000),
-        hood.trackHub(),
+        // hood.trackHub(),
         // This branch waits, then starts feeder/index
         Commands.sequence(new WaitCommand(0), Commands.parallel(index.runIndex(0.8))));
   }

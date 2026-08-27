@@ -117,18 +117,26 @@ public class AutoRoutines {
   }
 
   public Command DN_Sw() {
+    // return Commands.sequence(
+    //     Commands.deadline(
+    //         drive.followPPPathCommand("DT-DNZ-N").withTimeout(4.5),
+    //         Commands.sequence(
+    //             new WaitCommand(0.75),
+    //             Commands.parallel(
+    //                 Commands.sequence(
+    //                     superStruc.deployPivot().withTimeout(2.5),
+    //                     superStruc.stopPivot().withTimeout(0.5)),
+    //                 Commands.sequence(new WaitCommand(1), superStruc.weirdMasterCommand())))),
+    //     drive.driveToDepotReturn().withTimeout(1),
+    //     drive.followPPPathCommand("DNZ-DB").withTimeout(2.6),
+    //     scoreWithDriveAlign());
     return Commands.sequence(
+        superStruc.deployPivot().withTimeout(1),
+        superStruc.stopPivot().withTimeout(0.1),
         Commands.deadline(
-            drive.followPPPathCommand("DT-DNZ-N").withTimeout(4.5),
-            Commands.sequence(
-                new WaitCommand(0.75),
-                Commands.parallel(
-                    Commands.sequence(
-                        superStruc.deployPivot().withTimeout(2.5),
-                        superStruc.stopPivot().withTimeout(0.5)),
-                    Commands.sequence(new WaitCommand(1), superStruc.weirdMasterCommand())))),
+            drive.followPPPathCommand("DT-DNZ-N").withTimeout(5), superStruc.weirdMasterCommand()),
         drive.driveToDepotReturn().withTimeout(1),
-        drive.followPPPathCommand("DNZ-DB").withTimeout(2.6),
+        drive.followPPPathCommand("DNZ-DB").withTimeout(3),
         scoreWithDriveAlign());
   }
 
@@ -140,6 +148,11 @@ public class AutoRoutines {
   public Command DN_D2_Sw() {
     return Commands.sequence(
         DN_Sw().withTimeout(15), superStruc.resetHoods().withTimeout(1), D2_Sw());
+  }
+
+  public Command D2_D2_Sw() {
+    return Commands.sequence(
+        D2_Sw().withTimeout(10), superStruc.resetHoods().withTimeout(1), D2_Sw());
   }
 
   // Source Side Autons

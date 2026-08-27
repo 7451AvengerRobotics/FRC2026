@@ -60,10 +60,10 @@ public class Hood extends SubsystemBase {
                 new MotorOutputConfigs()
                     .withInverted(InvertedValue.CounterClockwise_Positive)
                     .withNeutralMode(NeutralModeValue.Brake))
-            // .withFeedback(
-            //     new FeedbackConfigs()
-            //         .withFeedbackRemoteSensorID(HoodConstants.kHoodEncoderID)
-            //         .withFeedbackSensorSource(FeedbackSensorSourceValue.RemoteCANcoder))
+            .withFeedback(
+                new FeedbackConfigs()
+                    .withFeedbackRemoteSensorID(HoodConstants.kHoodEncoderID)
+                    .withFeedbackSensorSource(FeedbackSensorSourceValue.RemoteCANcoder))
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
                     .withStatorCurrentLimit(Amps.of(60))
@@ -99,7 +99,11 @@ public class Hood extends SubsystemBase {
 
   public void setAngleRad(double angleRad) {
     double setpointRotations = angleRad / (2 * Math.PI) * HoodConstants.kHoodGearRatio;
-    hoodMotor.setControl(hoodRequest.withPosition(setpointRotations));
+    if (Math.abs(Math.toDegrees(angleRad - getAngleRad())) < 0.01) {
+      hoodMotor.setControl(new DutyCycleOut(0));
+    } else {
+      hoodMotor.setControl(hoodRequest.withPosition(setpointRotations));
+    }
   }
 
   public void setAngleDegrees(double angleDeg) {

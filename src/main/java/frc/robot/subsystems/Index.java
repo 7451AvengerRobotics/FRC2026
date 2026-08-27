@@ -53,7 +53,7 @@ public class Index extends SubsystemBase {
   }
 
   public Command stopIndex() {
-    return run(
+    return runOnce(
         () -> {
           this.run(0);
         });

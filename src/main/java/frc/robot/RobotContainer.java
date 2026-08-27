@@ -184,13 +184,14 @@ public class RobotContainer {
     // // controller.L1().toggleOnTrue(hood.trackHub());
     controller
         .R1()
-        .whileTrue(drive.alignToHub(0))
+        .whileTrue(
+            Commands.parallel(
+                drive.alignToHub(0),
+                hood.trackHub(),
+                Commands.sequence(Commands.waitSeconds(0.5), superStructure.masterCommand())))
         .onFalse(Commands.run(() -> drive.runVelocity(new ChassisSpeeds(0, 0, 0))));
 
-    controller
-        .L1()
-        .whileTrue(drive.alignForTrench())
-        .onFalse(Commands.run(() -> drive.runVelocity(new ChassisSpeeds(0, 0, 0))));
+    controller.L1().toggleOnTrue(superStructure.weirdMasterCommand());
     // // controller.povDown().whileTrue(drive.moveBackward());
     // // controller.povUp().whileTrue(drive.moveForward());
     manip.povUp().whileTrue(hood.moveUp()).onFalse(hood.stop());
