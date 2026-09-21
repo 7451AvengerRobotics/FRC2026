@@ -108,7 +108,7 @@ public class SuperStructure {
   }
 
   public Command shooterlessMasterCommand() {
-    return Commands.parallel(soleIntake(), index.runIndex(-0.9), shooter.stopShooter());
+    return Commands.parallel(soleIntake(), index.runIndex(0.8));
   }
 
   public Command intakelessMasterCommand() {
@@ -119,8 +119,8 @@ public class SuperStructure {
     return Commands.parallel(soleIntake(), index.runIndex(0.6));
   }
 
-  public Command stopMasterCommand() {
-    return Commands.parallel(intake.stopIntake(), index.stopIndex(), stopShooters(), hood.stop());
+  public Command killEverything() {
+    return Commands.parallel(intake.stopIntake(), index.stopIndex(), stopShooters());
   }
 
   public Command deployPivot() {

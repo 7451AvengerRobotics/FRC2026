@@ -90,13 +90,11 @@ public class Drive extends SubsystemBase {
 
   public double velOffset = 1;
 
-  private final PIDController headingController = new PIDController(2.5, 0.0, 0.0);
-  private final PIDController headingControllerStrong = new PIDController(5, 0, 0.0);
+  private final PIDController headingController = new PIDController(8, 0.8, 0.0);
   private boolean holonomicControllerActive = false;
   private Pose2d holonomicPoseTarget = new Pose2d();
   private Rotation2d rotation2d = new Rotation2d();
   private final HolonomicDriveWithPIDController holonomicDriveWithPIDController;
-  private final HolonomicDriveWithPIDController holonomicDriveWithPIDControllerStrong;
 
   static final Lock odometryLock = new ReentrantLock();
   private final GyroIO gyroIO;
@@ -134,14 +132,6 @@ public class Drive extends SubsystemBase {
             new PIDController(4, 0, 0),
             new PIDController(4, 0, 0),
             headingController,
-            0.5,
-            new Pose2d(0.04, 0.04, Rotation2d.fromDegrees(2)),
-            1);
-    this.holonomicDriveWithPIDControllerStrong =
-        new HolonomicDriveWithPIDController(
-            new PIDController(4, 0, 0),
-            new PIDController(5.5, 0, 0),
-            headingControllerStrong,
             0.5,
             new Pose2d(0.04, 0.04, Rotation2d.fromDegrees(2)),
             1);
@@ -555,22 +545,21 @@ public class Drive extends SubsystemBase {
             runOnce(
                 () -> {
                   holonomicControllerActive = true;
-                  holonomicDriveWithPIDControllerStrong.reset(getPose(), getRobotRelativeSpeeds());
+                  holonomicDriveWithPIDController.reset(getPose(), getRobotRelativeSpeeds());
                 }),
             run(() -> {
                   this.holonomicPoseTarget = pose;
                   runVelocity(
-                      holonomicDriveWithPIDControllerStrong.calculate(
-                          getPose(), holonomicPoseTarget));
+                      holonomicDriveWithPIDController.calculate(getPose(), holonomicPoseTarget));
                   SmartDashboard.putBoolean(
-                      "x controller", holonomicDriveWithPIDControllerStrong.xReferenceReached());
+                      "x controller", holonomicDriveWithPIDController.xReferenceReached());
                   SmartDashboard.putBoolean(
-                      "y controller", holonomicDriveWithPIDControllerStrong.yReferenceReached());
+                      "y controller", holonomicDriveWithPIDController.yReferenceReached());
                   SmartDashboard.putBoolean(
                       "rotation controller",
-                      holonomicDriveWithPIDControllerStrong.rotationReferenceReached());
+                      holonomicDriveWithPIDController.rotationReferenceReached());
                 })
-                .until(holonomicDriveWithPIDControllerStrong::atReference),
+                .until(holonomicDriveWithPIDController::atReference),
             runOnce(this::stop))
         .finallyDo(() -> holonomicControllerActive = false);
   }
@@ -580,22 +569,21 @@ public class Drive extends SubsystemBase {
             runOnce(
                 () -> {
                   holonomicControllerActive = true;
-                  holonomicDriveWithPIDControllerStrong.reset(getPose(), getRobotRelativeSpeeds());
+                  holonomicDriveWithPIDController.reset(getPose(), getRobotRelativeSpeeds());
                 }),
             run(() -> {
                   this.rotation2d = rotation;
                   runVelocity(
-                      holonomicDriveWithPIDControllerStrong.calculateRotations(
-                          getPose(), rotation2d));
+                      holonomicDriveWithPIDController.calculateRotations(getPose(), rotation2d));
                   SmartDashboard.putBoolean(
-                      "x controller", holonomicDriveWithPIDControllerStrong.xReferenceReached());
+                      "x controller", holonomicDriveWithPIDController.xReferenceReached());
                   SmartDashboard.putBoolean(
-                      "y controller", holonomicDriveWithPIDControllerStrong.yReferenceReached());
+                      "y controller", holonomicDriveWithPIDController.yReferenceReached());
                   SmartDashboard.putBoolean(
                       "rotation controller",
-                      holonomicDriveWithPIDControllerStrong.rotationReferenceReached());
+                      holonomicDriveWithPIDController.rotationReferenceReached());
                 })
-                .until(holonomicDriveWithPIDControllerStrong::atReference),
+                .until(holonomicDriveWithPIDController::atReference),
             runOnce(this::stop))
         .finallyDo(() -> holonomicControllerActive = false);
   }

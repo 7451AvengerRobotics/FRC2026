@@ -144,7 +144,7 @@ public class Hood extends SubsystemBase {
   }
 
   public Command trackHub() {
-    return Commands.run(
+    return Commands.runOnce(
         () -> {
           double launchPitchRad = simTurret.getMovingPitch();
           setAngleRad(

@@ -96,6 +96,10 @@ public class Shooter extends SubsystemBase {
         });
   }
 
+  public double getCurrVel() {
+    return shooterLeader.getVelocity().getValueAsDouble() * 60;
+  }
+
   public Command runShooter4000() {
     return run(
         () -> {

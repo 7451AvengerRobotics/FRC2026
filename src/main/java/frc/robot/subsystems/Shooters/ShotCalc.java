@@ -21,31 +21,26 @@ public class ShotCalc {
   public ShotCalc(Transform3d turretOffset) {
     this.turretOffset = turretOffset;
     // angleLerp: distance (m) -> angle (rad)
-    angleLerp.put(1.629 + shotOffset, 1.3072516100); // 15.1°
-    angleLerp.put(2.067 + shotOffset, 1.3037609510); // 15.3°
-    angleLerp.put(2.178 + shotOffset, 1.2955579040); // 15.77°
-    angleLerp.put(2.200 + shotOffset, 1.2941616400); // 15.85°
-    angleLerp.put(2.330 + shotOffset, 1.2835151320); // 16.46°
-    angleLerp.put(2.390 + shotOffset, 1.2718214260); // 17.13°
-    angleLerp.put(2.580 + shotOffset, 1.2603022530); // 17.79°
-    angleLerp.put(2.640 + shotOffset, 1.2541936000); // 18.14°
-    angleLerp.put(2.840 + shotOffset, 1.2250466020); // 19.81°
-    angleLerp.put(2.860 + shotOffset, 1.2107349020); // 20.63°
-    angleLerp.put(3.140 + shotOffset, 1.1475539830); // 24.25°
-    angleLerp.put(3.420 + shotOffset, 1.1135200630); // 26.2°
-    angleLerp.put(3.630 + shotOffset, 1.0960667700); // 27.2°
-    angleLerp.put(3.500 + shotOffset, 1.0838494650); // 27.9°
-    angleLerp.put(4.120 + shotOffset, 1.0314895880); // 30.9°
-    angleLerp.put(4.240 + shotOffset, 1.0005972600); // 32.67°
-    angleLerp.put(4.680 + shotOffset, 0.9684832019); // 34.51°
-    angleLerp.put(4.970 + shotOffset, 0.9171705219); // 37.45°
-    angleLerp.put(5.060 + shotOffset, 0.8749335540); // 39.87°
-    angleLerp.put(5.190 + shotOffset, 0.8477064177); // 41.43°
-    angleLerp.put(5.340 + shotOffset, 0.8382816397); // 41.97°
-    angleLerp.put(5.510 + shotOffset, 0.8014551925); // 44.08°
-    angleLerp.put(5.610 + shotOffset, 0.7686430026); // 45.96°
-    angleLerp.put(5.670 + shotOffset, 0.7518878418); // 46.92°
-    angleLerp.put(5.700 + shotOffset, 0.5846852994); // 56.5°
+    angleLerp.put(2.38 + shotOffset, 1.3028882870); // 74.65°
+    angleLerp.put(2.52 + shotOffset, 1.2777555450); // 73.21°
+    angleLerp.put(2.63 + shotOffset, 1.2575097260); // 72.05°
+    angleLerp.put(2.72 + shotOffset, 1.2384856370); // 70.96°
+    angleLerp.put(2.92 + shotOffset, 1.2264428650); // 70.27°
+    angleLerp.put(3.07 + shotOffset, 1.1974704000); // 68.61°
+    angleLerp.put(3.15 + shotOffset, 1.1705923290); // 67.07°
+    angleLerp.put(3.39 + shotOffset, 1.1506955760); // 65.93°
+    angleLerp.put(3.64 + shotOffset, 1.1218976430); // 64.28°
+    angleLerp.put(3.82 + shotOffset, 1.0993828960); // 62.99°
+    angleLerp.put(4.25 + shotOffset, 1.0796606750); // 61.86°
+    angleLerp.put(4.41 + shotOffset, 1.0564477960); // 60.53°
+    angleLerp.put(4.72 + shotOffset, 1.0088003080); // 57.80°
+    angleLerp.put(4.99 + shotOffset, 0.9848892969); // 56.43°
+    angleLerp.put(5.17 + shotOffset, 0.9660397410); // 55.35°
+    angleLerp.put(5.29 + shotOffset, 0.9180431865); // 52.60°
+    angleLerp.put(5.41 + shotOffset, 0.8677777041); // 49.72°
+    angleLerp.put(5.58 + shotOffset, 0.8513716091); // 48.78°
+    angleLerp.put(5.66 + shotOffset, 0.8307767239); // 47.60°
+    angleLerp.put(5.79 + shotOffset, 0.8011061267); // 45.90°
 
     // velocityLerp: angle (rad) -> velocity (m/s)
     velocityLerp.put(1.3072516100, 6.3764160460); // 15.1°

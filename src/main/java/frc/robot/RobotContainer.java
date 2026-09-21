@@ -169,9 +169,9 @@ public class RobotContainer {
     // controller.L1().whileTrue(superStructure.intakeBalls()).onFalse(superStructure.noIntakeBalls());
     // controller.R1().whileTrue(superStructure.shootBalls()).onFalse(superStructure.noShootBalls());
     // controller.triangle().onTrue(superStructure.weirdMasterCommand());
-    controller.cross().toggleOnTrue(superStructure.masterCommand());
+    controller.cross().onTrue(superStructure.killEverything());
     controller.circle().onTrue(superStructure.restingRun());
-    controller.triangle().onTrue(superStructure.weirdMasterCommand());
+    controller.triangle().onTrue(superStructure.stopHood());
     controller.square().onTrue(superStructure.deployPivot());
 
     // controller
@@ -188,16 +188,34 @@ public class RobotContainer {
             Commands.parallel(
                 drive.alignToHub(0),
                 hood.trackHub(),
-                Commands.sequence(Commands.waitSeconds(0.5), superStructure.masterCommand())))
-        .onFalse(Commands.run(() -> drive.runVelocity(new ChassisSpeeds(0, 0, 0))));
+                superStructure.runShooters3000(),
+                Commands.waitUntil(() -> shooter.getCurrVel() >= 2750)
+                    .andThen(superStructure.shooterlessMasterCommand())))
+        .onFalse(
+            Commands.parallel(
+                Commands.runOnce(() -> drive.runVelocity(new ChassisSpeeds(0, 0, 0))),
+                superStructure.resetHoods(),
+                superStructure.weirdMasterCommand()));
+    controller
+        .L2()
+        .whileTrue(Commands.runOnce(() -> drive.runVelocity(new ChassisSpeeds(0, 0, 0.5))));
 
     controller.L1().toggleOnTrue(superStructure.weirdMasterCommand());
+    // controller
+    //     .L2()
+    //     .whileTrue(drive.alignToHub(0))
+    //     .onFalse(Commands.runOnce(() -> drive.runVelocity(new ChassisSpeeds(0, 0, 0))));
     // // controller.povDown().whileTrue(drive.moveBackward());
     // // controller.povUp().whileTrue(drive.moveForward());
-    manip.povUp().whileTrue(hood.moveUp()).onFalse(hood.stop());
-    manip.povDown().whileTrue(hood.moveDown()).onFalse(hood.stop());
+    controller
+        .povUp()
+        .whileTrue(Commands.run(() -> drive.runVelocity(new ChassisSpeeds(-1, 0, 0))))
+        .onFalse(Commands.runOnce(() -> drive.runVelocity(new ChassisSpeeds(0, 0, 0))));
+    controller
+        .povDown()
+        .whileTrue(Commands.run(() -> drive.runVelocity(new ChassisSpeeds(1, 0, 0))))
+        .onFalse(Commands.runOnce(() -> drive.runVelocity(new ChassisSpeeds(0, 0, 0))));
     manip.povRight().onTrue(pivot.stopPivot());
-    manip.povLeft().onTrue(superStructure.stopMasterCommand());
 
     manip.L1().whileTrue(pivot.jiggle2()).onFalse(superStructure.stopJiggle());
     manip.circle().whileTrue(hood.resetHood());
@@ -213,8 +231,8 @@ public class RobotContainer {
 
     // manip.R1().onTrue(pivot.runPivot(0));
 
-    // manip.povUp().whileTrue(superStructure.hoodsUp()).onFalse(superStructure.stopHood());
-    // manip.povDown().whileTrue(superStructure.hoodsDown()).onFalse(superStructure.stopHood());
+    manip.povUp().whileTrue(superStructure.hoodsUp()).onFalse(superStructure.stopHood());
+    manip.povDown().whileTrue(superStructure.hoodsDown()).onFalse(superStructure.stopHood());
   }
 
   public void configureAutos() {
