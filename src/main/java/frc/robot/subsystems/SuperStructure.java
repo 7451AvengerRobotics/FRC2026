@@ -100,7 +100,7 @@ public class SuperStructure {
   }
 
   public Command weirdMasterCommand() {
-    return Commands.parallel(soleIntake(), index.runIndex(-0.3), shooter.setVelCommand(3000));
+    return Commands.parallel(soleIntake(), index.runIndex(-0.3));
   }
 
   public Command strongWeirdMasterCommand() {
