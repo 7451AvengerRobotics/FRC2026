@@ -30,7 +30,27 @@ public final class Constants {
   }
 
   public static final class IntakeConstants {
-    public static final int kIntakeID = 19;
-    public static final double kIntakeGearRatio = 2;
+    public static final int kIntakeLeaderID = 21;
+    public static final int kIntakeFollowerID = 22;
+    public static final double kIntakeGearRatio = 2.0;
+  }
+
+  public static final class IntakePivotConstants {
+    public static final int kPivotLeaderID = 10;
+    public static final int kPivotFollowerID = 11;
+    public static final double kIntakeGearRatio = 50;
+    public static final double kP = 6.0;
+    public static final double kI = 0.0;
+    public static final double kD = 0.0;
+    public static final double kS = 0.0;
+    public static final double kV = 0.0;
+    public static final double kA = 0.0;
+    public static final double kG = 2.0;
+  }
+
+  public static final class IndexConstants {
+    public static final int kIndexLeaderID = 30;
+    public static final int kIndexFollowerID = 31;
+    public static final double kIntexGearRatio = 1.0;
   }
 }
