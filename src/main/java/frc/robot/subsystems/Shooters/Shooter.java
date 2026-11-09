@@ -46,7 +46,9 @@ public class Shooter extends SubsystemBase {
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
                     .withStatorCurrentLimit(Amps.of(60))
-                    .withStatorCurrentLimitEnable(true))
+                    .withStatorCurrentLimitEnable(true)
+                    .withSupplyCurrentLimit(Amps.of(45))
+                    .withSupplyCurrentLimitEnable(true))
             .withSlot0(
                 new Slot0Configs()
                     .withKP(ShooterConstants.kP)

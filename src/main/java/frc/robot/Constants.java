@@ -36,7 +36,7 @@ public final class Constants {
     public static final int kPivotFollowerID = 11;
     public static final double kIntakeGearRatio = 50;
     public static final double kInitialPivotPosition = 0.62;
-    public static final double kP = 4.0;
+    public static final double kP = 6.0;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
     public static final double kS = 0.0;
@@ -63,11 +63,11 @@ public final class Constants {
     public static final int kShooterMiniID = 52;
     public static final double kShooterGearRatio = 1.0;
     public static final double kS = 0;
-    public static final double kP = 0.5;
+    public static final double kP = 0.4;
     public static final double kD = 0.0165;
     public static final double kI = 0.0;
     public static final double kV = 0.15;
-    public static final double kA = 0;
+    public static final double kA = 0.0;
   }
 
   public static final class HoodConstants {
@@ -79,7 +79,7 @@ public final class Constants {
     public static final double kHoodOffset = -0.01;
     public static final int kHoodMotorID = 40;
     public static final int kHoodEncoderID = 0;
-    public static final double kP = 30;
+    public static final double kP = 35;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
     public static final double kS = 0.3;

@@ -38,7 +38,7 @@ public class TurretSim extends SubsystemBase {
   double g = 9.8;
   double a = -g;
 
-  private final ShotCalc shotCalc;
+  public final ShotCalc shotCalc;
 
   public TurretSim(Drive drive, Transform3d turretOffset) {
     this.drive = drive;

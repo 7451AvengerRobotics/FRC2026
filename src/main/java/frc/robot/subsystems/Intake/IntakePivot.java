@@ -43,7 +43,9 @@ public class IntakePivot extends SubsystemBase {
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
                     .withStatorCurrentLimit(Amps.of(40))
-                    .withStatorCurrentLimitEnable(true))
+                    .withStatorCurrentLimitEnable(true)
+                    .withSupplyCurrentLimit(Amps.of(30))
+                    .withSupplyCurrentLimitEnable(true))
             .withMotionMagic(
                 new MotionMagicConfigs()
                     .withMotionMagicCruiseVelocity(RotationsPerSecond.of(10))
@@ -94,7 +96,7 @@ public class IntakePivot extends SubsystemBase {
   }
 
   public Command jiggle2() {
-    return Commands.sequence(runPivot(0.15).withTimeout(1), toPosition(0).withTimeout(1))
+    return Commands.sequence(runPivot(0.15).withTimeout(0.5), toPosition(0).withTimeout(1))
         .repeatedly();
   }
 
@@ -104,6 +106,11 @@ public class IntakePivot extends SubsystemBase {
 
   public Command toPosition(double rotations) {
     return setIntakePivotAngle(rotations).until(() -> nearSetpoint(rotations));
+  }
+
+  public boolean isDeployed() {
+    return pivotLeader.getPosition().getValueAsDouble() < (PivotPosition.DEPLOYED.rotations + 0.1)
+        && pivotLeader.getPosition().getValueAsDouble() > (PivotPosition.DEPLOYED.rotations - 0.1);
   }
 
   public enum PivotPosition {

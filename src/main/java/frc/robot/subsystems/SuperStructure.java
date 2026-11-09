@@ -83,11 +83,7 @@ public class SuperStructure {
 
   public Command masterCommand() {
     return Commands.parallel( // These run immediately
-        soleIntake(),
-        shooter.setVelCommand(3000),
-        // hood.trackHub(),
-        // This branch waits, then starts feeder/index
-        Commands.sequence(new WaitCommand(0), Commands.parallel(index.runIndex(0.8))));
+        soleIntake(), soleIndex(), shooter.setVelCommand(3000));
   }
 
   public Command startupMasterCommand() {
@@ -100,7 +96,11 @@ public class SuperStructure {
   }
 
   public Command weirdMasterCommand() {
-    return Commands.parallel(soleIntake(), index.runIndex(-0.3));
+    return Commands.parallel(intake.runIntake(-0.5), index.runIndex(-0.3));
+  }
+
+  public Command startupWeirdMasterCommand() {
+    return Commands.parallel(soleIntake(), index.runIndex(-0.3), runShooters3000());
   }
 
   public Command strongWeirdMasterCommand() {
@@ -127,12 +127,16 @@ public class SuperStructure {
     return pivot.toPosition(PivotPosition.DEPLOYED.rotations);
   }
 
+  public boolean isDeployed() {
+    return pivot.isDeployed();
+  }
+
   public Command stopPivot() {
     return pivot.stopPivot();
   }
 
   public Command jiggle() {
-    return pivot.jiggle();
+    return pivot.jiggle2();
   }
 
   public Command stopJiggle() {
@@ -156,7 +160,7 @@ public class SuperStructure {
   }
 
   public Command noIntakeBalls() {
-    return Commands.parallel(stopIntake(), stopIndex(), runShooters3000());
+    return Commands.parallel(stopIntake(), stopIndex());
   }
 
   public Command reverseOutput() {
@@ -177,5 +181,17 @@ public class SuperStructure {
 
   public Command restingRun() {
     return Commands.parallel(stopIntake(), stopIndex(), runShooters3000());
+  }
+
+  public double getCurrLevel() {
+    return shooter.getCurrVel();
+  }
+
+  public Command outreachShootBallsAt1000() {
+    return Commands.parallel(soleIndex(), intake.runIntake(-0.5));
+  }
+
+  public Command runShooters1000() {
+    return shooter.setVelCommand(1000);
   }
 }

@@ -32,7 +32,9 @@ public class Intake extends SubsystemBase {
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
                     .withStatorCurrentLimit(Amps.of(60))
-                    .withStatorCurrentLimitEnable(true));
+                    .withStatorCurrentLimitEnable(true)
+                    .withSupplyCurrentLimit(Amps.of(40))
+                    .withSupplyCurrentLimitEnable(true));
 
     intakeLeader.getConfigurator().apply(cfg);
     intakeFollower.getConfigurator().apply(cfg);

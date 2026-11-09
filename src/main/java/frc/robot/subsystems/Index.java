@@ -32,7 +32,9 @@ public class Index extends SubsystemBase {
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
                     .withStatorCurrentLimit(Amps.of(60))
-                    .withStatorCurrentLimitEnable(true));
+                    .withStatorCurrentLimitEnable(true)
+                    .withSupplyCurrentLimit(Amps.of(40))
+                    .withSupplyCurrentLimitEnable(true));
 
     indexLeader.getConfigurator().apply(cfg);
     indexFollower.getConfigurator().apply(cfg);
@@ -62,6 +64,7 @@ public class Index extends SubsystemBase {
   @Override
   public void periodic() {
     Logger.recordOutput("Index Voltage", indexLeader.getMotorVoltage().getValueAsDouble());
-    Logger.recordOutput("Index Current", indexLeader.getStatorCurrent().getValueAsDouble());
+    Logger.recordOutput("Index Stator Current", indexLeader.getStatorCurrent().getValueAsDouble());
+    Logger.recordOutput("Index Supply Current", indexLeader.getSupplyCurrent().getValueAsDouble());
   }
 }

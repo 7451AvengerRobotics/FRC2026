@@ -67,7 +67,9 @@ public class Hood extends SubsystemBase {
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
                     .withStatorCurrentLimit(Amps.of(60))
-                    .withStatorCurrentLimitEnable(true))
+                    .withStatorCurrentLimitEnable(true)
+                    .withSupplyCurrentLimit(Amps.of(30))
+                    .withSupplyCurrentLimitEnable(true))
             .withMotionMagic(
                 new MotionMagicConfigs()
                     .withMotionMagicCruiseVelocity(RotationsPerSecond.of(200))
@@ -191,6 +193,7 @@ public class Hood extends SubsystemBase {
   public void periodic() {
     double angleRad = getAngleRad();
     Logger.recordOutput("Hood/AngleDeg", Math.toDegrees(angleRad));
+    Logger.recordOutput("Hood/Xf", simTurret.getXf(0, 0));
     Logger.recordOutput("Hood/EncoderCount", hoodMotor.getPosition().getValueAsDouble());
     Logger.recordOutput("Hood/SuggestedAngleDeg", Math.toDegrees(simTurret.getMovingPitch()));
     Logger.recordOutput("hood Voltage", hoodMotor.getMotorVoltage().getValueAsDouble());

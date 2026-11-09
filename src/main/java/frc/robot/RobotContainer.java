@@ -147,7 +147,8 @@ public class RobotContainer {
     // NamedCommands.registerCommand("DeployPivot", superStructure.deployPivot().withTimeout(2.5));
 
     // Configure the bindings
-    configureButtonBindings();
+    // configureButtonBindings();
+    configureOutreachBindings();
     configureAutos();
   }
 
@@ -189,7 +190,8 @@ public class RobotContainer {
                 drive.alignToHub(0),
                 hood.trackHub(),
                 superStructure.runShooters3000(),
-                Commands.waitUntil(() -> shooter.getCurrVel() >= 2750)
+                Commands.waitSeconds(0.5),
+                Commands.waitUntil(() -> shooter.getCurrVel() >= 3000)
                     .andThen(superStructure.shooterlessMasterCommand())))
         .onFalse(
             Commands.parallel(
@@ -215,7 +217,6 @@ public class RobotContainer {
         .povDown()
         .whileTrue(Commands.run(() -> drive.runVelocity(new ChassisSpeeds(1, 0, 0))))
         .onFalse(Commands.runOnce(() -> drive.runVelocity(new ChassisSpeeds(0, 0, 0))));
-    manip.povRight().onTrue(pivot.stopPivot());
 
     manip.L1().whileTrue(pivot.jiggle2()).onFalse(superStructure.stopJiggle());
     manip.circle().whileTrue(hood.resetHood());
@@ -233,6 +234,33 @@ public class RobotContainer {
 
     manip.povUp().whileTrue(superStructure.hoodsUp()).onFalse(superStructure.stopHood());
     manip.povDown().whileTrue(superStructure.hoodsDown()).onFalse(superStructure.stopHood());
+    manip.povRight().onTrue(pivot.stopPivot());
+  }
+
+  public void configureOutreachBindings() {
+    drive.setDefaultCommand(
+        DriveCommands.joystickDrive(
+            drive,
+            () -> -controller.getLeftY(),
+            () -> -controller.getLeftX(),
+            () -> -controller.getRightX()));
+
+    controller
+        .R1()
+        .whileTrue(
+            Commands.parallel(
+                superStructure.runShooters1000(),
+                Commands.waitUntil(() -> shooter.getCurrVel() >= 1000)
+                    .andThen(superStructure.outreachShootBallsAt1000())))
+        .onFalse(superStructure.killEverything());
+    controller
+        .L1()
+        .whileTrue(superStructure.weirdMasterCommand())
+        .onFalse(superStructure.killEverything());
+    controller.circle().onTrue(superStructure.killEverything());
+
+    controller.povUp().whileTrue(superStructure.hoodsUp()).onFalse(superStructure.stopHood());
+    controller.povDown().whileTrue(superStructure.hoodsDown()).onFalse(superStructure.stopHood());
   }
 
   public void configureAutos() {
@@ -274,6 +302,8 @@ public class RobotContainer {
 
     // Preload
     autoChooser.addOption("Single Auto", autos.singleAuto());
+
+    autoChooser.addOption("Auto Deploy Pivot", autos.autoDeployPivot());
   }
 
   /**
