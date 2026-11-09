@@ -28,4 +28,9 @@ public final class Constants {
     /** Replaying from a log file. */
     REPLAY
   }
+
+  public static final class IntakeConstants {
+    public static final int kIntakeID = 19;
+    public static final double kIntakeGearRatio = 2;
+  }
 }
