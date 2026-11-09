@@ -39,6 +39,7 @@ public final class Constants {
     public static final int kPivotLeaderID = 10;
     public static final int kPivotFollowerID = 11;
     public static final double kIntakeGearRatio = 50;
+    public static final double kInitialPivotPosition = 0.62;
     public static final double kP = 6.0;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
@@ -52,5 +53,34 @@ public final class Constants {
     public static final int kIndexLeaderID = 30;
     public static final int kIndexFollowerID = 31;
     public static final double kIntexGearRatio = 1.0;
+  }
+
+  public static final class ShooterConstants {
+    public static final int kShooterLeaderID = 50;
+    public static final int kShooterFollowerID = 51;
+    public static final double kShooterGearRatio = 1.0;
+    public static final double kP = 0.4;
+    public static final double kI = 0.0;
+    public static final double kD = 0.0165;
+    public static final double kS = 0.0;
+    public static final double kV = 0.15;
+    public static final double kA = 0.0;
+    public static final double kG = 0.0;
+  }
+
+  public static final class HoodConstants {
+    public static final double kInitialHoodEncoderPosition = 0.67905;
+    public static final double kHoodGearRatio = 16.2;
+    public static final double kInitialHoodAnglePosition = kInitialHoodEncoderPosition / kHoodGearRatio * 360;
+    public static final double kMaxHoodAnglePosition = 55;
+    public static final int kHoodMotorID = 40;
+    public static final int kHoodEncoderID = 0;
+    public static final double kP = 35.0;
+    public static final double kI = 0.0;
+    public static final double kD = 0.0;
+    public static final double kS = 0.3;
+    public static final double kV = 0.8;
+    public static final double kA = 0.032;
+    public static final double kG = 0.0;
   }
 }
