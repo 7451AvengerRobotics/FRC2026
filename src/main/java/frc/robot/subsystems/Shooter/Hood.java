@@ -96,11 +96,11 @@ public class Hood extends SubsystemBase {
     // Make methods to set and get the hood angle in radians and degrees
     public void setAngleRad(double angleRad) {
         double setpointRotations = angleRad / (2 * Math.PI) * HoodConstants.kHoodGearRatio;
-        if (Math.abs(Math.toDegrees(angleRad - getAngleRad())) < 0.01) {
-            hoodMotor.setControl(new DutyCycleOut(0));
-        } else {
+        // if (Math.abs(Math.toDegrees(angleRad - getAngleRad())) < 0.01) {
+        //     hoodMotor.setControl(new DutyCycleOut(0));
+        // } else {
             hoodMotor.setControl(hoodRequest.withPosition(setpointRotations));
-        }
+        // }
     }
 
     public void setAngleDegrees(double angleDeg) {
@@ -122,21 +122,21 @@ public class Hood extends SubsystemBase {
     public Command moveUp() {
         return run(
             () -> {
-            hoodMotor.setControl(motorDutyCycleOut.withOutput(0.05));
+            hoodMotor.setControl(new DutyCycleOut(0.05));
             });
     }
 
     public Command moveDown() {
         return run(
             () -> {
-            hoodMotor.setControl(motorDutyCycleOut.withOutput(-0.05));
+            hoodMotor.setControl(new DutyCycleOut(-0.05));
             });
     }
 
     public Command stop() {
         return run(
             () -> {
-            hoodMotor.setControl(motorDutyCycleOut.withOutput(0.0));
+            hoodMotor.setControl(new DutyCycleOut(0.0));
             });
     }
 
