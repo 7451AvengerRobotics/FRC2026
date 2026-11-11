@@ -12,6 +12,8 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Second;
 
+import java.util.Set;
+
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
@@ -29,10 +31,15 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.HoodConstants;
+import frc.robot.Constants.TargetConstants;
 import frc.robot.subsystems.drive.Drive;
 
 import org.littletonrobotics.junction.Logger;
@@ -44,6 +51,9 @@ public class Hood extends SubsystemBase {
 
     //Make the control request
     private final MotionMagicVoltage hoodRequest = new MotionMagicVoltage(0);
+
+    //Drive reference
+    private final Drive drive;
 
     public Hood(Drive drive) {
         //Make a configuration (settings) for your motor
@@ -91,6 +101,8 @@ public class Hood extends SubsystemBase {
         // Set the initial position of the hood encoder and motor
         hoodEncoder.setPosition(HoodConstants.kInitialHoodEncoderPosition);
         hoodMotor.getConfigurator().setPosition(HoodConstants.kInitialHoodEncoderPosition);
+
+        this.drive = drive;
     }
 
     // Make methods to set and get the hood angle in radians and degrees
@@ -141,56 +153,35 @@ public class Hood extends SubsystemBase {
     }
 
     public Command trackHub() {
-        return Commands.runOnce(
+        return Commands.defer(
             () -> {
-            double launchPitchRad = simTurret.getMovingPitch() + HoodConstants.kHoodOffset;
-            setAngleRad(
+            double launchPitchRad = ShotCalc.newGetPitch(getXf());
+            return toAngleRad(
                 MathUtil.clamp(
                     launchPitchRad,
                     Math.toRadians(HoodConstants.kInitialHoodAnglePosition),
                     Math.toRadians(HoodConstants.kMaxHoodAnglePosition)));
-            });
-    }
-
-    public Command trackWrongHub() {
-        return Commands.run(
-            () -> {
-            double launchPitchRad = simTurret.getMovingPitch();
-            setAngleRad(
-                MathUtil.clamp(
-                    launchPitchRad,
-                    Math.toRadians(HoodConstants.kInitialHoodAnglePosition),
-                    Math.toRadians(HoodConstants.kMaxHoodAnglePosition)));
-            });
-    }
-
-    public Command pass() {
-        return run(
-            () -> {
-            double launchPitchRad = simTurret.getPassingPitch();
-            setAngleRad(
-                MathUtil.clamp(
-                    launchPitchRad,
-                    Math.toRadians(HoodConstants.kInitialHoodAnglePosition),
-                    Math.toRadians(HoodConstants.kMaxHoodAnglePosition)));
-            });
-    }
-
-    public Command stopHood() {
-        return run(() -> hoodMotor.set(0));
+            }, Set.of(this));
     }
 
     public Command resetHood() {
         return toAngleDegrees(HoodConstants.kInitialHoodAnglePosition);
     }
 
+    public double getXf() {
+        Pose2d shooterPositionPose2d = drive.getPose().plus(TargetConstants.shooterOffset);
+        double xf =
+            Math.sqrt(
+                Math.pow(TargetConstants.hub.getX() - shooterPositionPose2d.getX(), 2)
+                    + Math.pow(TargetConstants.hub.getY() - shooterPositionPose2d.getY(), 2));
+        return xf;
+    }
+
     @Override
     public void periodic() {
         double angleRad = getAngleRad();
         Logger.recordOutput("Hood/AngleDeg", Math.toDegrees(angleRad));
-        Logger.recordOutput("Hood/Xf", simTurret.getXf(0, 0));
         Logger.recordOutput("Hood/EncoderCount", hoodMotor.getPosition().getValueAsDouble());
-        Logger.recordOutput("Hood/SuggestedAngleDeg", Math.toDegrees(simTurret.getMovingPitch()));
         Logger.recordOutput("hood Voltage", hoodMotor.getMotorVoltage().getValueAsDouble());
         Logger.recordOutput("hood Current", hoodMotor.getStatorCurrent().getValueAsDouble());
     }
