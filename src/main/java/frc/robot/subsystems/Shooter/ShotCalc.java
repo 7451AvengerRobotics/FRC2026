@@ -1,8 +1,6 @@
 package frc.robot.subsystems.Shooter;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
-import frc.robot.Constants.TargetConstants;
 
 public class ShotCalc {
   double shotOffset = 0;
@@ -35,10 +33,6 @@ public class ShotCalc {
   public static double newGetPitch(double xf) {
     return Math.PI / 2 - angleLerp.get(xf);
   }
-
-//   public double getRobotRelativeYaw(Pose2d robotPose, double hubX) {
-//     return getYaw(robotPose, hubX) + 0 * robotPose.getRotation().getRadians();
-//   }
 
   public double mod(double angle) {
     return ((angle % (2 * Math.PI)) + (2 * Math.PI)) % (2 * Math.PI);
