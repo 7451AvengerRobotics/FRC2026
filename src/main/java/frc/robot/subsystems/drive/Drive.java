@@ -20,6 +20,7 @@ import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -36,13 +37,18 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
+import frc.robot.Constants.TargetConstants;
 import frc.robot.generated.TunerConstants;
 import frc.robot.util.LocalADStarAK;
+
+import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -78,6 +84,11 @@ public class Drive extends SubsystemBase {
               1),
           getModuleTranslations());
 
+  private final PIDController headingController = new PIDController(8, 0.8, 0.0);
+  private boolean holonomicControllerActive = false;
+  private Pose2d holonomicPoseTarget = new Pose2d();
+  private final HolonomicDriveWithPIDController holonomicDriveWithPIDController;
+
   static final Lock odometryLock = new ReentrantLock();
   private final GyroIO gyroIO;
   private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
@@ -109,6 +120,14 @@ public class Drive extends SubsystemBase {
     modules[1] = new Module(frModuleIO, 1, TunerConstants.FrontRight);
     modules[2] = new Module(blModuleIO, 2, TunerConstants.BackLeft);
     modules[3] = new Module(brModuleIO, 3, TunerConstants.BackRight);
+    this.holonomicDriveWithPIDController =
+        new HolonomicDriveWithPIDController(
+            new PIDController(4, 0, 0),
+            new PIDController(4, 0, 0),
+            headingController,
+            0.5,
+            new Pose2d(0.04, 0.04, Rotation2d.fromDegrees(2)),
+            1);
 
     // Usage reporting for swerve template
     HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_AdvantageKit);
@@ -355,5 +374,72 @@ public class Drive extends SubsystemBase {
       new Translation2d(TunerConstants.BackLeft.LocationX, TunerConstants.BackLeft.LocationY),
       new Translation2d(TunerConstants.BackRight.LocationX, TunerConstants.BackRight.LocationY)
     };
+  }
+
+  public ChassisSpeeds getRobotRelativeSpeeds() {
+    return kinematics.toChassisSpeeds(
+        modules[0].getState(), modules[1].getState(), modules[2].getState(), modules[3].getState());
+  }
+
+  public Command driveToPose(Pose2d pose) {
+    return Commands.sequence(
+            runOnce(
+                () -> {
+                  holonomicControllerActive = true;
+                  holonomicDriveWithPIDController.reset(getPose(), getRobotRelativeSpeeds());
+                }),
+            run(() -> {
+                  this.holonomicPoseTarget = pose;
+                  runVelocity(
+                      holonomicDriveWithPIDController.calculate(getPose(), holonomicPoseTarget));
+                  SmartDashboard.putBoolean(
+                      "x controller", holonomicDriveWithPIDController.xReferenceReached());
+                  SmartDashboard.putBoolean(
+                      "y controller", holonomicDriveWithPIDController.yReferenceReached());
+                  SmartDashboard.putBoolean(
+                      "rotation controller",
+                      holonomicDriveWithPIDController.rotationReferenceReached());
+                })
+                .until(holonomicDriveWithPIDController::atReference),
+            runOnce(this::stop))
+        .finallyDo(() -> holonomicControllerActive = false);
+  }
+
+  public Command driveToRotation(Rotation2d rotation) {
+    return Commands.sequence(
+            runOnce(
+                () -> {
+                  holonomicControllerActive = true;
+                  holonomicDriveWithPIDController.reset(getPose(), getRobotRelativeSpeeds());
+                }),
+            run(() -> {
+                  runVelocity(
+                      holonomicDriveWithPIDController.calculateRotations(getPose(), rotation));
+                  SmartDashboard.putBoolean(
+                      "x controller", holonomicDriveWithPIDController.xReferenceReached());
+                  SmartDashboard.putBoolean(
+                      "y controller", holonomicDriveWithPIDController.yReferenceReached());
+                  SmartDashboard.putBoolean(
+                      "rotation controller",
+                      holonomicDriveWithPIDController.rotationReferenceReached());
+                })
+                .until(holonomicDriveWithPIDController::atReference),
+            runOnce(this::stop))
+        .finallyDo(() -> holonomicControllerActive = false);
+  }
+
+  public Command alignToHub() {
+    return Commands.defer(
+        () -> {
+          double deltax = TargetConstants.hub.getX() - getPose().getX();
+          double deltay = TargetConstants.hub.getY() - getPose().getY();
+
+          double initTheta = Math.atan2(deltay, deltax);
+
+          double theta = (initTheta);
+
+          return driveToRotation(new Rotation2d(theta + Math.PI));
+        },
+        Set.of(this));
   }
 }
