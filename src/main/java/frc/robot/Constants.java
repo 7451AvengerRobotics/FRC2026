@@ -7,6 +7,12 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 
 /**
@@ -82,5 +88,16 @@ public final class Constants {
     public static final double kV = 0.8;
     public static final double kA = 0.032;
     public static final double kG = 0.0;
+  }
+
+  public static final class TargetConstants {
+    public static final Translation2d hub =
+        new Translation2d(
+            DriverStation.getAlliance().get() == DriverStation.Alliance.Red
+                ? 11.915
+                : 16.54 - 11.915,
+            4.035);
+    public static final double yf = 1.32;
+    public static final Transform2d shooterOffset = new Transform2d(-0.17, 0, new Rotation2d());
   }
 }
