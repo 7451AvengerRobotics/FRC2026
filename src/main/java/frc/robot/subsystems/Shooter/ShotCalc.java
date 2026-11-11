@@ -36,34 +36,6 @@ public class ShotCalc {
     return Math.PI / 2 - angleLerp.get(xf);
   }
 
-//   public double getYaw(Pose2d robotPose, double hubX) {
-//     Transform2d turretOffsetTransform2d =
-//         new Transform2d(turretOffset.getX(), turretOffset.getY(), new Rotation2d());
-//     Pose2d turretPositionPose2d = robotPose.plus(turretOffsetTransform2d);
-
-//     double deltax = hubX - turretPositionPose2d.getX();
-//     double deltay = Constants.TargetConstants.hub.getY() - turretPositionPose2d.getY();
-
-//     double initTheta = Math.PI - Math.atan2(deltay, -deltax);
-
-//     double theta = (initTheta - robotPose.getRotation().getRadians());
-
-//     return mod(theta);
-//   }
-
-  public double getYaw(Pose2d robotPose) {
-    Pose2d shooterPositionPose2d = robotPose.plus(TargetConstants.shooterOffset);
-
-    double deltax = TargetConstants.hub.getX() - shooterPositionPose2d.getX();
-    double deltay = TargetConstants.hub.getY() - shooterPositionPose2d.getY();
-
-    double initTheta = Math.PI - Math.atan2(deltay, -deltax);
-
-    double theta = initTheta - robotPose.getRotation().getRadians();
-
-    return mod(theta);
-  }
-
 //   public double getRobotRelativeYaw(Pose2d robotPose, double hubX) {
 //     return getYaw(robotPose, hubX) + 0 * robotPose.getRotation().getRadians();
 //   }
